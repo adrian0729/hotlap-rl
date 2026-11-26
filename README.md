@@ -10,6 +10,16 @@ physically drive.
 25 November 2026. Every study that was started has been run and written up.
 [docs/STATUS.md](docs/STATUS.md) tells the whole story in order.
 
+## Start here
+
+1. **Watch it drive.** The [live showcase](https://adrian0729.github.io/apexzero/showcase/)
+   replays the laps and walks through the findings.
+2. **Read the result.** The next three sections of this page.
+3. **Read the whole story.** [docs/STATUS.md](docs/STATUS.md), then any study in the
+   [findings index](docs/findings/README.md).
+4. **Find your way in the code.** The [repository map](#repository-map) below: every top-level
+   folder has a note that says what is in it.
+
 ## What it is
 
 - **One set of vehicle equations, compiled twice.** A JAX simulator of an F1-style car for
@@ -121,20 +131,23 @@ beside their charts, with a drawing of the network itself and of the loop that t
 |---|---|
 | [`docs/`](docs/README.md) | Status, findings, pre-registrations, designs, plans and the showcase |
 | [`scripts/`](scripts/README.md) | Every runnable entry point, indexed by purpose |
+| [`src/`](src/README.md) | The `apexzero` package, mapped package by package. In short: |
 | `src/apexzero/vehicle/` | The vehicle ODE, written once and compiled for JAX and CasADi |
 | `src/apexzero/tracks/` | Track kit, spline lookups, reference lines, corners, the procedural generator, width models |
 | `src/apexzero/env/` | The vectorised racing environment |
 | `src/apexzero/agents/` | PPO from scratch, and checkpoints |
-| `src/apexzero/ocp/`, `oracle/` | Minimum-lap-time and training-objective optimal control; the quasi-steady-state oracle |
+| `src/apexzero/ocp/`, `oracle/`, `learn/` | Minimum-lap-time and training-objective optimal control; the quasi-steady-state oracle; the one-dimensional braking study |
 | `src/apexzero/eval/` | Timed laps with a deterministic policy |
 | `src/apexzero/interp/`, `fields/`, `costate/` | The three studies of the trained networks |
 | `src/apexzero/audit/`, `ued/`, `maze/` | Level-score estimators, racing curricula and the maze audit |
 | `src/apexzero/data/`, `drivers/` | The OpenF1 archiver and the teammate-timing pipeline |
 | `src/apexzero/viz/` | Trajectory export, figures and the earlier viewer |
-| `tests/` | About 2,090 tests in 92 files |
-| `outputs/` | The committed result files that the findings and the showcase read |
-| `paper/` | The unfinished [paper draft](paper/README.md) |
-| `third_party/` | JaxUED's and SFL's maze code, vendored unmodified (Apache-2.0) |
+| [`tests/`](tests/README.md) | 2,088 tests in 92 files, grouped by what they check |
+| [`outputs/`](outputs/README.md) | The committed result files that the findings and the showcase read |
+| [`data/`](data/README.md) | Not in git: the circuits and the timing data, fetched by script |
+| `runs/` | Not in git: the trained checkpoints |
+| [`paper/`](paper/README.md) | The unfinished paper draft |
+| [`third_party/`](third_party/README.md) | JaxUED's and SFL's maze code, vendored unmodified (Apache-2.0) |
 
 ## Setup
 

@@ -5,7 +5,8 @@ what it does in its docstring (`--help` prints it). They are kept in one flat fo
 the findings and the pre-registrations cite these paths, and several frozen studies hash them.
 
 `_bootstrap.py` is imported first by every script so that `import apexzero` works without the
-editable install.
+editable install. `h4r_prereg.json` and `p4b2_prereg.json` are the pre-registration records
+that `h4r.py` and `p4_b2.py` froze and still read.
 
 ## Data and physics
 

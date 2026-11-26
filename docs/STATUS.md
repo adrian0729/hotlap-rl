@@ -63,6 +63,14 @@ Nothing was trained, and no study's result changed, after 30 Oct. The wrap-up ad
 - **Indexes and a licence file:** [docs/README.md](README.md),
   [findings/README.md](findings/README.md), `scripts/README.md`, `paper/README.md` and `LICENSE`
   (Apache-2.0, as the README and `pyproject.toml` already said).
+  - A last audit on 26 Nov 2026, at the user's request, gave every remaining folder a note
+    that says what is in it: `src/`, `tests/`, `outputs/`, `data/`, `third_party/`,
+    `docs/prereg/`, `docs/interp/` and `docs/paper/`. The README gained a "Start here" list
+    and links each folder's note from its map. No file was moved or renamed, because the
+    findings, the pre-registrations and several frozen studies cite or hash these paths.
+  - The same audit found nothing to remove from git: only `main` exists, locally and on
+    GitHub; no tracked file is a duplicate, a leftover or empty; all 340 relative links
+    resolve; and neither the tree nor its history holds a key, a token or a personal address.
 - **One defect, found and worked around.** `viz.sectors.carry_over_split` stops on Austin and Spa,
   where a sector boundary lands within 1e-12 m of a grid station. `scripts/showcase.py` snaps
   such boundaries first, with a test. The fix is not in `src/`, for the next reason.

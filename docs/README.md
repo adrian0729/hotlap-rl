@@ -5,10 +5,10 @@
 | [STATUS.md](STATUS.md) | The whole project in order: what was built, every study and its result, and what was left undone. Read this first. |
 | [showcase/](showcase/README.md) | The interactive page: the final agent replayed on the 12 held-out circuits against the optimal lap, with the results as charts. |
 | [findings/](findings/README.md) | One note per study, indexed by theme, each labelled confirmatory, exploratory, post hoc or pilot. |
-| [prereg/](prereg/) | The pre-registrations written during the follow-through: the lockbox protocol (`protocol-v1`), the width round, the specialists, the value-gradient term and the maze audit. |
-| [interp/](interp/) | Designs and protocols of the studies of the trained networks: psychophysics, receptive fields, H4R and the costate. |
+| [prereg/](prereg/README.md) | The pre-registrations written during the follow-through: the lockbox protocol (`protocol-v1`), the width round, the specialists, the value-gradient term and the maze audit. |
+| [interp/](interp/README.md) | Designs and protocols of the studies of the trained networks: psychophysics, receptive fields, H4R and the costate. |
 | [plan/](plan/README.md) | The plans: the first plan, the two-track plan that governed the project, the follow-through plan with its record of decisions, and E0's run plan. |
-| [paper/](paper/) | The level-score specification extracted from the curriculum methods' pinned source, and the source notes behind it. |
+| [paper/](paper/README.md) | The level-score specification extracted from the curriculum methods' pinned source, and the source notes behind it. |
 | [demo/](demo/README.md) | Earlier single-lap exports and figures (the Hockenheim specialist and one development-circuit generalist). |
 
 The LaTeX draft of the planned paper is in [`../paper/`](../paper/README.md). It was not
