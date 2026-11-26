@@ -62,6 +62,9 @@ def test_increasing_removes_ties_and_reversals(sc):
 def test_rollout_run0_is_run_0_of_the_lockbox_batch(sc):
     """The replay must be the registered run, not a look-alike: run 0 of the harness's own
     batch, state for state."""
+    import contextlib
+
+    import jax
     import jax.numpy as jnp
 
     track = rounded_square()
@@ -72,8 +75,13 @@ def test_rollout_run0_is_run_0_of_the_lockbox_batch(sc):
 
     lp = sc.lb.PROTOCOL["laps"]
     ro = sc.rollout_run0(policy, track, v_start=18.0)
-    ref = sc.lb.rollout_laps(policy, track, 18.0, runs=lp["runs"], laps=lp["laps"],
-                             seed=lp["seed"])
+    # The harness is a float32 program run as its own process. Inside the whole suite another
+    # module may have left this process in float64, so the reference gets the same guard that
+    # rollout_run0 carries.
+    float32 = getattr(jax, "enable_x64", None)
+    with float32(False) if float32 is not None else contextlib.nullcontext():
+        ref = sc.lb.rollout_laps(policy, track, 18.0, runs=lp["runs"], laps=lp["laps"],
+                                 seed=lp["seed"])
     assert ro.x.shape == (ref.s.shape[0] + 1, 8) and ro.laps == lp["laps"]
     assert (ro.x[0, 1], ro.x[0, 3]) == (0.0, 18.0)               # run 0 starts centred
     for col, arr in ((0, ref.s), (1, ref.n), (3, ref.vx)):

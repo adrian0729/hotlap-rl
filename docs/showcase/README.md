@@ -3,7 +3,7 @@
 `index.html` is one self-contained page: the final agent, and the margin recipe found after
 it, replayed on the 12 held-out circuits beside the optimal lap, the scoreboard of all five
 networks, and the project's main findings as charts. It has no build step and no dependency
-beyond two web fonts.
+beyond one family of web fonts (IBM Plex).
 
 Live: <https://adrian0729.github.io/apexzero/showcase/>
 
@@ -22,8 +22,31 @@ python3 -m http.server 8765 --directory docs/showcase
 
 Then open `http://localhost:8765`. Opening `index.html` straight from disk works too.
 
-Deep links: `?c=Spa&t=41.5&cam=whole` opens a circuit paused at a time, `?view=<element id>`
-shows one element alone and `?theme=light|dark` fixes the theme. The stills use all three.
+Deep links: `?c=Spa&t=41.5&cam=whole&net=margin` opens a circuit and a network paused at a
+time, and `?view=<element id>` shows one element alone. The stills use both.
+
+## How it is laid out
+
+The first screen is a lap report drawn like an engineering sheet, on one paper ground:
+
+- **Detail:** the road to scale around the network's car, with the optimal car, the gap between
+  them as a dimension line, the distance to the nearer edge and the forty road points the
+  network sees. When the optimal car is out of the drawing, an arrowhead at the frame points
+  to it.
+- **Plan:** the whole circuit, with a red spike at each corner group as long as the time lost
+  there.
+- **Trace:** speed against distance for both laps, and the time lost. Click or drag to move the
+  replay.
+- **Lap sheet:** the twelve circuits for both networks. Each cell opens its lap.
+
+Below it the findings read as an essay: text on the left, unframed figures on the right.
+Three colours carry meaning and nothing else is coloured: ink for the network, purple for the
+optimal lap, red for time lost and for a run that ended.
+
+The design was redone on 26 Nov 2026. It borrows from Bret Victor's "Up and Down the Ladder of
+Abstraction" and Bartosz Ciechanowski's essays (figures without frames, coloured words for
+legends), from lap-coaching tools (time lost pinned to the corner, one large delta) and from
+technical drawing (dimension lines, a plan with a scale bar and a north arrow).
 
 ## Rebuilding it
 

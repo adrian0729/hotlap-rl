@@ -4,395 +4,443 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>ApexZero</title>
+<meta name="description" content="A racing policy trained only on generated tracks, replayed on twelve real circuits it had never seen, beside the optimal lap.">
 <meta name="claude:viewport-fit-sides" content="cover">
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Barlow:wght@400;500;600&family=Barlow+Condensed:wght@500;600;700&display=swap">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans+Condensed:wght@400;500;600&family=IBM+Plex+Serif:ital,wght@0,400;0,600;1,400&display=swap">
 <style>
-/* Layout: one quiet reading column on paper; the dark replay screen is the only loud object. */
+/* One sheet of paper. Ink is the network, purple is the optimal lap, red is time lost.
+   The first screen is a lap report drawn like an engineering sheet; the findings follow as an
+   essay, text beside unframed figures. */
 :root {
-  --bg: #f3f4f6; --surface: #fcfcfd; --ink: #0c0e12; --ink-2: #464c58; --muted: #6f7683;
-  --hair: #dfe2e8; --axis: #c2c7d0; --link: #1c5cab;
-  --series-1: #2a78d6; --series-2: #eb6834; --deemph: #9aa0ab; --wash: rgba(42, 120, 214, .10);
-  --critical: #d03b3b;
-  --font-display: "Barlow Condensed", "Arial Narrow", system-ui, sans-serif;
-  --font-body: "Barlow", system-ui, -apple-system, "Segoe UI", sans-serif;
-  /* the replay screen keeps one look in both themes */
-  --scr-ground: #0e1115; --scr-asphalt: #2b3038; --scr-strip: #414752; --scr-edge: #e8ebf0;
-  --scr-opt: #f4f6f9; --scr-agent: #4f9af2; --scr-brake: #f08a52; --scr-ink: #f2f4f7;
-  --scr-ink-2: #aeb5c1; --scr-crash: #f26b6a; --scr-chip: rgba(14, 17, 21, .76);
-  --scr-rule: rgba(255, 255, 255, .14);
+  --paper: #f3f0e8; --ink: #16150f; --muted: #5f5b50; --rule: #b7b1a2; --faint: #dcd6c8; --road: #e8e3d6;
+  --opt: #5a22b8; --lost: #c8341b; --wash: #ecd3c8; --tip: #fbf9f3;
+  --sans: "IBM Plex Sans Condensed", "Arial Narrow", Arial, sans-serif;
+  --mono: "IBM Plex Mono", Menlo, Consolas, monospace;
+  --serif: "IBM Plex Serif", Georgia, "Times New Roman", serif;
+  --gut: clamp(10px, 1.7vw, 24px);
+  color-scheme: light;
 }
-@media (prefers-color-scheme: dark) {
-  :root:not([data-theme="light"]) {
-    --bg: #0d0f12; --surface: #16181c; --ink: #eef0f3; --ink-2: #c1c6cf; --muted: #8f95a1;
-    --hair: #292c32; --axis: #3b3f47; --link: #86b6ef;
-    --series-1: #3987e5; --series-2: #d95926; --deemph: #6d737e; --wash: rgba(57, 135, 229, .16);
-    --critical: #d03b3b; color-scheme: dark;
-  }
-}
-:root[data-theme="dark"] {
-  --bg: #0d0f12; --surface: #16181c; --ink: #eef0f3; --ink-2: #c1c6cf; --muted: #8f95a1;
-  --hair: #292c32; --axis: #3b3f47; --link: #86b6ef;
-  --series-1: #3987e5; --series-2: #d95926; --deemph: #6d737e; --wash: rgba(57, 135, 229, .16);
-  --critical: #d03b3b; color-scheme: dark;
-}
-
-*, *::before, *::after { box-sizing: border-box; }
+* { box-sizing: border-box; }
+html { background: var(--paper); -webkit-text-size-adjust: 100%; text-size-adjust: 100%; }
+body { margin: 0; color: var(--ink); font: 400 18px/1.6 var(--serif);
+       padding: 0 env(safe-area-inset-right, 0px) 0 env(safe-area-inset-left, 0px); }
+a { color: inherit; text-underline-offset: 0.18em; text-decoration-thickness: 1px; }
+a:hover { color: var(--opt); }
+button { font: inherit; color: inherit; }
+:focus-visible { outline: 2px solid var(--opt); outline-offset: 2px; }
 [hidden] { display: none !important; }
-.solo .wrap { padding-block: 14px; } .solo section { border: 0; padding-block: 0; }
-html { -webkit-text-size-adjust: 100%; scroll-behavior: smooth; }
-@media (prefers-reduced-motion: reduce) { html { scroll-behavior: auto; } }
-body { margin: 0; background: var(--bg); color: var(--ink); font: 400 17px/1.55 var(--font-body); }
-a { color: var(--link); text-underline-offset: 2px; }
-:focus-visible { outline: 2px solid var(--series-1); outline-offset: 2px; border-radius: 4px; }
-.wrap { max-width: 1120px; margin-inline: auto;
-  padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px)); }
-h1, h2, h3 { font-family: var(--font-display); font-weight: 600; line-height: 1.05; margin: 0; text-wrap: balance; }
-h1 { font-size: clamp(2.5rem, 6.2vw, 4.6rem); letter-spacing: -.01em; max-width: 16ch; }
-h2 { font-size: clamp(1.9rem, 3.6vw, 2.6rem); }
-h3 { font-size: 1.35rem; line-height: 1.15; }
-p { margin: 0; max-width: 66ch; }
-.lede { font-size: 1.18rem; color: var(--ink-2); max-width: 58ch; }
-.eyebrow { font: 600 .74rem/1 var(--font-body); letter-spacing: .14em; text-transform: uppercase; color: var(--muted); }
-.note { font-size: .9rem; color: var(--muted); max-width: 78ch; }
-.stack { display: flex; flex-direction: column; gap: 1rem; }
-.stack-lg { display: flex; flex-direction: column; gap: 1.6rem; }
-section { padding-block: clamp(2.4rem, 5.5vw, 4.2rem); border-top: 1px solid var(--hair); }
+.sr { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); white-space: nowrap; }
+.caps { font: 400 11px/1.3 var(--sans); letter-spacing: 0.1em; text-transform: uppercase; color: var(--muted); }
+svg { display: block; }
 
-/* header and opening */
-.top { display: flex; flex-wrap: wrap; align-items: baseline; justify-content: space-between; gap: .6rem 1.4rem; padding-block: 1.1rem; }
-.mark { font: 700 1.45rem/1 var(--font-display); letter-spacing: .06em; text-transform: uppercase; color: var(--ink); text-decoration: none; }
-.mark b { color: var(--series-1); font-weight: 700; }
-.top nav { display: flex; flex-wrap: wrap; gap: .3rem 1.1rem; font-size: .95rem; }
-.top nav a { color: var(--ink-2); text-decoration: none; }
-.top nav a:hover { color: var(--ink); text-decoration: underline; }
-.intro { border-top: 0; padding-top: clamp(1.4rem, 4vw, 3rem); }
-.facts { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 0 2rem; margin-top: .6rem; }
-.fact { border-top: 2px solid var(--ink); padding-top: .7rem; }
-.fact .num { font: 600 clamp(2.2rem, 5vw, 3.3rem)/1 var(--font-body); letter-spacing: -.02em; }
-.fact .lab { color: var(--ink-2); font-size: .98rem; margin-top: .35rem; max-width: 26ch; }
-@media (max-width: 640px) { .facts { grid-template-columns: 1fr; gap: 1.1rem; } }
+/* ---- masthead ---- */
+.mast { display: flex; align-items: baseline; gap: clamp(14px, 2.4vw, 34px); padding: 13px var(--gut) 11px; }
+.mast .brand { font: 600 13px/1.2 var(--sans); letter-spacing: 0.16em; text-transform: uppercase; text-decoration: none; white-space: nowrap; }
+.mast h1 { flex: 1; margin: 0; font: 400 16px/1.45 var(--serif); max-width: 62rem; text-wrap: pretty; }
+.mast .repo { font: 400 13px/1.2 var(--sans); white-space: nowrap; }
 
-/* circuit picker */
-.picker { display: grid; grid-template-columns: repeat(6, minmax(0, 1fr)); gap: .5rem; }
-@media (max-width: 900px) { .picker { grid-template-columns: repeat(4, minmax(0, 1fr)); } }
-@media (max-width: 520px) { .picker { grid-template-columns: repeat(3, minmax(0, 1fr)); } }
-.pick { display: flex; flex-direction: column; align-items: flex-start; gap: .15rem; min-width: 0; padding: .5rem .6rem .55rem;
-  background: var(--surface); color: var(--ink); border: 1px solid var(--hair); border-radius: 10px; cursor: pointer; font: inherit; text-align: left; }
-.pick:hover { border-color: var(--axis); }
-.pick[aria-pressed="true"] { border-color: var(--series-1); box-shadow: inset 0 0 0 1px var(--series-1); }
-.pick svg { width: 100%; height: 46px; display: block; }
-.pick svg path { fill: none; stroke: var(--ink-2); stroke-width: 2; stroke-linejoin: round; stroke-linecap: round; }
-.pick[aria-pressed="true"] svg path { stroke: var(--series-1); }
-.pick svg .x { stroke: var(--critical); stroke-width: 2.4; }
-.pick .nm { font-weight: 600; font-size: .95rem; line-height: 1.2; overflow-wrap: anywhere; }
-.pick .st { font-size: .82rem; color: var(--muted); font-variant-numeric: tabular-nums; }
+/* ---- the sheet ---- */
+.sheet { margin: 0 var(--gut); border: 1px solid var(--ink); display: grid;
+         grid-template-columns: minmax(0, 1fr) 470px; grid-template-rows: auto minmax(0, 1fr) 262px auto;
+         grid-template-areas: "stage readout" "stage plan" "trace laps" "strip strip";
+         height: clamp(720px, calc(100vh - var(--mast, 80px) - var(--gut)), 960px);
+         font: 400 13px/1.3 var(--sans); }
+.stage { grid-area: stage; display: flex; flex-direction: column; min-width: 0; min-height: 0; }
+.stage .cv { position: relative; flex: 1; min-height: 0; overflow: hidden; }
+.stage canvas { position: absolute; inset: 0; width: 100%; height: 100%; display: block; }
+.st-title { position: absolute; left: 24px; top: 20px; display: flex; flex-direction: column; gap: 3px; pointer-events: none; }
+.st-title b { font: 600 12px/1.2 var(--sans); letter-spacing: 0.1em; text-transform: uppercase; }
+.st-title span { color: var(--muted); }
+.st-title, .st-end { text-shadow: 0 0 2px var(--paper), 0 0 2px var(--paper), 0 0 3px var(--paper), 0 0 4px var(--paper); }
+.st-end { position: absolute; left: 24px; top: 64px; max-width: 22rem; pointer-events: none; }
+.st-end strong { display: block; font: 600 12px/1.2 var(--sans); letter-spacing: 0.1em; text-transform: uppercase; color: var(--lost); margin-bottom: 2px; }
+.st-end.done strong { color: var(--ink); }
+.st-foot { display: flex; align-items: center; justify-content: space-between; gap: 4px 18px; flex-wrap: wrap; padding: 7px 24px 8px; border-top: 1px solid var(--faint); }
+.st-key { display: flex; flex-wrap: wrap; gap: 2px 22px; color: var(--muted); font-size: 12px; }
+.st-key > span { display: flex; align-items: center; gap: 8px; }
+.st-key i { flex: none; display: block; }
+.k-pt { width: 7px; height: 7px; border: 1.2px solid var(--ink); border-radius: 50%; }
+.k-dash { width: 16px; border-top: 1px dashed var(--muted); }
+.st-ctl { display: flex; gap: 4px 20px; align-items: center; flex-wrap: wrap; margin-left: auto; }
+.tb { appearance: none; background: none; border: 0; border-bottom: 1px solid var(--ink); border-radius: 0; padding: 5px 0 2px;
+      font: 600 11px/1.2 var(--sans); letter-spacing: 0.1em; text-transform: uppercase; color: var(--ink); cursor: pointer; }
+.tb:hover { color: var(--opt); border-color: var(--opt); }
 
-.choose { display: inline-flex; flex-wrap: wrap; }
-.choose button { font: 600 .92rem/1 var(--font-body); color: var(--ink-2); background: var(--surface); border: 1px solid var(--hair); padding: .6rem .95rem; cursor: pointer; margin-left: -1px; }
-.choose button:first-child { border-radius: 8px 0 0 8px; margin-left: 0; } .choose button:last-child { border-radius: 0 8px 8px 0; }
-.choose button[aria-pressed="true"] { background: var(--ink); color: var(--bg); border-color: var(--ink); }
+.readout { grid-area: readout; border-left: 1px solid var(--ink); border-bottom: 1px solid var(--ink); padding: 18px 24px 16px;
+           display: flex; flex-direction: column; gap: 13px; min-width: 0; }
+.ro-head { display: flex; justify-content: space-between; align-items: baseline; gap: 12px; }
+.ro-head h2 { margin: 0; font: 600 26px/1 var(--sans); letter-spacing: 0.01em; }
+.ro-big { display: flex; align-items: flex-end; gap: 16px; min-height: 47px; }
+.ro-big output { font: 500 54px/0.86 var(--mono); letter-spacing: -0.04em; color: var(--lost); white-space: nowrap; }
+.ro-big output.plain { color: var(--ink); }
+.ro-big .sub { display: flex; flex-direction: column; font-size: 13px; line-height: 1.25; color: var(--muted); padding-bottom: 1px; min-width: 0; }
+.ro-laps { display: flex; flex-wrap: wrap; align-items: baseline; gap: 4px 26px; margin: 0; font: 400 14px/1.3 var(--mono); }
+.ro-laps div { display: flex; align-items: baseline; gap: 9px; }
+.ro-laps dt { font: 600 11px/1.3 var(--sans); letter-spacing: 0.1em; text-transform: uppercase; }
+.ro-laps dd { margin: 0; }
+.ro-laps .opt { color: var(--opt); }
+.ro-laps .lost { color: var(--lost); }
+.ro-laps dd.out { font-family: var(--sans); color: var(--lost); }
 
-/* replay screen */
-.screen { position: relative; background: var(--scr-ground); color: var(--scr-ink); border-radius: 14px; overflow: hidden; }
-.stage { position: relative; aspect-ratio: 16 / 9; max-width: 100%; }
-@media (max-width: 640px) { .stage { aspect-ratio: 4 / 5; } }
-#view { position: absolute; inset: 0; width: 100%; height: 100%; display: block; }
-.hud { position: absolute; background: var(--scr-chip); border-radius: 8px; padding: .5rem .7rem; line-height: 1.15; pointer-events: none; }
-.hud-tl { top: .7rem; left: .7rem; }
-.hud-tr { top: .7rem; right: .7rem; padding: .35rem; }
-.hud-bl { bottom: .7rem; left: .7rem; min-width: 11.5rem; }
-.hud-br { bottom: .7rem; right: .7rem; text-align: right; }
-.hud-name { font: 600 1.25rem/1.1 var(--font-display); letter-spacing: .04em; text-transform: uppercase; }
-.hud-clock { font: 600 2rem/1 var(--font-display); font-variant-numeric: tabular-nums; margin-top: .15rem; }
-.hud-sub { font-size: .78rem; color: var(--scr-ink-2); font-variant-numeric: tabular-nums; }
-.hud-speed { font: 600 2.2rem/1 var(--font-display); font-variant-numeric: tabular-nums; }
-.hud-speed small { font: 500 .8rem/1 var(--font-body); color: var(--scr-ink-2); margin-left: .3rem; }
-.bars { display: grid; gap: .28rem; margin-top: .45rem; }
-.bar { display: grid; grid-template-columns: 4.9rem 1fr; align-items: center; gap: .5rem; font-size: .72rem; color: var(--scr-ink-2); }
-.bar i { display: block; height: 6px; border-radius: 3px; background: var(--scr-rule); overflow: hidden; }
-.bar b { display: block; height: 100%; width: 0; border-radius: 3px; background: var(--scr-agent); }
-.bar.brake b { background: var(--scr-brake); }
-.bar.grip b { background: var(--scr-ink); }
-.hud-delta { font: 600 1.7rem/1 var(--font-display); font-variant-numeric: tabular-nums; }
-#mini { display: block; width: 132px; height: 92px; }
-.hud-end { position: absolute; left: 50%; top: 27%; transform: translate(-50%, -50%); background: var(--scr-chip); border: 1px solid var(--scr-rule);
-  border-radius: 10px; padding: .8rem 1.1rem; text-align: center; max-width: min(92%, 30rem); }
-.hud-end strong { display: block; font: 600 1.5rem/1.1 var(--font-display); letter-spacing: .03em; text-transform: uppercase; }
-.hud-end span { font-size: .9rem; color: var(--scr-ink-2); }
-@media (max-width: 640px) { .hud-tr { display: none; } .hud-clock { font-size: 1.6rem; } .hud-speed { font-size: 1.7rem; } .hud-delta { font-size: 1.35rem; }
-  .hud-bl { min-width: 9.6rem; } .bar { grid-template-columns: 4.3rem 1fr; } }
-.controls { display: flex; flex-wrap: wrap; align-items: center; gap: .55rem .7rem; padding: .65rem .7rem; border-top: 1px solid var(--scr-rule); }
-.controls button { font: 600 .88rem/1 var(--font-body); color: var(--scr-ink); background: transparent; border: 1px solid var(--scr-rule);
-  border-radius: 7px; padding: .5rem .75rem; cursor: pointer; }
-.controls button:hover { background: rgba(255, 255, 255, .08); }
-.controls button[aria-pressed="true"] { background: var(--scr-ink); color: var(--scr-ground); border-color: var(--scr-ink); }
-.controls .primary { background: var(--scr-agent); border-color: var(--scr-agent); color: #071019; min-width: 5.2rem; }
-.controls .primary:hover { background: #6aabf5; }
-.seg { display: flex; } .seg button { border-radius: 0; margin-left: -1px; }
-.seg button:first-child { border-radius: 7px 0 0 7px; margin-left: 0; } .seg button:last-child { border-radius: 0 7px 7px 0; }
-#scrub { flex: 1 1 12rem; min-width: 8rem; accent-color: var(--scr-agent); }
-.key { display: flex; flex-wrap: wrap; gap: .3rem 1.2rem; font-size: .88rem; color: var(--ink-2); }
-.key span { display: inline-flex; align-items: center; gap: .45rem; }
-.sw { display: inline-block; width: 18px; height: 3px; border-radius: 2px; background: var(--series-1); }
-.sw.ref { background: var(--deemph); } .sw.box { width: 11px; height: 11px; border-radius: 3px; }
-.sw.strip { width: 14px; height: 10px; border-radius: 2px; background: var(--scr-strip); }
+.plan { grid-area: plan; border-left: 1px solid var(--ink); position: relative; margin: 0; min-width: 0; min-height: 0; }
+.plan figcaption, .trace figcaption { position: absolute; left: 24px; top: 12px; z-index: 1; }
+#plan { position: absolute; inset: 34px 0 0 0; }
+.trace { grid-area: trace; border-top: 1px solid var(--ink); position: relative; margin: 0; min-width: 0; }
+.trace figcaption { top: 10px; display: flex; align-items: center; gap: 18px; }
+.trace figcaption span { display: flex; align-items: center; gap: 6px; }
+.trace figcaption i { display: block; width: 16px; height: 2px; background: currentColor; }
+.trace .k-net { color: var(--ink); }
+.trace .k-opt { color: var(--opt); }
+#tele { position: absolute; inset: 20px 0 0 0; touch-action: pan-y; }
 
-/* figures */
-figure { margin: 0; background: var(--surface); border: 1px solid var(--hair); border-radius: 12px; padding: 1rem 1rem .9rem; min-width: 0; }
-figcaption { display: flex; flex-wrap: wrap; align-items: baseline; justify-content: space-between; gap: .3rem 1rem; margin-bottom: .6rem; }
-figcaption strong { font-weight: 600; }
-.fig-sub { font-size: .88rem; color: var(--muted); }
-.chart { min-width: 0; } .chart svg { display: block; max-width: 100%; overflow: visible; }
-.chart text { font: 400 12px/1 var(--font-body); fill: var(--muted); }
-.chart .lab { fill: var(--ink-2); } .chart .val { fill: var(--ink); font-weight: 600; }
-.grid { stroke: var(--hair); stroke-width: 1; } .base { stroke: var(--axis); stroke-width: 1; }
-.l1 { fill: none; stroke: var(--series-1); stroke-width: 2; stroke-linejoin: round; stroke-linecap: round; }
-.l0 { fill: none; stroke: var(--deemph); stroke-width: 2; stroke-linejoin: round; stroke-linecap: round; }
-.a1 { fill: var(--wash); stroke: none; }
-.f1 { fill: var(--series-1); } .f0 { fill: var(--deemph); } .fi { fill: var(--ink); }
-.ring { stroke: var(--surface); stroke-width: 2; }
-.cross { stroke: var(--ink-2); stroke-width: 1; } .head { stroke: var(--ink); stroke-width: 1.5; }
-.rule-ink { stroke: var(--ink); stroke-width: 1.5; } .hit { fill: transparent; cursor: pointer; }
-.hit:focus-visible { outline: 2px solid var(--series-1); }
-.tog { font: 500 .85rem/1 var(--font-body); color: var(--link); background: none; border: 0; padding: .2rem 0; cursor: pointer; text-decoration: underline; text-underline-offset: 2px; }
-.tbl { overflow-x: auto; margin-top: .7rem; }
-table { border-collapse: collapse; width: 100%; font-size: .93rem; font-variant-numeric: tabular-nums; }
-th, td { text-align: left; padding: .5rem .7rem .5rem 0; border-bottom: 1px solid var(--hair); vertical-align: middle; }
-th { font-weight: 600; color: var(--ink-2); font-size: .82rem; white-space: nowrap; }
-td.num, th.num { text-align: right; padding-right: 1.1rem; }
-td:last-child, th:last-child { padding-right: 0; }
-#tip { position: fixed; z-index: 20; pointer-events: none; background: var(--ink); color: var(--bg); border-radius: 7px; padding: .45rem .6rem; font-size: .84rem; line-height: 1.35; max-width: 16rem; }
-#tip strong { font-weight: 600; } #tip span { opacity: .78; }
+.laps { grid-area: laps; border-top: 1px solid var(--ink); border-left: 1px solid var(--ink); padding: 11px 24px 0 26px; min-width: 0; overflow: hidden; }
+.laps table { width: 100%; border-collapse: collapse; font: 400 13px/17.4px var(--sans); }
+.laps th { font: 400 11px/1.3 var(--sans); letter-spacing: 0.1em; text-transform: uppercase; color: var(--muted); text-align: right; padding: 0 0 5px; border-bottom: 1px solid var(--ink); white-space: nowrap; }
+.laps th:first-child { text-align: left; }
+.laps td { padding: 0; text-align: right; white-space: nowrap; }
+.laps tbody tr:first-child td { padding-top: 4px; }
+.laps td:first-child { text-align: left; }
+.laps td.t { font: 400 12px/17.4px var(--mono); color: var(--muted); }
+.pickb { appearance: none; background: none; border: 0; border-radius: 0; padding: 0 0 0 10px; margin: 0; font: 400 12px/17.4px var(--mono); color: var(--ink); cursor: pointer; }
+.pickb.out { font-family: var(--sans); font-size: 13px; color: var(--lost); }
+.pickb:hover { text-decoration: underline; text-underline-offset: 3px; }
+.pickb[aria-pressed="true"] { font-weight: 600; }
+.pickb[aria-pressed="true"]::before { content: ""; display: inline-block; width: 6px; height: 6px; background: currentColor; margin-right: 7px; vertical-align: 1px; }
+.laps tr.on td:first-child, .laps tr.on td.t { font-weight: 600; color: var(--ink); }
 
-/* scoreboard */
-.targets { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 1rem; }
-@media (max-width: 640px) { .targets { grid-template-columns: 1fr; } }
-.target { background: var(--surface); border: 1px solid var(--hair); border-radius: 12px; padding: 1rem 1.1rem; }
-.target .num { font: 600 2.4rem/1 var(--font-body); letter-spacing: -.02em; }
-.target .lab { color: var(--ink-2); margin-top: .3rem; }
-.target .res { display: inline-flex; align-items: center; gap: .4rem; margin-top: .55rem; font-size: .9rem; font-weight: 600; }
-.target .res svg { width: 13px; height: 13px; }
-.dots { display: inline-flex; gap: 5px; align-items: center; } .dots svg { width: 16px; height: 16px; display: block; }
-.gapbar { display: flex; align-items: center; gap: .6rem; min-width: 9rem; }
-.gapbar i { display: block; flex: 1; height: 8px; border-radius: 4px; background: var(--hair); overflow: hidden; }
-.gapbar b { display: block; height: 100%; border-radius: 0 4px 4px 0; background: var(--series-1); }
-.gapbar span { min-width: 3.4rem; text-align: right; }
-.watch { font: 600 .84rem/1 var(--font-body); color: var(--link); background: none; border: 1px solid var(--hair); border-radius: 6px; padding: .4rem .6rem; cursor: pointer; white-space: nowrap; }
-.watch:hover { border-color: var(--link); }
-tr.shown td:first-child { font-weight: 600; }
+.strip { grid-area: strip; border-top: 1px solid var(--ink); display: flex; align-items: center; justify-content: space-between; gap: 4px 18px;
+         padding: 5px 24px; min-height: 27px; font: 400 11px/1.3 var(--sans); letter-spacing: 0.1em; text-transform: uppercase; }
+.strip b { font-weight: 600; }
+.strip .mid { color: var(--muted); text-align: center; min-width: 0; }
+.strip .nav { display: flex; align-items: center; gap: 6px; white-space: nowrap; }
+.strip .nav button { appearance: none; background: none; border: 0; padding: 0 5px; font: 600 14px/1 var(--mono); cursor: pointer; }
+.strip .nav button:hover { color: var(--opt); }
+.runcap { margin: 10px var(--gut) 0; font: italic 400 14.5px/1.45 var(--serif); color: var(--muted); max-width: 72rem; min-height: 1.45em; }
 
-/* two-column story rows */
-.split { display: grid; grid-template-columns: minmax(0, 5fr) minmax(0, 7fr); gap: 1.6rem 2.4rem; align-items: start; }
-@media (max-width: 860px) { .split { grid-template-columns: 1fr; } }
-.points { display: grid; gap: 1.3rem; }
-.points h3 { margin-bottom: .35rem; }
-.pair { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 1rem; }
-.pair > div { border-top: 2px solid var(--ink); padding-top: .55rem; }
-.split.chart-first { grid-template-columns: minmax(0, 7fr) minmax(0, 5fr); }
-@media (max-width: 860px) { .split.chart-first { grid-template-columns: 1fr; } }
-.pair .num { font: 600 2rem/1 var(--font-body); letter-spacing: -.02em; }
-.pair .lab { color: var(--ink-2); font-size: .93rem; margin-top: .3rem; }
-.studies td:nth-child(1) { font-weight: 600; white-space: nowrap; }
-.studies td { vertical-align: top; }
-.more { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 1.4rem 2rem; }
-@media (max-width: 860px) { .more { grid-template-columns: 1fr; } }
-.more h3 { margin-bottom: .35rem; }
-footer { border-top: 1px solid var(--hair); padding-block: 1.6rem 2.6rem; }
+/* ---- drawings: the plan, the trace and the essay's charts ---- */
+svg text { font: 400 10px var(--mono); fill: var(--muted); }
+svg text.lab { font: 400 12px var(--sans); }
+svg text.ink { fill: var(--ink); }
+svg text.name { font: 600 11px var(--sans); fill: var(--ink); }
+svg text.caps { font: 400 11px var(--sans); letter-spacing: 0.1em; fill: var(--muted); }
+svg text.val { font: 500 11px var(--mono); fill: var(--ink); }
+svg text.red, svg tspan.red { fill: var(--lost); }
+svg text.purple { fill: var(--opt); }
+svg .grid { stroke: var(--faint); stroke-width: 0.8; }
+svg .base { stroke: var(--ink); stroke-width: 0.9; }
+svg .tick { stroke: var(--ink); stroke-width: 0.9; }
+svg .pm { stroke: var(--ink); stroke-width: 0.9; stroke-dasharray: 4 3; }
+svg .l-net { fill: none; stroke: var(--ink); stroke-width: 1.4; stroke-linejoin: round; }
+svg .l-opt { fill: none; stroke: var(--opt); stroke-width: 1.2; stroke-linejoin: round; }
+svg .l-lost { fill: none; stroke: var(--lost); stroke-width: 1.4; stroke-linejoin: round; }
+svg .a-lost { fill: var(--wash); }
+svg .hit { fill: transparent; cursor: pointer; }
+svg .cross { stroke: var(--muted); stroke-width: 0.8; stroke-dasharray: 2 3; }
+svg .head { stroke: var(--ink); stroke-width: 0.8; }
+svg .pt { fill: var(--paper); stroke: var(--ink); stroke-width: 1.5; }
+svg .pt.o { stroke: var(--opt); }
+svg .pt.l { stroke: var(--lost); }
+svg .f-ink { fill: var(--ink); }
+svg .f-lost { fill: var(--lost); }
+svg .f-hollow { fill: var(--paper); stroke: var(--ink); stroke-width: 1.2; }
+svg .f-ref { fill: var(--paper); stroke: var(--muted); stroke-width: 1.2; }
+svg .pl-track { fill: none; stroke: var(--ink); stroke-width: 2; stroke-linejoin: round; }
+svg .pl-rest { fill: none; stroke: var(--rule); stroke-width: 2; stroke-linejoin: round; }
+svg .pl-spike { stroke: var(--lost); stroke-width: 2.2; }
+svg .pl-dot { fill: var(--paper); stroke: var(--ink); stroke-width: 1.2; }
+svg .pl-frame { fill: none; stroke: var(--ink); stroke-width: 0.9; }
+svg .pl-net { fill: var(--ink); }
+svg .pl-opt { fill: var(--paper); stroke: var(--opt); stroke-width: 1.7; }
+svg .pl-x { fill: none; stroke: var(--lost); stroke-width: 2; }
+
+/* ---- the essay ---- */
+.essay { max-width: 1240px; margin: clamp(2.6rem, 6vw, 4.4rem) auto 0; padding: 0 clamp(18px, 5vw, 64px); }
+.essay section { display: grid; grid-template-columns: minmax(0, 31rem) minmax(0, 1fr); column-gap: clamp(2rem, 6vw, 5.5rem); row-gap: 1.6rem;
+                 align-items: start; padding-bottom: clamp(3rem, 7vw, 5.2rem); }
+.essay h2 { grid-column: 1 / -1; display: flex; align-items: center; gap: 1.5rem; margin: 0 0 clamp(0.5rem, 2vw, 1.3rem);
+            font: 600 1.55rem/1.2 var(--serif); letter-spacing: -0.005em; text-align: center; text-wrap: balance; }
+.essay h2::before, .essay h2::after { content: ""; flex: 1; height: 1px; background: var(--rule); }
+.txt { display: flex; flex-direction: column; gap: 1.05rem; min-width: 0; }
+.txt p { margin: 0; text-wrap: pretty; }
+.txt .aside { font-size: 0.86rem; line-height: 1.5; color: var(--muted); }
+.w-net { font-weight: 600; }
+.w-opt { font-weight: 600; color: var(--opt); }
+.w-lost { font-weight: 600; color: var(--lost); }
+.figs { display: flex; flex-direction: column; gap: 2.4rem; min-width: 0; }
+.essay figure { margin: 0; min-width: 0; font: 400 14px/1.35 var(--sans); }
+.figtitle { margin: 0 0 0.8rem; font: 600 12px/1.3 var(--sans); letter-spacing: 0.1em; text-transform: uppercase; }
+.essay figcaption { margin-top: 0.8rem; max-width: 44rem; font: italic 400 0.86rem/1.45 var(--serif); color: var(--muted); }
+.targets { display: grid; grid-template-columns: auto 1fr; gap: 8px 18px; align-items: baseline; margin: 0.15rem 0; font: 400 14px/1.35 var(--sans); }
+.targets .n { font: 500 24px/1 var(--mono); letter-spacing: -0.03em; }
+.targets .miss { font-weight: 600; color: var(--lost); }
+.tbl { overflow-x: auto; }
+.tbl table { width: 100%; border-collapse: collapse; font: 400 14px/1.35 var(--sans); }
+.tbl th { font: 400 11px/1.3 var(--sans); letter-spacing: 0.1em; text-transform: uppercase; color: var(--muted); text-align: left;
+          padding: 0 14px 6px 0; border-bottom: 1px solid var(--ink); white-space: nowrap; vertical-align: bottom; }
+.tbl td { padding: 6px 14px 6px 0; border-bottom: 1px solid var(--faint); vertical-align: middle; }
+.tbl th:last-child, .tbl td:last-child { padding-right: 0; }
+.tbl th.num, .tbl td.num { text-align: right; }
+.tbl td.num { font: 400 12.5px/1.35 var(--mono); white-space: nowrap; }
+.tbl td.dim { color: var(--muted); }
+.marks { display: inline-flex; gap: 4px; vertical-align: middle; }
+.marks i { display: block; width: 9px; height: 9px; border: 1.3px solid var(--ink); }
+.marks i.on { background: var(--ink); }
+.marks i.me { outline: 1.4px solid var(--opt); outline-offset: 2px; }
+.gapbar { display: inline-flex; align-items: center; gap: 9px; font: 400 12.5px/1.35 var(--mono); }
+.gapbar i { display: block; position: relative; width: 84px; height: 5px; border-bottom: 1px solid var(--rule); }
+.gapbar b { position: absolute; left: 0; bottom: -1px; height: 5px; background: var(--ink); }
+.watch { appearance: none; background: none; border: 0; border-bottom: 1px solid var(--ink); border-radius: 0; padding: 0 0 1px;
+         font: 600 10.5px/1.2 var(--sans); letter-spacing: 0.1em; text-transform: uppercase; cursor: pointer; }
+.watch:hover { color: var(--opt); border-color: var(--opt); }
+.studies td:first-child { font-weight: 600; white-space: nowrap; }
+.minis { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 22px 10px; }
+.mini { appearance: none; background: none; border: 0; border-radius: 0; padding: 4px 0 2px; min-width: 0; display: flex; flex-direction: column; align-items: center; gap: 3px;
+        font: 400 12px/1.2 var(--sans); color: var(--ink); cursor: pointer; }
+.mini svg { width: 100%; max-width: 128px; height: auto; }
+.mini svg path { fill: none; stroke: var(--ink); stroke-width: 1.3; stroke-linejoin: round; }
+.mini svg path.rest { stroke: var(--rule); }
+.mini svg path.x { stroke: var(--lost); stroke-width: 1.8; }
+.mini .st { font: 400 11px/1.2 var(--mono); color: var(--muted); }
+.mini .st.out { font-family: var(--sans); color: var(--lost); }
+.mini[aria-pressed="true"] .nm { font-weight: 600; text-decoration: underline; text-underline-offset: 3px; }
+.mini:hover .nm { color: var(--opt); }
+.more { grid-column: 1 / -1; display: grid; grid-template-columns: repeat(auto-fit, minmax(min(16rem, 100%), 1fr)); gap: 1.6rem 2.8rem; font-size: 0.94rem; line-height: 1.55; }
+.more h3 { margin: 0 0 0.35rem; font: 600 1rem/1.3 var(--serif); }
+.more p { margin: 0; }
+.foot { max-width: 1240px; margin: 0 auto; padding: 1.3rem clamp(18px, 5vw, 64px) 3rem; border-top: 1px solid var(--rule);
+        display: flex; flex-direction: column; gap: 0.5rem; font: 400 13px/1.5 var(--sans); color: var(--muted); }
+.foot p { margin: 0; max-width: 62rem; }
+#tip { position: fixed; z-index: 10; pointer-events: none; max-width: 280px; padding: 6px 9px; background: var(--tip); border: 1px solid var(--ink); font: 400 12px/1.45 var(--sans); }
+#tip strong { font: 500 12px/1.45 var(--mono); }
+
+/* ---- narrower windows ---- */
+@media (max-width: 1099px) {
+  .sheet { height: auto; grid-template-columns: minmax(0, 1fr); grid-template-rows: none;
+           grid-template-areas: "readout" "stage" "trace" "plan" "laps" "strip"; }
+  .stage { height: min(66vw, 70vh); min-height: 320px; }
+  .readout { border-left: 0; }
+  .trace { height: 262px; }
+  .plan { height: 360px; border-left: 0; border-top: 1px solid var(--ink); }
+  .laps { border-left: 0; padding-bottom: 10px; }
+  .laps table, .laps td.t, .pickb { line-height: 28px; }
+  .strip { flex-wrap: wrap; }
+  .strip .mid { order: 3; flex-basis: 100%; text-align: left; }
+}
+@media (max-width: 900px) {
+  .essay section { grid-template-columns: minmax(0, 1fr); }
+}
+@media (max-width: 720px) {
+  .mast { flex-wrap: wrap; }
+  .mast h1 { order: 3; flex-basis: 100%; }
+  .mast .repo { margin-left: auto; }
+  .st-key { display: none; }
+  .st-title, .st-end { left: 14px; }
+  .st-foot { padding: 7px 14px 8px; }
+  .readout { padding: 16px 14px 14px; }
+  .ro-big output { font-size: 44px; }
+  .plan figcaption, .trace figcaption { left: 14px; }
+  .laps { padding-left: 12px; padding-right: 12px; }
+  .laps th:nth-child(2), .laps td:nth-child(2) { display: none; }
+  .strip { padding: 6px 14px; }
+  .minis { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+}
+/* ---- one element alone, for the stills ---- */
+body.solo { padding: 18px; }
+body.solo .sheet { margin: 0; height: calc(100vh - 36px); }
+body.solo .essay { margin: 0; padding: 0; max-width: none; }
+body.solo .essay section { display: block; padding: 0; }
 </style>
 </head>
 <body>
-<div class="wrap">
 
-<header class="top">
-  <a class="mark" href="#replay">Apex<b>Zero</b></a>
-  <nav aria-label="Sections">
-    <a href="#replay">Replay</a>
-    <a href="#test">The test</a>
-    <a href="#why">Why it crashes</a>
-    <a href="#fix">What helped</a>
-    <a href="#method">Method</a>
-  </nav>
+<header class="mast" id="mast">
+  <a class="brand" href="#sheet">ApexZero</a>
+  <h1>A racing policy that learned to drive only on computer-generated road, replayed on twelve real Grand Prix circuits it had never seen, beside the fastest lap the same car can physically drive.</h1>
+  <a class="repo" href="https://github.com/adrian0729/apexzero">Code and data on GitHub</a>
 </header>
 
-<section class="intro stack-lg">
-  <div class="stack">
-    <div class="eyebrow">Reinforcement learning, measured against optimal control</div>
-    <h1>Trained on tracks that don't exist. Tested on twelve that do.</h1>
-    <p class="lede">ApexZero is a racing policy that learned to drive only on computer-generated road. This page puts it on twelve real Grand Prix circuits it had never seen and scores every lap against the fastest lap the same car can physically drive.</p>
-  </div>
-  <div class="facts">
-    <div class="fact"><div class="num">0</div><div class="lab">real circuits seen in training</div></div>
-    <div class="fact"><div class="num" id="factDone">8 of 12</div><div class="lab">unseen circuits completed by the median of five trained networks</div></div>
-    <div class="fact"><div class="num" id="factGap">5.2%</div><div class="lab">slower than the optimal lap, on the laps it finishes</div></div>
-  </div>
-  <p id="introNote">Both targets were set before the test and both were missed. The rest of this page is what that miss taught: where the policy fails, why, and what fixed most of it.</p>
-</section>
-
-<section id="replay" class="stack-lg">
-  <div class="stack">
-    <h2>Watch it drive</h2>
-    <p>Pick a circuit. The blue car is the network. The white outline is the optimal lap: the minimum lap time for the same car on the same physics, found by an optimal-control solver. A run ends the moment the car's centre reaches the pale strip, the last metre of road. The blue dots on the edges are all the network sees of the road: forty points, reaching 150 to 500 m ahead depending on speed.</p>
-  </div>
-  <div class="choose" id="agentSeg" role="group" aria-label="Which network to watch" hidden>
-    <button type="button" data-agent="e0" aria-pressed="true">The final agent</button>
-    <button type="button" data-agent="margin" aria-pressed="false">With the training margin</button>
-  </div>
-  <div class="picker" id="picker"></div>
-  <div class="screen" id="screen">
-    <div class="stage">
-      <canvas id="view" role="img" aria-label="Top-down replay of the network's lap beside the optimal lap"></canvas>
-      <div class="hud hud-tl"><div class="hud-name" id="hudName"></div><div class="hud-clock" id="hudClock">0:00.0</div><div class="hud-sub" id="hudSub"></div></div>
-      <div class="hud hud-tr"><canvas id="mini" aria-hidden="true"></canvas></div>
-      <div class="hud hud-bl">
-        <div class="hud-speed"><span id="hudSpeed">0</span><small>km/h</small></div>
-        <div class="bars">
-          <div class="bar"><span>Throttle</span><i><b id="barT"></b></i></div>
-          <div class="bar brake"><span>Brake</span><i><b id="barB"></b></i></div>
-          <div class="bar grip"><span>Grip in use</span><i><b id="barG"></b></i></div>
-        </div>
+<section class="sheet" id="sheet" aria-label="Lap report: a replay of one lap beside the optimal lap">
+  <div class="stage" id="stage">
+    <div class="cv">
+      <canvas id="view" role="img" aria-label="Plan drawing of the road around the network's car, with the optimal car and the road points the network sees"></canvas>
+      <div class="st-title"><b id="stKicker">Detail</b><span id="stWhere"></span></div>
+      <div class="st-end" id="stEnd" hidden><strong id="stEndTitle"></strong><span id="stEndText"></span></div>
+    </div>
+    <div class="st-foot">
+      <div class="st-key" id="stKey">
+        <span><i class="k-pt"></i><span>what the network sees: forty points on each edge, up to <b id="keyD" style="font-weight: 400">150</b> m ahead</span></span>
+        <span><i class="k-dash"></i><span>the last metre of road: a run ends there</span></span>
       </div>
-      <div class="hud hud-br"><div class="hud-delta" id="hudDelta"></div><div class="hud-sub" id="hudDeltaSub"></div></div>
-      <div class="hud-end" id="hudEnd" hidden><strong id="hudEndTitle"></strong><span id="hudEndText"></span></div>
-    </div>
-    <div class="controls">
-      <button class="primary" id="btnPlay" type="button">Play</button>
-      <button id="btnRestart" type="button">Restart</button>
-      <div class="seg" role="group" aria-label="Playback speed">
-        <button type="button" data-rate="1" aria-pressed="true">1×</button>
-        <button type="button" data-rate="2" aria-pressed="false">2×</button>
-        <button type="button" data-rate="4" aria-pressed="false">4×</button>
+      <div class="st-ctl">
+        <button class="tb" id="btnPlay" type="button">Play</button>
+        <button class="tb" id="btnRate" type="button" aria-label="Playback speed, 1 times">Speed 1×</button>
+        <button class="tb" id="btnCam" type="button">Whole circuit</button>
+        <button class="tb" id="btnSight" type="button" aria-pressed="true">Hide what it sees</button>
       </div>
-      <div class="seg" role="group" aria-label="Camera">
-        <button type="button" data-cam="follow" aria-pressed="true">Follow</button>
-        <button type="button" data-cam="whole" aria-pressed="false">Whole circuit</button>
-      </div>
-      <button type="button" id="btnSight" aria-pressed="true">What it sees</button>
-      <input type="range" id="scrub" min="0" max="1000" value="0" aria-label="Position in the run">
     </div>
+    <label class="sr" for="scrub">Position in the run</label>
+    <input class="sr" type="range" id="scrub" min="0" max="1000" value="0">
   </div>
-  <p id="runCaption"></p>
-  <figure>
-    <figcaption><strong id="teleTitle">Speed and time lost along the lap</strong>
-      <span class="key"><span><i class="sw"></i>Network</span><span><i class="sw ref"></i>Optimal lap</span></span></figcaption>
-    <div class="chart" id="tele"></div>
-    <div class="fig-sub">Click the chart to jump the replay to that point.</div>
-  </figure>
-  <figure id="cornerFig">
-    <figcaption><strong>Where the time goes: seconds lost in each corner group</strong>
-      <button class="tog" type="button" data-table="cornerTable">Show as a table</button></figcaption>
-    <div class="chart" id="corners"></div>
-    <div class="fig-sub">Corner groups in lap order. Time lost on a straight is charged to the corner before it. Click a bar to watch that corner.</div>
-    <div class="tbl" id="cornerTable" hidden></div>
-  </figure>
-  <p class="note" id="replayNote"></p>
-</section>
 
-<section id="test" class="stack-lg">
-  <div class="stack">
-    <h2>The held-out test</h2>
-    <p>Five networks were trained with one recipe and five random seeds, a billion simulation steps each. Twelve circuits were locked away from the first day of the project. The test plan and its pass marks were written down and tagged in the repository before any network touched those circuits, and the test ran once: ten laps per network per circuit.</p>
+  <div class="readout">
+    <div class="ro-head"><h2 id="roName"></h2><span class="caps" id="roMeta"></span></div>
+    <div class="ro-big"><output id="roDelta"></output><span class="sub"><span id="roSubA"></span><span id="roSubB"></span></span></div>
+    <dl class="ro-laps">
+      <div class="opt"><dt>Optimal</dt><dd id="roOpt"></dd></div>
+      <div><dt id="roWho">Network</dt><dd id="roLap"></dd><dd class="lost" id="roLost"></dd></div>
+    </dl>
   </div>
-  <div class="targets" id="targets"></div>
-  <figure>
-    <figcaption><strong>Every network on every circuit</strong><span class="fig-sub" id="scoreSub"></span></figcaption>
-    <div class="tbl" style="margin-top:0" id="scoreTable"></div>
-    <div class="fig-sub" style="margin-top:.7rem">Filled: finished all ten laps. Hollow: crashed. Ringed: the network shown in the replay. The gap is the median over the networks that finished.</div>
+
+  <figure class="plan" id="planFig">
+    <figcaption class="caps" id="planCap">Plan · seconds lost at each corner group</figcaption>
+    <div id="plan"></div>
   </figure>
-  <p class="note">Mirrored and reversed versions of the twelve circuits gave the same picture: 8 of 12 completed at the median, with gaps of 5.3% and 5.6%. Every one of the 550 crashes in the test was the car leaving the road. None was a spin or a stall.</p>
-</section>
 
-<section id="why" class="stack-lg">
-  <div class="stack">
-    <h2>Why it crashes</h2>
-    <p>The obvious guess was that the policy arrives at tight corners too fast. A series of studies, each planned before its data existed, said otherwise.</p>
-  </div>
-  <div class="split">
-    <div class="points">
-      <div><h3>It is not the braking</h3>
-        <p>On controlled test corners, all nine networks studied entered within about 10% of the speed their own optimum would use, and their braking distance scaled with speed the way the physics does. Arriving too fast after a long straight was the failure the project expected. It was not seen once.</p></div>
-      <div><h3>It is the inside edge</h3>
-        <p>Of 160 crashes on real development circuits, 159 left the road on the inside of the corner, and 146 of them where the inside edge had moved by a metre or more in the last 100 m. Generated training tracks almost never do that: under 0.5% of their tight corners, against 79% on the real crash corners.</p></div>
-      <div><h3>The line follows a slow change and ignores a sharp one</h3>
-        <p>Move the inside edge of a whole corner by a metre and the network's line moves about three quarters of a metre with it. Squeeze the same metre into a few metres of road and the line barely reacts. The real edge changes at its crash corners are that sharp.</p></div>
-      <div class="pair" id="intrusion"></div>
-    </div>
-    <figure>
-      <figcaption><strong>How much of an edge move the line follows</strong>
-        <button class="tog" type="button" data-table="followTable">Show as a table</button></figcaption>
-      <div class="chart" id="follow"></div>
-      <div class="fig-sub">One of the earlier networks, at the three real corners where it crashes, twelve start states. 1.0 means the line moves as far as the edge does, which is what the optimal line does.</div>
-      <div class="tbl" id="followTable" hidden></div>
-    </figure>
-  </div>
-</section>
-
-<section id="fix" class="stack-lg">
-  <div class="stack">
-    <h2>More training did not help. More room did.</h2>
-    <p>Training on real track-width profiles helped. Training five times longer did not. What worked was ending training runs 1.4 m from the edge instead of 1.0 m, so the network learns to keep more clearance. Racing is still judged at 1.0 m.</p>
-  </div>
-  <div class="split chart-first">
-    <figure>
-      <figcaption><strong>Development circuits completed, of 12</strong>
-        <button class="tog" type="button" data-table="ladderTable">Show as a table</button></figcaption>
-      <div class="chart" id="ladder"></div>
-      <div class="fig-sub">Bars are means over the seeds; ticks under each bar are the individual seeds. Rows come from different training rounds.</div>
-      <div class="tbl" id="ladderTable" hidden></div>
-    </figure>
-    <div class="points">
-      <div class="pair" id="fixPair"></div>
-      <p>The margin is a dial. Each extra 0.2 m buys clearance at the corners where the policy used to crash and costs about half a point of lap time. It does not teach the policy to follow the edge any better. It simply stops driving so close to it.</p>
-      <p class="note" id="fixNote">These are the twelve development circuits, whose width profiles the track generator borrows, so they are not an independent test. The margin recipe has not been run on the twelve held-out circuits.</p>
-    </div>
-  </div>
-  <div class="stack-lg" id="rtest" hidden>
-    <div class="stack">
-      <h3>And on the twelve held-out circuits?</h3>
-      <p id="rtestText"></p>
-    </div>
-    <div class="pair" id="rtestPair"></div>
-    <figure>
-      <figcaption><strong>The same twelve circuits, without and with the margin</strong><span class="fig-sub">Post hoc: one look, after the test was spent</span></figcaption>
-      <div class="tbl" style="margin-top:0" id="rtestTable"></div>
-      <div class="fig-sub" style="margin-top:.7rem">Five networks per recipe. Filled: finished all ten laps. Hollow: crashed. Ringed: the network you can watch in the replay. Gaps are medians over the networks that finished.</div>
-    </figure>
-  </div>
-  <figure>
-    <figcaption><strong>The training margin as a dial</strong>
-      <span class="key"><span><i class="sw box"></i>Margin sweep, five seeds each</span><span><i class="sw box ref"></i>No extra margin, from an earlier round</span></span></figcaption>
-    <div class="chart" id="dial"></div>
-    <div class="fig-sub">Each dot is one trained network at 200 million steps; the bar is the mean. No step between neighbouring margins is statistically significant at five seeds; the three measures move together and in order.
-      <button class="tog" type="button" data-table="dialTable">Show as a table</button></div>
-    <div class="tbl" id="dialTable" hidden></div>
+  <figure class="trace" id="traceFig">
+    <figcaption class="caps"><span id="teleTitle">Speed, km/h</span><span class="k-net"><i></i>Network</span><span class="k-opt"><i></i>Optimal lap</span></figcaption>
+    <div id="tele"></div>
   </figure>
-</section>
 
-<section id="method" class="stack-lg">
-  <div class="stack">
-    <h2>How it was built and checked</h2>
-    <p>One set of vehicle equations is compiled twice: for the simulator the policy trains in, and for the optimal-control solver. The optimum is therefore exact for the problem the policy actually faces, and the simulator reproduces the solver's laps to within 0.02%. The policy sees the road edges 150 to 500 m ahead, its own motion and the car's parameters. It never sees its position on the lap.</p>
-    <p>Nine studies were pre-registered. For each, the design, the code and the decision rules were frozen under a git tag before any result existed, and the deciding analysis ran once.</p>
-  </div>
-  <div class="tbl">
-    <table class="studies">
-      <thead><tr><th>Study</th><th>Question</th><th>Outcome</th></tr></thead>
-      <tbody>
-        <tr><td>Psychophysics</td><td>Do the policies judge a corner the way their own optimum does?</td><td>Yes on ordinary corners. The expected overspeed never appeared. The crashes depend on the road's width profile.</td></tr>
-        <tr><td>Receptive fields</td><td>Does the line follow the inside edge when it moves?</td><td>About 80% of a corner-wide move. About 20% of the local moves on real crash corners.</td></tr>
-        <tr><td>Width training</td><td>What does training on real width profiles change?</td><td>More clearance and more circuits completed, with less edge following, not more.</td></tr>
-        <tr><td>Costate</td><td>Is the critic's value gradient the costate of optimal control?</td><td>No, in all nine networks. The values fit; their gradients do not.</td></tr>
-        <tr><td>Width model</td><td>Does a statistical width model that copies no circuit transfer to circuits it was not fitted on?</td><td>Yes: 9.8 circuits against 4.6. It costs 1.5 points of lap time, over the limit set in advance.</td></tr>
-        <tr><td>Specialists</td><td>Do single-circuit specialists memorise their circuit?</td><td>Five networks gave five different answers. No general statement.</td></tr>
-        <tr><td>Value gradient</td><td>If the critic is trained toward the right gradient, does driving improve?</td><td>The gradient moves toward the costate. Completion does not move.</td></tr>
-        <tr><td>Maze audit</td><td>Do the level scores that curriculum methods use rank true regret?</td><td>No score beats the simplest baseline, on the methods' own maze agents with exact regret.</td></tr>
-        <tr><td>Held-out test</td><td>90% of laps on unseen circuits, within 4% of optimal?</td><td>Missed on both counts: 67% of laps, 5.2% off optimal.</td></tr>
-      </tbody>
+  <div class="laps" id="lapsFig">
+    <table>
+      <thead><tr><th scope="col">Circuit</th><th scope="col">Optimal</th><th scope="col">Final agent</th><th scope="col" id="thMargin">With margin</th></tr></thead>
+      <tbody id="lapBody"></tbody>
     </table>
   </div>
-  <p class="note">About 400 commits and more than 2,000 tests. Everything on this page is computed from result files in the repository. The scoreboard is the pre-registered analysis as it was written. The replays are the registered runs simulated again for this page, which the project's own rules label post hoc; each reproduces the stored result.</p>
+
+  <div class="strip">
+    <span><b>ApexZero</b> · lap report</span>
+    <span class="mid" id="stripMid"></span>
+    <span class="nav"><button type="button" id="btnPrev" aria-label="Previous circuit">‹</button><span id="sheetNo"></span><button type="button" id="btnNext" aria-label="Next circuit">›</button></span>
+  </div>
+</section>
+<p class="runcap" id="runCaption"></p>
+
+<main class="essay">
+
+<section id="read">
+  <h2>What the sheet shows</h2>
+  <div class="txt">
+    <p>The <span class="w-net">black car</span> is driven by a neural network. It learned on computer-generated road, and these laps are the first time it has met a real circuit.</p>
+    <p>The <span class="w-opt">purple car</span> drives the optimal lap: the minimum lap time for the same car on the same physics, found by an optimal-control solver. Every lap here is measured against it.</p>
+    <p>The small circles on the road edges are all the network sees of the road: forty points on each edge, reaching 150 to 500 m ahead depending on speed. A run ends the moment the car's centre crosses the dashed line into the last metre of road.</p>
+    <p>On the plan, a <span class="w-lost">red spike</span> at each corner group shows the time lost there. Corner groups are runs of corners with no straight between them, numbered from the start line; they are not official turn numbers. Time lost on a straight is charged to the corner before it.</p>
+    <p id="introNote">Both targets were set before the test and both were missed. The rest of this page is what that miss taught: where the policy fails, why, and what fixed most of it.</p>
+  </div>
+  <div class="figs">
+    <figure id="twelve">
+      <div class="minis" id="minis"></div>
+      <figcaption id="replayNote"></figcaption>
+    </figure>
+  </div>
 </section>
 
-<section class="stack-lg">
+<section id="test">
+  <h2>The held-out test</h2>
+  <div class="txt">
+    <p>Five networks were trained with one recipe and five random seeds, a billion simulation steps each. Twelve circuits were locked away from the first day of the project. The test plan and its pass marks were written down and tagged in the repository before any network touched those circuits, and the test ran once: ten laps per network per circuit.</p>
+    <div class="targets" id="targets"></div>
+    <p class="aside">Mirrored and reversed versions of the twelve circuits gave the same picture: 8 of 12 completed at the median, with gaps of 5.3% and 5.6%. Every one of the 550 crashes in the test was the car leaving the road. None was a spin or a stall.</p>
+  </div>
+  <div class="figs">
+    <figure id="scoreFig">
+      <p class="figtitle">Every network on every circuit</p>
+      <div class="tbl" id="scoreTable"></div>
+      <figcaption>The pre-registered result: 12 circuits, 5 networks, 10 laps each. Filled: finished all ten laps. Hollow: crashed. Outlined in purple: the network in the replay. The gap is the median over the networks that finished.</figcaption>
+    </figure>
+  </div>
+</section>
+
+<section id="why">
+  <h2>Why it leaves the road</h2>
+  <div class="txt">
+    <p>The obvious guess was that the policy arrives at tight corners too fast. A series of studies, each planned before its data existed, said otherwise.</p>
+    <p><strong>It is not the braking.</strong> On controlled test corners, all nine networks studied entered within about 10% of the speed their own optimum would use, and their braking distance scaled with speed the way the physics does. Arriving too fast after a long straight was the failure the project expected. It was not seen once.</p>
+    <p><strong>It is the inside edge.</strong> Of 160 crashes on real development circuits, 159 left the road on the inside of the corner, and 146 of them where the inside edge had moved by a metre or more in the last 100 m. Generated training tracks almost never do that: under 0.5% of their tight corners, against 79% on the real crash corners.</p>
+    <p><strong>The line follows a slow change and ignores a sharp one.</strong> Move the inside edge of a whole corner by a metre and the network's line moves about three quarters of a metre with it. Squeeze the same metre into a few metres of road and the line barely reacts. The real edge changes at its crash corners are that sharp.</p>
+    <p id="intrusion"></p>
+  </div>
+  <div class="figs">
+    <figure id="followFig">
+      <p class="figtitle">How much of an edge move the line follows</p>
+      <div id="follow"></div>
+      <figcaption>One of the earlier networks, at the three real corners where it crashes, twelve start states. 1.0 means the line moves as far as the edge does, which is what the optimal line does.</figcaption>
+      <div class="sr" id="followTable"></div>
+    </figure>
+  </div>
+</section>
+
+<section id="fix">
+  <h2>More training did not help. More room did.</h2>
+  <div class="txt">
+    <p>Training on real track-width profiles helped. Training five times longer did not. What worked was ending training runs 1.4 m from the edge instead of 1.0 m, so the network learns to keep more clearance. Racing is still judged at 1.0 m.</p>
+    <p id="fixPair"></p>
+    <p>The margin is a dial. Each extra 0.2 m buys clearance at the corners where the policy used to crash and costs about half a point of lap time. It does not teach the policy to follow the edge any better. It simply stops driving so close to it.</p>
+    <p class="aside" id="fixNote">These are the twelve development circuits, whose width profiles the track generator borrows, so they are not an independent test. The margin recipe has not been run on the twelve held-out circuits.</p>
+  </div>
+  <div class="figs">
+    <figure id="ladderFig">
+      <p class="figtitle">Development circuits completed, of 12</p>
+      <div id="ladder"></div>
+      <figcaption>Bars are means over the seeds; the ticks under each bar are the individual seeds. Solid bars carry the training margin. Rows come from different training rounds.</figcaption>
+      <div class="sr" id="ladderTable"></div>
+    </figure>
+    <figure id="dialFig">
+      <p class="figtitle">The training margin as a dial</p>
+      <div id="dial"></div>
+      <figcaption>Circuits completed, gap to the optimal lap and clearance at the crash corners, against the training margin. Each dot is one trained network at 200 million steps; the bar is the mean. Hollow dots: no extra margin, from an earlier round. No step between neighbouring margins is statistically significant at five seeds; the three measures move together and in order.</figcaption>
+      <div class="sr" id="dialTable"></div>
+    </figure>
+  </div>
+</section>
+
+<section id="rtest" hidden>
+  <h2>And on the twelve held-out circuits?</h2>
+  <div class="txt">
+    <p id="rtestText"></p>
+    <p id="rtestPair"></p>
+  </div>
+  <div class="figs">
+    <figure id="heldoutFig">
+      <p class="figtitle">The same twelve circuits, without and with the margin</p>
+      <div class="tbl" id="rtestTable"></div>
+      <figcaption>Post hoc: one look, after the test was spent. Five networks per recipe. Filled: finished all ten laps. Hollow: crashed. Outlined in purple: the network you can watch in the replay. Gaps are medians over the networks that finished.</figcaption>
+    </figure>
+  </div>
+</section>
+
+<section id="method">
+  <h2>How it was built and checked</h2>
+  <div class="txt">
+    <p>One set of vehicle equations is compiled twice: for the simulator the policy trains in, and for the optimal-control solver. The optimum is therefore exact for the problem the policy actually faces, and the simulator reproduces the solver's laps to within 0.02%. The policy sees the road edges 150 to 500 m ahead, its own motion and the car's parameters. It never sees its position on the lap.</p>
+    <p>Nine studies were pre-registered. For each, the design, the code and the decision rules were frozen under a git tag before any result existed, and the deciding analysis ran once.</p>
+    <p class="aside">About 400 commits and more than 2,000 tests. Everything on this page is computed from result files in the repository. The scoreboard is the pre-registered analysis as it was written. The replays are the registered runs simulated again for this page, which the project's own rules label post hoc; each reproduces the stored result.</p>
+  </div>
+  <div class="figs">
+    <figure id="studiesFig">
+      <div class="tbl">
+        <table class="studies">
+          <thead><tr><th>Study</th><th>Question</th><th>Outcome</th></tr></thead>
+          <tbody>
+            <tr><td>Psychophysics</td><td>Do the policies judge a corner the way their own optimum does?</td><td>Yes on ordinary corners. The expected overspeed never appeared. The crashes depend on the road's width profile.</td></tr>
+            <tr><td>Receptive fields</td><td>Does the line follow the inside edge when it moves?</td><td>About 80% of a corner-wide move. About 20% of the local moves on real crash corners.</td></tr>
+            <tr><td>Width training</td><td>What does training on real width profiles change?</td><td>More clearance and more circuits completed, with less edge following, not more.</td></tr>
+            <tr><td>Costate</td><td>Is the critic's value gradient the costate of optimal control?</td><td>No, in all nine networks. The values fit; their gradients do not.</td></tr>
+            <tr><td>Width model</td><td>Does a statistical width model that copies no circuit transfer to circuits it was not fitted on?</td><td>Yes: 9.8 circuits against 4.6. It costs 1.5 points of lap time, over the limit set in advance.</td></tr>
+            <tr><td>Specialists</td><td>Do single-circuit specialists memorise their circuit?</td><td>Five networks gave five different answers. No general statement.</td></tr>
+            <tr><td>Value gradient</td><td>If the critic is trained toward the right gradient, does driving improve?</td><td>The gradient moves toward the costate. Completion does not move.</td></tr>
+            <tr><td>Maze audit</td><td>Do the level scores that curriculum methods use rank true regret?</td><td>No score beats the simplest baseline, on the methods' own maze agents with exact regret.</td></tr>
+            <tr><td>Held-out test</td><td>90% of laps on unseen circuits, within 4% of optimal?</td><td>Missed on both counts: 67% of laps, 5.2% off optimal.</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </figure>
+  </div>
+</section>
+
+<section id="more">
   <h2>Three smaller results</h2>
   <div class="more">
     <div><h3>A good critic is not a good gradient</h3><p>The critics predict their own returns with R² of 0.80 to 0.93, yet the gradient of that value explains almost none of the true price of the car's state. The price can be decoded from what the network sees. The critic's gradient just does not express it.</p></div>
@@ -401,11 +449,12 @@ footer { border-top: 1px solid var(--hair); padding-block: 1.6rem 2.6rem; }
   </div>
 </section>
 
-<footer class="stack">
-  <p class="note">Code, findings and the full record: <a href="https://github.com/adrian0729/apexzero">github.com/adrian0729/apexzero</a>.</p>
-  <p class="note" id="footNote">Circuit geometry is derived from the TUMFTM racetrack-database and distributed under LGPL-3.0 (<a href="https://github.com/adrian0729/apexzero/blob/main/docs/showcase/DATA-LICENSE.md">notice</a>). The car is a generic single-seater model on flat tracks. This project is not affiliated with Formula 1 or with any team or circuit.</p>
+</main>
+
+<footer class="foot">
+  <p>Code, findings and the full record: <a href="https://github.com/adrian0729/apexzero">github.com/adrian0729/apexzero</a>.</p>
+  <p>Circuit geometry is derived from the TUMFTM racetrack-database and distributed under LGPL-3.0 (<a href="https://github.com/adrian0729/apexzero/blob/main/docs/showcase/DATA-LICENSE.md">notice</a>). The car is a generic single-seater model on flat tracks. This project is not affiliated with Formula 1 or with any team or circuit.</p>
 </footer>
-</div>
 <div id="tip" hidden></div>
 
 <script src="data.js"></script>
@@ -428,11 +477,16 @@ function H(tag, attrs, kids) {
   return e;
 }
 const T = (x, y, text, cls, anchor) => { const t = S("text", { x, y, class: cls || "", "text-anchor": anchor || "start" }); t.textContent = text; return t; };
+const set = (el, s) => { if (el.textContent !== s) el.textContent = s; };
 const lapStr = t => { const m = Math.floor(t / 60), s = t - 60 * m; return m + ":" + s.toFixed(3).padStart(6, "0"); };
 const clockStr = t => { const m = Math.floor(t / 60), s = t - 60 * m; return m + ":" + s.toFixed(1).padStart(4, "0"); };
 const pct = (x, d) => (100 * x).toFixed(d == null ? 1 : d) + "%";
 const mean = a => a.reduce((p, q) => p + q, 0) / a.length;
 const clamp = (x, a, b) => Math.max(a, Math.min(b, x));
+const metres = x => Math.round(x).toLocaleString("en-US");
+const cname = s => s.replace(/C/g, "").replace(/-/g, "–");     // "C8-C9" reads "8–9"
+const signed = (d, k) => (d >= 0 ? "+" : "−") + Math.abs(d).toFixed(k);
+const reduced = matchMedia("(prefers-reduced-motion: reduce)").matches;
 
 async function loadData() {
   if (window.APEXZERO) return window.APEXZERO;
@@ -476,40 +530,51 @@ function build(c) {
   const lx = cum(tr.lx, 10), ly = cum(tr.ly, 10), rx = cum(tr.rx, 10), ry = cum(tr.ry, 10);
   const ax = new Float64Array(n), ay = new Float64Array(n), bx = new Float64Array(n), by = new Float64Array(n);
   const mx = new Float64Array(n), my = new Float64Array(n);
-  let x0 = Infinity, x1 = -Infinity, y0 = Infinity, y1 = -Infinity;
+  let cx0 = 0, cy0 = 0;
   for (let i = 0; i < n; i++) {
     const ux = lx[i] - rx[i], uy = ly[i] - ry[i], d = Math.hypot(ux, uy) || 1;
     ax[i] = lx[i] - MARGIN * ux / d; ay[i] = ly[i] - MARGIN * uy / d;
     bx[i] = rx[i] + MARGIN * ux / d; by[i] = ry[i] + MARGIN * uy / d;
     mx[i] = (lx[i] + rx[i]) / 2; my[i] = (ly[i] + ry[i]) / 2;
-    x0 = Math.min(x0, lx[i], rx[i]); x1 = Math.max(x1, lx[i], rx[i]);
-    y0 = Math.min(y0, ly[i], ry[i]); y1 = Math.max(y1, ly[i], ry[i]);
+    cx0 += mx[i] / n; cy0 += my[i] / n;
   }
-  const road = new Path2D(), strips = new Path2D();
-  const quad = (p, x1_, y1_, x2_, y2_, x3_, y3_, x4_, y4_) => { p.moveTo(x1_, y1_); p.lineTo(x2_, y2_); p.lineTo(x3_, y3_); p.lineTo(x4_, y4_); p.closePath(); };
+  const road = new Path2D();
   for (let i = 0; i < n; i++) {
     const j = (i + 1) % n;
-    quad(road, lx[i], ly[i], lx[j], ly[j], rx[j], ry[j], rx[i], ry[i]);
-    quad(strips, lx[i], ly[i], lx[j], ly[j], ax[j], ay[j], ax[i], ay[i]);
-    quad(strips, bx[i], by[i], bx[j], by[j], rx[j], ry[j], rx[i], ry[i]);
+    road.moveTo(lx[i], ly[i]); road.lineTo(lx[j], ly[j]); road.lineTo(rx[j], ry[j]); road.lineTo(rx[i], ry[i]); road.closePath();
   }
-  const edgeL = linePath(lx, ly), edgeR = linePath(rx, ry), mid = linePath(mx, my);
-  edgeL.closePath(); edgeR.closePath(); mid.closePath();
-  // distance boards: a short mark outside each edge every 50 m, longer every 250 m
-  const marks = new Path2D();
-  for (let d = 50; d < tr.length - 10; d += 50) {
-    const i = Math.min(n - 1, Math.round(d / tr.ds)), ux = lx[i] - rx[i], uy = ly[i] - ry[i], w = Math.hypot(ux, uy) || 1, len = d % 250 ? 2.2 : 5;
-    marks.moveTo(lx[i] + 0.8 * ux / w, ly[i] + 0.8 * uy / w); marks.lineTo(lx[i] + (0.8 + len) * ux / w, ly[i] + (0.8 + len) * uy / w);
-    marks.moveTo(rx[i] - 0.8 * ux / w, ry[i] - 0.8 * uy / w); marks.lineTo(rx[i] - (0.8 + len) * ux / w, ry[i] - (0.8 + len) * uy / w);
-  }
-  const opt = ghost(c.opt), oPath = linePath(opt.x, opt.y);
-  oPath.closePath();
-  return { n, ds: tr.ds, lx, ly, rx, ry, mx, my, road, strips, edgeL, edgeR, mid, marks, bb: { x0, x1, y0, y1 },
-           line0: [lx[0], ly[0], rx[0], ry[0]], opt, oPath, L: tr.length };
+  const closed = (xs, ys) => { const p = linePath(xs, ys); p.closePath(); return p; };
+  const opt = ghost(c.opt);
+  return { n, ds: tr.ds, L: tr.length, lx, ly, rx, ry, mx, my, cx0, cy0, road, edgeL: closed(lx, ly), edgeR: closed(rx, ry),
+           inL: closed(ax, ay), inR: closed(bx, by), line0: [lx[0], ly[0], rx[0], ry[0]], opt, oPath: closed(opt.x, opt.y), fits: {} };
 }
+/* a point of the track at distance s, on any of its lines; the lap closes on itself */
+function at(k, X, Y, s) {
+  const u = ((s / k.ds) % k.n + k.n) % k.n, i0 = Math.floor(u) % k.n, i1 = (i0 + 1) % k.n, w = u - Math.floor(u);
+  return [X[i0] + w * (X[i1] - X[i0]), Y[i0] + w * (Y[i1] - Y[i0])];
+}
+function tangent(k, s) {
+  const p = at(k, k.mx, k.my, s - 1), q = at(k, k.mx, k.my, s + 1), d = Math.hypot(q[0] - p[0], q[1] - p[1]) || 1;
+  return [(q[0] - p[0]) / d, (q[1] - p[1]) / d];
+}
+const turnAt = (k, s) => { const p = tangent(k, s - 15), q = tangent(k, s + 15); return p[0] * q[1] - p[1] * q[0]; };   // > 0: a left-hander
+function nearestEdge(k, a) {
+  const i0 = Math.round(a.s / k.ds);
+  let best = null;
+  [["l", k.lx, k.ly], ["r", k.rx, k.ry]].forEach(([side, X, Y]) => {
+    for (let j = i0 - 8; j <= i0 + 8; j++) {
+      const i = ((j % k.n) + k.n) % k.n, i2 = (i + 1) % k.n, vx = X[i2] - X[i], vy = Y[i2] - Y[i];
+      const w = clamp(((a.x - X[i]) * vx + (a.y - Y[i]) * vy) / (vx * vx + vy * vy || 1), 0, 1);
+      const qx = X[i] + w * vx, qy = Y[i] + w * vy, d = Math.hypot(a.x - qx, a.y - qy);
+      if (!best || d < best.d) best = { d, x: qx, y: qy, side };
+    }
+  });
+  return best;
+}
+
 /* A circuit's geometry and optimal lap are built once; each network's run on it separately. */
-const AGENTS = { e0: { subject: D.subject, run: c => c, board: D.scoreboard } };
-if (D.margin) AGENTS.margin = { subject: D.margin.subject, run: c => D.margin.runs[c.id], board: D.margin.scoreboard };
+const AGENTS = { e0: { subject: D.subject, run: c => c, board: D.scoreboard, label: "Final agent" } };
+if (D.margin) AGENTS.margin = { subject: D.margin.subject, run: c => D.margin.runs[c.id], board: D.margin.scoreboard, label: "With margin" };
 let agentKey = "e0";
 const tracksBuilt = {}, runsBuilt = {};
 function circuit(id, key) {
@@ -517,24 +582,32 @@ function circuit(id, key) {
   const base = D.circuits.find(c => c.id === id), tk = tracksBuilt[id] || (tracksBuilt[id] = build(base)), rk = key + ":" + id;
   if (!runsBuilt[rk]) {
     const run = AGENTS[key].run(base), agent = ghost(run.agent), P = run.plot, np_ = P.va.length;
-    runsBuilt[rk] = Object.assign({}, tk, { c: Object.assign({}, run, { id: base.id, name: base.name, t_opt: base.t_opt }), agent,
+    runsBuilt[rk] = Object.assign(Object.create(tk), { c: Object.assign({}, run, { id: base.id, name: base.name, t_opt: base.t_opt }), agent,
       aPath: linePath(agent.x, agent.y), gs: i => i < np_ - 1 ? i * P.ds : P.s_end });
   }
   return runsBuilt[rk];
 }
 const boardRow = id => AGENTS[agentKey].board.circuits.find(r => r.id === id);
 const shownIdx = D.scoreboard.subjects.indexOf(D.subject.name);
+function lostAt(k, s) {
+  const P = k.c.plot, i = clamp(s / P.ds, 0, P.dt.length - 1), i0 = Math.min(P.dt.length - 2, Math.floor(i));
+  return (P.dt[i0] + (i - i0) * (P.dt[i0 + 1] - P.dt[i0])) / 1000;
+}
+function plotAt(k, key, s) {
+  const P = k.c.plot, A = P[key], i = clamp(s / P.ds, 0, A.length - 1), i0 = Math.min(A.length - 2, Math.floor(i));
+  return A[i0] + (i - i0) * (A[i0 + 1] - A[i0]);
+}
 
-/* ---------------------------------------------------------------- tooltip */
+/* ---------------------------------------------------------------- small parts */
 const tip = $("#tip");
 function showTip(x, y, rows) {
   tip.replaceChildren(...rows.map(r => { const d = H("div"); const b = H("strong"); b.textContent = r[0]; const s = H("span"); s.textContent = " " + r[1]; d.append(b, s); return d; }));
   tip.hidden = false;
   const b = tip.getBoundingClientRect();
-  let px = x + 14, py = y + 14;
-  if (px + b.width > innerWidth - 8) px = x - b.width - 14;
-  if (py + b.height > innerHeight - 8) py = y - b.height - 14;
-  tip.style.left = Math.max(8, px) + "px"; tip.style.top = Math.max(8, py) + "px";
+  let qx = x + 14, qy = y + 14;
+  if (qx + b.width > innerWidth - 8) qx = x - b.width - 14;
+  if (qy + b.height > innerHeight - 8) qy = y - b.height - 14;
+  tip.style.left = Math.max(8, qx) + "px"; tip.style.top = Math.max(8, qy) + "px";
 }
 const hideTip = () => { tip.hidden = true; };
 function hover(el, rows) {
@@ -551,141 +624,225 @@ function table(head, rows) {
   rows.forEach(r => { const tr = H("tr"); r.forEach((v, i) => { const c = H("td", head[i][1] ? { class: "num" } : {}); c.textContent = v; tr.append(c); }); tb.append(tr); });
   t.append(tb); return t;
 }
-function pair(el, items) {
-  items.forEach(([n, l]) => { const d = H("div"), a = H("div", { class: "num" }), b = H("div", { class: "lab" }); a.textContent = n; b.textContent = l; d.append(a, b); el.append(d); });
-}
-function dotRow(r, ring) {
-  const wrap = H("span", { class: "dots", role: "img", "aria-label": r.n_done + " of 5 networks finished" });
-  r.nets.forEach((nt, i) => {
-    const g = S("svg", { viewBox: "0 0 16 16" });
-    if (i === ring) g.append(S("circle", { cx: 8, cy: 8, r: 7, fill: "none", stroke: "var(--series-1)", "stroke-width": 1.6 }));
-    g.append(S("circle", nt.done ? { cx: 8, cy: 8, r: 4, fill: "var(--ink)" } : { cx: 8, cy: 8, r: 3.3, fill: "none", stroke: "var(--muted)", "stroke-width": 1.5 }));
-    wrap.append(g);
-  });
+function marks(r, me) {
+  const wrap = H("span", { class: "marks", role: "img", "aria-label": r.n_done + " of 5 networks finished" });
+  r.nets.forEach((nt, i) => wrap.append(H("i", { class: (nt.done ? "on" : "") + (i === me ? " me" : "") })));
   return wrap;
 }
-$$(".tog").forEach(b => b.addEventListener("click", () => {
-  const t = $("#" + b.dataset.table); t.hidden = !t.hidden;
-  b.textContent = t.hidden ? "Show as a table" : "Hide the table";
-}));
+const meas = (() => { const c = document.createElement("canvas").getContext("2d"); return (str, font) => { c.font = font; return c.measureText(str).width; }; })();
+const toSheet = () => $("#sheet").scrollIntoView({ block: "start", behavior: reduced ? "auto" : "smooth" });
 
-/* ---------------------------------------------------------------- replay */
-const css = getComputedStyle(document.documentElement);
-const col = k => css.getPropertyValue(k).trim();
-const C = { ground: col("--scr-ground"), asphalt: col("--scr-asphalt"), strip: col("--scr-strip"), edge: col("--scr-edge"),
-            opt: col("--scr-opt"), agent: col("--scr-agent"), crash: col("--scr-crash") };
-const view = $("#view"), ctx = view.getContext("2d"), mini = $("#mini"), mctx = mini.getContext("2d");
-const reduced = matchMedia("(prefers-reduced-motion: reduce)").matches;
-let cur = null, t = 0, playing = false, rate = 1, cam = "follow", last = 0, raf = 0, onScreen = true, sight = true;
-const CAR_L = 5.6, CAR_W = 2.0;
+/* ---------------------------------------------------------------- the stage */
+const css = getComputedStyle(document.documentElement), col = k => css.getPropertyValue(k).trim();
+const C = { paper: col("--paper"), ink: col("--ink"), muted: col("--muted"), rule: col("--rule"), road: col("--road"), opt: col("--opt"), lost: col("--lost") };
+const SANS = "'IBM Plex Sans Condensed', 'Arial Narrow', Arial, sans-serif", MONO = "'IBM Plex Mono', Menlo, Consolas, monospace";
+const FONT = { cap: "600 11px " + SANS, mono: "400 13px " + MONO, dim: "400 12px " + MONO, small: "400 10px " + MONO, note: "500 12px " + SANS };
+const view = $("#view"), ctx = view.getContext("2d");
+let cur = null, t = 0, playing = false, rate = 1, cam = "detail", last = 0, raf = 0, onScreen = true, sight = true, zoomS = 0, stageM = null;
 
-function camFollow(W, Hh, a, hs) {
-  const zoom = W / ((W < 520 ? 70 : 105) + a.v);
-  const phi = Math.PI / 2 - hs, cs = Math.cos(phi), sn = Math.sin(phi);
-  return { zoom, a: zoom * cs, b: -zoom * sn, c: -zoom * sn, d: -zoom * cs,
-           e: W / 2 - zoom * (a.x * cs - a.y * sn), f: Hh * 0.7 + zoom * (a.x * sn + a.y * cs) };
+/* world metres (x east, y north) to screen pixels: turn by rot about (cx, cy), scale, flip y */
+function M(zoom, rot, cx, cy, sx, sy) {
+  const cs = Math.cos(rot), sn = Math.sin(rot), a = zoom * cs, c = -zoom * sn, b = -zoom * sn, d = -zoom * cs;
+  return { zoom, rot, a, b, c, d, e: sx - (a * cx + c * cy), f: sy - (b * cx + d * cy) };
 }
-function ground(g, m, W, Hh) {
-  // a faint world-fixed grid, so speed and rotation read on a straight
-  const step = m.zoom > 1.6 ? 50 : 250, det = m.a * m.d - m.b * m.c;
-  let x0 = Infinity, x1 = -Infinity, y0 = Infinity, y1 = -Infinity;
-  [[0, 0], [W, 0], [0, Hh], [W, Hh]].forEach(([u, v]) => {
-    const x = (m.d * (u - m.e) - m.c * (v - m.f)) / det, y = (-m.b * (u - m.e) + m.a * (v - m.f)) / det;
-    x0 = Math.min(x0, x); x1 = Math.max(x1, x); y0 = Math.min(y0, y); y1 = Math.max(y1, y);
-  });
-  g.beginPath();
-  for (let x = Math.ceil(x0 / step) * step; x <= x1; x += step) { g.moveTo(x, y0); g.lineTo(x, y1); }
-  for (let y = Math.ceil(y0 / step) * step; y <= y1; y += step) { g.moveTo(x0, y); g.lineTo(x1, y); }
-  g.lineWidth = 1 / m.zoom; g.strokeStyle = "rgba(255,255,255,.055)"; g.stroke();
+const toPx = (m, x, y) => [m.a * x + m.c * y + m.e, m.b * x + m.d * y + m.f];
+const dirPx = (m, vx, vy) => [(m.a * vx + m.c * vy) / m.zoom, (m.b * vx + m.d * vy) / m.zoom];
+function fromPx(m, u, v) { const det = m.a * m.d - m.b * m.c; return [(m.d * (u - m.e) - m.c * (v - m.f)) / det, (-m.b * (u - m.e) + m.a * (v - m.f)) / det]; }
+/* the turn of the whole circuit that fills a box best, north kept in the upper half */
+function fitRot(k, W, Hh, pad) {
+  const key = Math.round(W) + "x" + Math.round(Hh) + "/" + pad;
+  if (k.fits[key]) return k.fits[key];
+  const step = Math.max(1, Math.floor(k.n / 400));
+  let best = null;
+  for (let deg = 0; deg < 180; deg += 2) {
+    const r = deg * Math.PI / 180, cs = Math.cos(r), sn = Math.sin(r);
+    let x0 = Infinity, x1 = -Infinity, y0 = Infinity, y1 = -Infinity;
+    for (let i = 0; i < k.n; i += step) {
+      const x = cs * k.mx[i] - sn * k.my[i], y = sn * k.mx[i] + cs * k.my[i];
+      if (x < x0) x0 = x; if (x > x1) x1 = x; if (y < y0) y0 = y; if (y > y1) y1 = y;
+    }
+    const z = Math.min((W - 2 * pad) / (x1 - x0), (Hh - 2 * pad) / (y1 - y0));
+    if (!best || z > best.zoom * 1.0001) best = { zoom: z, rot: r, qx: (x0 + x1) / 2, qy: (y0 + y1) / 2 };
+  }
+  const cs = Math.cos(best.rot), sn = Math.sin(best.rot);
+  best.cx = cs * best.qx + sn * best.qy; best.cy = -sn * best.qx + cs * best.qy;
+  if (cs < 0) best.rot += Math.PI;
+  return (k.fits[key] = best);
 }
-function camWhole(W, Hh, bb, pad) {
-  const bw = bb.x1 - bb.x0, bh = bb.y1 - bb.y0;
-  const f0 = Math.min(W / bw, Hh / bh), f90 = Math.min(W / bh, Hh / bw), rot = f90 > f0 * 1.15;
-  const zoom = (pad || 0.86) * (rot ? f90 : f0), phi = rot ? Math.PI / 2 : 0, cs = Math.cos(phi), sn = Math.sin(phi);
-  const cx = (bb.x0 + bb.x1) / 2, cy = (bb.y0 + bb.y1) / 2;
-  return { zoom, a: zoom * cs, b: -zoom * sn, c: -zoom * sn, d: -zoom * cs,
-           e: W / 2 - zoom * (cx * cs - cy * sn), f: Hh / 2 + zoom * (cx * sn + cy * cs) };
+/* the detail view: the network's car heads to the right, a third of the way in, and the view
+   opens out as far as it must to keep the optimal car in the drawing */
+function camDetail(W, Hh, a, o, hs, snap, alone) {
+  const cs = Math.cos(hs), sn = Math.sin(hs), dx = o.x - a.x, dy = o.y - a.y;
+  const fx = cs * dx + sn * dy, fy = -sn * dx + cs * dy, ax = W * 0.3, ay = Hh * 0.56;
+  const base = W < 560 ? 4.4 : W < 820 ? 5.6 : 7;
+  let z = alone ? base : Math.min(base, fx >= 0 ? (W * 0.56) / Math.max(1, fx) : (W * 0.2) / Math.max(1, -fx),
+                                  fy >= 0 ? (ay - 72) / Math.max(1, fy) : (Hh - ay - 72) / Math.max(1, -fy));
+  z = Math.max(0.62 * base, z);
+  zoomS = snap || !zoomS ? z : zoomS + (z - zoomS) * 0.12;
+  return M(zoomS, -hs, a.x, a.y, ax, ay);
 }
 function fit(cv) {
   const dpr = Math.min(2, window.devicePixelRatio || 1), W = cv.clientWidth, Hh = cv.clientHeight;
   if (cv.width !== Math.round(W * dpr) || cv.height !== Math.round(Hh * dpr)) { cv.width = Math.round(W * dpr); cv.height = Math.round(Hh * dpr); }
   return { dpr, W, Hh };
 }
-function car(g, m, p, isAgent) {
-  g.save(); g.translate(p.x, p.y);
-  if (m.zoom * CAR_L < 9) {
-    g.beginPath(); g.arc(0, 0, 4.5 / m.zoom, 0, 2 * Math.PI);
-    if (isAgent) { g.fillStyle = C.agent; g.fill(); g.lineWidth = 1.5 / m.zoom; g.strokeStyle = C.ground; g.stroke(); }
-    else { g.lineWidth = 2 / m.zoom; g.strokeStyle = C.opt; g.stroke(); }
-  } else {
-    g.rotate(p.h); g.beginPath();
-    if (g.roundRect) g.roundRect(-CAR_L / 2, -CAR_W / 2, CAR_L, CAR_W, 0.45); else g.rect(-CAR_L / 2, -CAR_W / 2, CAR_L, CAR_W);
-    if (isAgent) { g.fillStyle = C.agent; g.fill(); g.fillStyle = C.ground; g.fillRect(CAR_L / 2 - 1.5, -CAR_W / 2 + 0.3, 0.55, CAR_W - 0.6); }
-    else { g.fillStyle = "rgba(244,246,249,.14)"; g.fill(); g.lineWidth = 1.6 / m.zoom; g.strokeStyle = C.opt; g.stroke(); }
-  }
+/* a single-seater in plan, in metres, nose along +x */
+const CAR = {
+  body: [[2.9, 0.12], [1.3, 0.30], [0.6, 0.58], [-0.9, 0.66], [-2.25, 0.46], [-2.25, -0.46], [-0.9, -0.66], [0.6, -0.58], [1.3, -0.30], [2.9, -0.12]],
+  wings: [[[2.55, 0.95], [2.98, 0.95], [2.98, -0.95], [2.55, -0.95]], [[-2.78, 0.78], [-2.3, 0.78], [-2.3, -0.78], [-2.78, -0.78]]],
+  wheels: [[[1.45, 0.72], [2.15, 0.72], [2.15, 1], [1.45, 1]], [[1.45, -0.72], [2.15, -0.72], [2.15, -1], [1.45, -1]],
+           [[-2.05, 0.66], [-1.25, 0.66], [-1.25, 1], [-2.05, 1]], [[-2.05, -0.66], [-1.25, -0.66], [-1.25, -1], [-2.05, -1]]] };
+function carShape(g, p, z, stroke) {
+  g.save(); g.translate(p.x, p.y); g.rotate(p.h);
+  g.lineWidth = 1.25 / z; g.strokeStyle = stroke; g.lineJoin = "round";
+  const poly = (pts, fill) => { g.beginPath(); pts.forEach((q, i) => { if (i) g.lineTo(q[0], q[1]); else g.moveTo(q[0], q[1]); }); g.closePath(); g.fillStyle = fill; g.fill(); g.stroke(); };
+  CAR.wheels.forEach(w => poly(w, stroke)); CAR.wings.forEach(w => poly(w, C.paper)); poly(CAR.body, C.paper);
   g.restore();
 }
+function text(str, x, y, font, color, align, spacing) {
+  ctx.font = font; ctx.textAlign = align || "left"; ctx.textBaseline = "alphabetic";
+  if ("letterSpacing" in ctx) ctx.letterSpacing = spacing || "0px";
+  ctx.lineJoin = "round"; ctx.lineWidth = 4; ctx.strokeStyle = C.paper; ctx.strokeText(str, x, y);
+  ctx.fillStyle = color; ctx.fillText(str, x, y);
+}
+const capLabel = (name, sub, x, y, align, color) => { text(name, x, y - 3, FONT.cap, color, align, "1.1px"); text(sub, x, y + 12, FONT.mono, color, align); };
+function arrowLine(p, q) {
+  const L = Math.hypot(q[0] - p[0], q[1] - p[1]) || 1, ux = (q[0] - p[0]) / L, uy = (q[1] - p[1]) / L, s = 6.5;
+  ctx.strokeStyle = C.ink; ctx.fillStyle = C.ink; ctx.lineWidth = 0.8;
+  ctx.beginPath(); ctx.moveTo(p[0], p[1]); ctx.lineTo(q[0], q[1]); ctx.stroke();
+  [[p, 1], [q, -1]].forEach(([tp, sg]) => {
+    ctx.beginPath(); ctx.moveTo(tp[0], tp[1]);
+    ctx.lineTo(tp[0] + sg * s * ux - 0.3 * s * uy, tp[1] + sg * s * uy + 0.3 * s * ux);
+    ctx.lineTo(tp[0] + sg * s * ux + 0.3 * s * uy, tp[1] + sg * s * uy - 0.3 * s * ux);
+    ctx.closePath(); ctx.fill();
+  });
+}
+
 function draw() {
   if (!cur) return;
-  const { dpr, W, Hh } = fit(view), k = cur, a = sample(k.agent, t), o = sample(k.opt, t % k.opt.T);
-  ctx.setTransform(dpr, 0, 0, dpr, 0, 0); ctx.fillStyle = C.ground; ctx.fillRect(0, 0, W, Hh);
+  const { dpr, W, Hh } = fit(view), k = cur, c = k.c, a = sample(k.agent, t), o = sample(k.opt, t % k.opt.T);
+  const ended = t >= k.agent.T - 1e-6, detail = cam === "detail";
+  ctx.setTransform(dpr, 0, 0, dpr, 0, 0); ctx.clearRect(0, 0, W, Hh);
   let m;
-  if (cam === "follow") {
+  if (detail) {
     const hs = (sample(k.agent, t - 0.45).h + 2 * a.h + sample(k.agent, t + 0.45).h) / 4;
-    m = camFollow(W, Hh, a, hs);
-  } else m = camWhole(W, Hh, k.bb);
+    m = camDetail(W, Hh, a, o, hs, !playing, !c.completed);
+  } else { const f = fitRot(k, W, Hh, 58); m = M(f.zoom, f.rot, f.cx, f.cy, W / 2, Hh / 2); }
+  stageM = detail ? m : null;
+  const z = m.zoom, near = z > 0.9;
   ctx.setTransform(dpr * m.a, dpr * m.b, dpr * m.c, dpr * m.d, dpr * m.e, dpr * m.f);
-  ground(ctx, m, W, Hh);
-  ctx.fillStyle = C.asphalt; ctx.fill(k.road);
-  if (m.zoom > 0.6) { ctx.fillStyle = C.strip; ctx.fill(k.strips); }
-  ctx.lineJoin = "round"; ctx.strokeStyle = C.edge;
-  if (m.zoom > 1.6) { ctx.globalAlpha = 0.5; ctx.lineWidth = 1.6 / m.zoom; ctx.stroke(k.marks); ctx.globalAlpha = 1; }
-  ctx.lineWidth = 1.4 / m.zoom; ctx.stroke(k.edgeL); ctx.stroke(k.edgeR);
-  ctx.beginPath(); ctx.moveTo(k.line0[0], k.line0[1]); ctx.lineTo(k.line0[2], k.line0[3]); ctx.lineWidth = Math.max(0.9, 3 / m.zoom); ctx.stroke();
-  ctx.lineWidth = 1.6 / m.zoom; ctx.strokeStyle = "rgba(244,246,249,.42)"; ctx.stroke(k.oPath);
-  ctx.strokeStyle = C.agent; ctx.globalAlpha = 0.85; ctx.stroke(k.aPath); ctx.globalAlpha = 1;
-  const ended = t >= k.agent.T - 1e-6;
-  if (k.c.crash && ended) {
-    const r = Math.max(2.4, 9 / m.zoom);
-    ctx.strokeStyle = C.crash; ctx.lineWidth = Math.max(0.5, 2.6 / m.zoom); ctx.beginPath();
+  ctx.lineJoin = "round"; ctx.lineCap = "butt";
+  ctx.fillStyle = C.road; ctx.fill(k.road);
+  if (near) { ctx.setLineDash([2 / z, 4 / z]); ctx.lineWidth = 0.8 / z; ctx.strokeStyle = C.rule; ctx.stroke(k.inL); ctx.stroke(k.inR); ctx.setLineDash([]); }
+  ctx.strokeStyle = C.ink; ctx.lineWidth = (near ? 1.5 : 1) / z; ctx.stroke(k.edgeL); ctx.stroke(k.edgeR);
+  ctx.beginPath(); ctx.moveTo(k.line0[0], k.line0[1]); ctx.lineTo(k.line0[2], k.line0[3]); ctx.lineWidth = Math.max(0.6, 2.4 / z); ctx.stroke();
+  if (near) { ctx.lineWidth = 1.2 / z; ctx.strokeStyle = C.opt; ctx.stroke(k.oPath); ctx.strokeStyle = C.ink; ctx.stroke(k.aPath); }
+  // the policy's preview, as the environment builds it: 40 points on each edge at
+  // s + d_max (j/40)^1.5, with d_max = 6 s of travel clipped to 150-500 m
+  const dmax = clamp(6 * a.v, 150, 500);
+  if (sight) {
+    const r = (near ? 3.1 : 2.2) / z;
+    ctx.fillStyle = C.paper; ctx.strokeStyle = C.ink; ctx.lineWidth = 1.1 / z; ctx.beginPath();
+    for (let j = 1; j <= 40; j++) {
+      const s = a.s + dmax * Math.pow(j / 40, 1.5), p = at(k, k.lx, k.ly, s), q = at(k, k.rx, k.ry, s);
+      ctx.moveTo(p[0] + r, p[1]); ctx.arc(p[0], p[1], r, 0, 2 * Math.PI); ctx.moveTo(q[0] + r, q[1]); ctx.arc(q[0], q[1], r, 0, 2 * Math.PI);
+    }
+    ctx.fill(); ctx.stroke();
+  }
+  const big = z * 5.6 >= 13;
+  if (big) { carShape(ctx, o, z, C.opt); carShape(ctx, a, z, C.ink); }
+  else {
+    ctx.beginPath(); ctx.arc(o.x, o.y, 4.8 / z, 0, 2 * Math.PI); ctx.fillStyle = C.paper; ctx.fill(); ctx.lineWidth = 1.8 / z; ctx.strokeStyle = C.opt; ctx.stroke();
+    ctx.beginPath(); ctx.arc(a.x, a.y, 4.8 / z, 0, 2 * Math.PI); ctx.fillStyle = C.ink; ctx.fill();
+  }
+  if (c.crash && ended) {
+    const r = Math.max(2.2, 9 / z);
+    ctx.strokeStyle = C.lost; ctx.lineWidth = Math.max(0.4, 2.4 / z); ctx.beginPath();
     ctx.moveTo(a.x - r, a.y - r); ctx.lineTo(a.x + r, a.y + r); ctx.moveTo(a.x - r, a.y + r); ctx.lineTo(a.x + r, a.y - r); ctx.stroke();
   }
-  if (sight) {
-    // the policy's preview, as the environment builds it: 40 points on each edge at
-    // s + d_max (k/40)^1.5, with d_max = 6 s of travel clipped to 150-500 m
-    const dmax = clamp(6 * a.v, 150, 500), r = Math.max(0.5, 2.3 / m.zoom);
-    ctx.fillStyle = C.agent; ctx.globalAlpha = 0.95; ctx.beginPath();
-    for (let j = 1; j <= 40; j++) {
-      const u = ((a.s + dmax * Math.pow(j / 40, 1.5)) / k.ds) % k.n, i0 = Math.floor(u), i1 = (i0 + 1) % k.n, w = u - i0;
-      const px = k.lx[i0] + w * (k.lx[i1] - k.lx[i0]), py = k.ly[i0] + w * (k.ly[i1] - k.ly[i0]);
-      const qx = k.rx[i0] + w * (k.rx[i1] - k.rx[i0]), qy = k.ry[i0] + w * (k.ry[i1] - k.ry[i0]);
-      ctx.moveTo(px + r, py); ctx.arc(px, py, r, 0, 2 * Math.PI); ctx.moveTo(qx + r, qy); ctx.arc(qx, qy, r, 0, 2 * Math.PI);
+
+  /* annotations, in screen pixels */
+  ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+  const A = toPx(m, a.x, a.y), B = toPx(m, o.x, o.y), gapM = Math.hypot(o.x - a.x, o.y - a.y);
+  const d = c.completed ? lostAt(k, a.s) : null;
+  const vA = Math.round(a.v * 3.6) + " km/h", vO = Math.round(o.v * 3.6) + " km/h";
+  if (detail) {
+    const ne = nearestEdge(k, a), E = toPx(m, ne.x, ne.y), el = Math.hypot(E[0] - A[0], E[1] - A[1]) || 1, ux = (E[0] - A[0]) / el, uy = (E[1] - A[1]) / el;
+    ctx.strokeStyle = C.lost; ctx.lineWidth = 1.1; ctx.beginPath(); ctx.moveTo(A[0], A[1]); ctx.lineTo(E[0], E[1]);
+    ctx.moveTo(E[0] + 5 * uy, E[1] - 5 * ux); ctx.lineTo(E[0] - 5 * uy, E[1] + 5 * ux); ctx.stroke();
+    ctx.fillStyle = C.lost; ctx.beginPath(); ctx.arc(A[0], A[1], 2.2, 0, 2 * Math.PI); ctx.fill();
+    const tn = turnAt(k, a.s), which = Math.abs(tn) < 0.04 ? "" : ((tn > 0) === (ne.side === "l") ? "inside " : "outside ");
+    text(ne.d.toFixed(1) + " m to the " + which + "edge", E[0] + 13 * ux, E[1] + 13 * uy + (uy > 0.3 ? 10 : uy < -0.3 ? -2 : 4), FONT.note, C.lost,
+         Math.abs(ux) < 0.4 ? "center" : ux > 0 ? "left" : "right");
+    const sep = Math.hypot(B[0] - A[0], B[1] - A[1]), inView = B[0] > 30 && B[0] < W - 30 && B[1] > 30 && B[1] < Hh - 30;
+    if (sep > 64 && inView && !(c.crash && ended)) {
+      // the gap to the optimal car as a dimension line, set off to the upper side
+      const ux2 = (B[0] - A[0]) / sep, uy2 = (B[1] - A[1]) / sep;
+      let nx = uy2, ny = -ux2; if (ny > 0) { nx = -nx; ny = -ny; }
+      const la = at(k, k.lx, k.ly, a.s), lo = at(k, k.lx, k.ly, o.s);
+      const off = clamp(Math.max(Math.hypot(a.x - la[0], a.y - la[1]), Math.hypot(o.x - lo[0], o.y - lo[1])) * z + 30, 62, 150);
+      const A2 = [A[0] + off * nx, A[1] + off * ny], B2 = [B[0] + off * nx, B[1] + off * ny];
+      ctx.strokeStyle = C.ink; ctx.lineWidth = 0.7; ctx.beginPath();
+      ctx.moveTo(A[0] + 16 * nx, A[1] + 16 * ny); ctx.lineTo(A2[0] + 6 * nx, A2[1] + 6 * ny);
+      ctx.moveTo(B[0] + 16 * nx, B[1] + 16 * ny); ctx.lineTo(B2[0] + 6 * nx, B2[1] + 6 * ny); ctx.stroke();
+      arrowLine(A2, B2);
+      let ang = Math.atan2(uy2, ux2); if (ang > Math.PI / 2 || ang < -Math.PI / 2) ang += Math.PI;
+      ctx.save(); ctx.translate((A2[0] + B2[0]) / 2 + 9 * nx, (A2[1] + B2[1]) / 2 + 9 * ny); ctx.rotate(ang);
+      text(gapM.toFixed(1) + " m" + (d == null ? "" : " · " + Math.abs(d).toFixed(2) + " s"), 0, 0, FONT.dim, C.ink, "center");
+      ctx.restore();
+      capLabel("NETWORK", vA, A2[0] - 10 * ux2, A2[1], ux2 > 0 ? "right" : "left", C.ink);
+      capLabel("OPTIMAL LAP", vO, B2[0] + 10 * ux2, B2[1], ux2 > 0 ? "left" : "right", C.opt);
+    } else {
+      // too close for a dimension line: two leaders, up and apart
+      const lead = (P0, dx, dy, name, sub, color) => {
+        ctx.strokeStyle = color; ctx.lineWidth = 0.7; ctx.beginPath(); ctx.moveTo(P0[0] + dx * 0.22, P0[1] + dy * 0.22); ctx.lineTo(P0[0] + dx, P0[1] + dy); ctx.stroke();
+        capLabel(name, sub, P0[0] + dx + (dx < 0 ? -6 : 6), P0[1] + dy, dx < 0 ? "right" : "left", color);
+      };
+      lead(A, -62, -62, "NETWORK", vA, C.ink);
+      if (inView && !(c.crash && ended)) lead(B, 62, -62, "OPTIMAL LAP", sep > 6 ? vO : vO + " · level", C.opt);
+      else if (!inView && !ended) {
+        // the optimal car is out of the drawing: an arrowhead where the line to it leaves the frame
+        const dx = (B[0] - A[0]) / sep, dy = (B[1] - A[1]) / sep, pad = 34;
+        const tx = dx > 0 ? (W - pad - A[0]) / dx : dx < 0 ? (pad - A[0]) / dx : Infinity, ty = dy > 0 ? (Hh - pad - A[1]) / dy : dy < 0 ? (pad - A[1]) / dy : Infinity;
+        const tt = Math.min(tx, ty), X = A[0] + tt * dx, Y = A[1] + tt * dy, side = tx < ty;
+        ctx.fillStyle = C.opt; ctx.beginPath(); ctx.moveTo(X + 9 * dx, Y + 9 * dy); ctx.lineTo(X - 5 * dx - 6 * dy, Y - 5 * dy + 6 * dx); ctx.lineTo(X - 5 * dx + 6 * dy, Y - 5 * dy - 6 * dx); ctx.closePath(); ctx.fill();
+        const cs0 = Math.cos(stageM.rot), sn0 = Math.sin(stageM.rot), ahead = cs0 * (o.x - a.x) - sn0 * (o.y - a.y) >= 0;
+        const note = Math.round(gapM) + " m " + (ahead ? "ahead" : "behind") + (d == null ? "" : " · " + Math.abs(d).toFixed(2) + " s");
+        capLabel("OPTIMAL LAP", note, side ? X + (dx > 0 ? -16 : 16) : X, side ? Y : Y + (dy > 0 ? -30 : 26), side ? (dx > 0 ? "right" : "left") : "center", C.opt);
+      }
     }
-    ctx.fill(); ctx.globalAlpha = 1;
+  } else {
+    // in the whole-circuit view the two dots are named in a key under the title, clear of the track
+    const ky = ended ? 122 : 76;
+    ctx.beginPath(); ctx.arc(29, ky - 4, 4.4, 0, 2 * Math.PI); ctx.fillStyle = C.ink; ctx.fill();
+    text("NETWORK", 42, ky, FONT.cap, C.ink, "left", "1.1px"); text(vA, 108, ky, FONT.dim, C.ink, "left");
+    ctx.beginPath(); ctx.arc(29, ky + 15, 4, 0, 2 * Math.PI); ctx.fillStyle = C.paper; ctx.fill(); ctx.lineWidth = 1.7; ctx.strokeStyle = C.opt; ctx.stroke();
+    text("OPTIMAL LAP", 42, ky + 19, FONT.cap, C.opt, "left", "1.1px"); text(vO, 124, ky + 19, FONT.dim, C.opt, "left");
   }
-  car(ctx, m, o, false); car(ctx, m, a, true);
+  // scale bar, top right
+  const mlen = [2, 5, 10, 20, 50, 100, 200, 500, 1000].find(v => v * z >= (W < 560 ? 52 : 96)) || 1000, bl = mlen * z, bx = W - 28 - bl, by = 42;
+  ctx.strokeStyle = C.ink; ctx.lineWidth = 1; ctx.beginPath(); ctx.moveTo(bx, by); ctx.lineTo(bx + bl, by);
+  [0, 0.5, 1].forEach(f => { ctx.moveTo(bx + f * bl, by - 5); ctx.lineTo(bx + f * bl, by); }); ctx.stroke();
+  text("0", bx, by - 9, FONT.small, C.muted, "center"); text(String(mlen / 2), bx + bl / 2, by - 9, FONT.small, C.muted, "center");
+  text(mlen >= 1000 ? "1 km" : mlen + " m", bx + bl, by - 9, FONT.small, C.muted, "center");
 
-  const f = fit(mini), mm = camWhole(f.W, f.Hh, k.bb, 0.84);
-  mctx.setTransform(f.dpr, 0, 0, f.dpr, 0, 0); mctx.clearRect(0, 0, f.W, f.Hh);
-  mctx.setTransform(f.dpr * mm.a, f.dpr * mm.b, f.dpr * mm.c, f.dpr * mm.d, f.dpr * mm.e, f.dpr * mm.f);
-  mctx.lineJoin = "round"; mctx.lineWidth = 2 / mm.zoom; mctx.strokeStyle = "rgba(232,235,240,.6)"; mctx.stroke(k.mid);
-  mctx.beginPath(); mctx.arc(o.x, o.y, 3.2 / mm.zoom, 0, 2 * Math.PI); mctx.lineWidth = 1.5 / mm.zoom; mctx.strokeStyle = C.opt; mctx.stroke();
-  mctx.beginPath(); mctx.arc(a.x, a.y, 3.6 / mm.zoom, 0, 2 * Math.PI); mctx.fillStyle = C.agent; mctx.fill();
-
-  $("#hudClock").textContent = clockStr(t);
-  $("#hudSpeed").textContent = Math.round(a.v * 3.6);
-  $("#barT").style.width = (100 * clamp(a.p, 0, 1)).toFixed(0) + "%";
-  $("#barB").style.width = (100 * clamp(-a.p, 0, 1)).toFixed(0) + "%";
-  $("#barG").style.width = (100 * clamp(a.g, 0, 1)).toFixed(0) + "%";
-  if (k.c.completed) {
-    const P = k.c.plot, i = clamp(a.s / P.ds, 0, P.dt.length - 1), i0 = Math.min(P.dt.length - 2, Math.floor(i));
-    const d = (P.dt[i0] + (i - i0) * (P.dt[i0 + 1] - P.dt[i0])) / 1000;
-    $("#hudDelta").textContent = (d >= 0 ? "+" : "−") + Math.abs(d).toFixed(2) + " s";
-  } else $("#hudDelta").textContent = Math.round(a.s).toLocaleString("en-US") + " m";
-  $("#hudEnd").hidden = !ended;
+  /* the readout and the other drawings follow the car */
+  const grp = c.corners.find(q => a.s >= q.s0 && a.s < q.s1);
+  set($("#stKicker"), detail ? "Detail · " + (grp ? "corner " + cname(grp.name) : "the start straight") : "Whole circuit");
+  set($("#stWhere"), (a.s / 1000).toFixed(2) + " km into the lap");
+  set($("#keyD"), String(Math.round(dmax)));
+  const out = $("#roDelta");
+  if (c.completed) {
+    set(out, signed(d, 2)); out.classList.toggle("plain", d < 0);
+    set($("#roSubA"), "seconds " + (d >= 0 ? "behind" : "ahead of") + " the optimal car,"); set($("#roSubB"), clockStr(t) + " into the lap");
+  } else {
+    set(out, metres(a.s) + " m"); out.classList.add("plain");
+    set($("#roSubA"), ended ? "where this run ends," : "of " + metres(k.L) + " m, " + clockStr(t) + " in."); set($("#roSubB"), ended ? clockStr(t) + " in" : "This run does not finish.");
+  }
+  $("#stEnd").hidden = !ended;
   if (!scrubbing) $("#scrub").value = Math.round(1000 * t / k.agent.T);
-  const head = $("#playhead");
-  if (head && teleX) { const x = teleX(a.s); head.setAttribute("x1", x); head.setAttribute("x2", x); }
+  if (planLive) planLive(a, o, W, Hh);
+  if (teleLive) teleLive(a);
 }
 function tick(now) {
   raf = 0;
@@ -697,251 +854,344 @@ function tick(now) {
   if (playing && onScreen) raf = requestAnimationFrame(tick);
 }
 function kick() { if (!raf) { last = performance.now(); raf = requestAnimationFrame(tick); } }
-function syncPlay() { $("#btnPlay").textContent = playing ? "Pause" : (t >= cur.agent.T - 1e-6 ? "Replay" : "Play"); }
+function syncPlay() { $("#btnPlay").textContent = playing ? "Pause" : (cur && t >= cur.agent.T - 1e-6 ? "Replay" : "Play"); }
 function play(on) {
   if (on && t >= cur.agent.T - 1e-6) t = 0;
   playing = on; syncPlay(); kick();
 }
 function seek(tt) { t = clamp(tt, 0, cur.agent.T); syncPlay(); kick(); }
 $("#btnPlay").addEventListener("click", () => play(!playing));
-$("#btnRestart").addEventListener("click", () => { t = 0; play(true); });
-$$("[data-rate]").forEach(b => b.addEventListener("click", () => { rate = +b.dataset.rate; $$("[data-rate]").forEach(x => x.setAttribute("aria-pressed", x === b)); }));
-$$("[data-cam]").forEach(b => b.addEventListener("click", () => { cam = b.dataset.cam; $$("[data-cam]").forEach(x => x.setAttribute("aria-pressed", x === b)); kick(); }));
-$("#btnSight").addEventListener("click", e => { sight = !sight; e.currentTarget.setAttribute("aria-pressed", sight); kick(); });
+$("#btnRate").addEventListener("click", e => { rate = rate === 1 ? 2 : rate === 2 ? 4 : 1; e.currentTarget.textContent = "Speed " + rate + "×"; e.currentTarget.setAttribute("aria-label", "Playback speed, " + rate + " times"); });
+function setCam(v) { cam = v; zoomS = 0; $("#btnCam").textContent = cam === "detail" ? "Whole circuit" : "Follow the car"; kick(); }
+$("#btnCam").addEventListener("click", () => setCam(cam === "detail" ? "whole" : "detail"));
+$("#btnSight").addEventListener("click", e => { sight = !sight; e.currentTarget.setAttribute("aria-pressed", String(sight)); e.currentTarget.textContent = sight ? "Hide what it sees" : "Show what it sees"; kick(); });
 let scrubbing = false;
 const scrub = $("#scrub");
 scrub.addEventListener("input", () => { scrubbing = true; seek(cur.agent.T * scrub.value / 1000); });
 scrub.addEventListener("change", () => { scrubbing = false; });
-new IntersectionObserver(es => { onScreen = es[0].isIntersecting; if (onScreen && playing) kick(); }).observe($("#screen"));
+new IntersectionObserver(es => { onScreen = es[0].isIntersecting; if (onScreen && playing) kick(); }).observe($("#sheet"));
 
-/* ---------------------------------------------------------------- picker */
-function thumb(k) {
-  const W = 96, Hh = 46, pad = 5, bb = k.bb, z = Math.min((W - 2 * pad) / (bb.x1 - bb.x0), (Hh - 2 * pad) / (bb.y1 - bb.y0));
-  const X = x => (W / 2 + z * (x - (bb.x0 + bb.x1) / 2)).toFixed(1), Y = y => (Hh / 2 - z * (y - (bb.y0 + bb.y1) / 2)).toFixed(1);
-  const step = Math.max(1, Math.floor(k.n / 240));
-  let d = "";
-  for (let i = 0; i < k.n; i += step) d += (i ? "L" : "M") + X(k.mx[i]) + "," + Y(k.my[i]);
-  const g = S("svg", { viewBox: `0 0 ${W} ${Hh}`, "aria-hidden": "true" }, S("path", { d: d + "Z" }));
-  if (k.c.crash) {
-    const e = sample(k.agent, k.agent.T), x = +X(e.x), y = +Y(e.y), r = 3.6;
-    g.append(S("path", { class: "x", d: `M${x - r},${y - r}L${x + r},${y + r}M${x - r},${y + r}L${x + r},${y - r}` }));
-  }
-  return g;
-}
-const picker = $("#picker");
-function renderPicker() {
-  picker.replaceChildren();
-  D.circuits.forEach(base => {
-    const k = circuit(base.id), c = k.c;
-    const b = H("button", { class: "pick", type: "button", "aria-pressed": String(!!cur && cur.c.id === c.id), "data-id": c.id });
-    const nm = H("span", { class: "nm" }); nm.textContent = c.name;
-    const st = H("span", { class: "st" }); st.textContent = c.completed ? "+" + pct(c.gap) : "Crashed";
-    b.append(thumb(k), nm, st);
-    b.setAttribute("aria-label", c.name + (c.completed ? ", lap completed, " + pct(c.gap) + " slower than optimal" : ", crashed"));
-    b.addEventListener("click", () => select(c.id, true));
-    picker.append(b);
+/* ---------------------------------------------------------------- the plan */
+let planLive = null;
+function plan() {
+  const box = $("#plan"); box.replaceChildren(); planLive = null;
+  const k = cur, c = k.c, W = Math.max(240, box.clientWidth), Hh = Math.max(180, box.clientHeight);
+  const f = fitRot(k, W - 30, Hh, 46), m = M(f.zoom, f.rot, f.cx, f.cy, W / 2 + 15, Hh / 2 - 4);
+  const P = (x, y) => toPx(m, x, y);
+  const svg = S("svg", { width: W, height: Hh, viewBox: `0 0 ${W} ${Hh}`, role: "img",
+    "aria-label": c.completed ? "Plan of the circuit with the time lost at each corner group" : "Plan of the circuit with the point where the run ended" });
+  const step = 3, pts = [];
+  for (let i = 0; i < k.n; i += step) pts.push(P(k.mx[i], k.my[i]));
+  const dOf = (arr, close) => arr.map((q, i) => (i ? "L" : "M") + q[0].toFixed(1) + "," + q[1].toFixed(1)).join("") + (close ? "Z" : "");
+  if (c.crash) {
+    const cut = clamp(Math.floor(c.crash.s / k.ds / step), 1, pts.length - 1);
+    svg.append(S("path", { class: "pl-rest", d: dOf(pts.slice(cut).concat([pts[0]])) }), S("path", { class: "pl-track", d: dOf(pts.slice(0, cut + 1)) }));
+  } else svg.append(S("path", { class: "pl-track", d: dOf(pts, true) }));
+  const t0 = tangent(k, 0), q0 = P(k.mx[0], k.my[0]), n0 = dirPx(m, -t0[1], t0[0]);
+  svg.append(S("line", { class: "pl-track", x1: q0[0] - 7 * n0[0], y1: q0[1] - 7 * n0[1], x2: q0[0] + 7 * n0[0], y2: q0[1] + 7 * n0[1] }));
+  // a spike at each corner group, pointing away from the middle of the circuit, as long as the time lost
+  const unit = clamp(W / 7.6, 34, 66), marksAt = [];
+  if (c.completed) c.corners.forEach((q, i) => {
+    const p = at(k, k.mx, k.my, q.apex), tg = tangent(k, q.apex);
+    let nx = -tg[1], ny = tg[0];
+    if (nx * (p[0] - k.cx0) + ny * (p[1] - k.cy0) < 0) { nx = -nx; ny = -ny; }
+    const sp = P(p[0], p[1]), nv = dirPx(m, nx, ny), len = unit * Math.max(0, q.lost);
+    marksAt.push({ q, i, sp, nv, len, tip: [sp[0] + len * nv[0], sp[1] + len * nv[1]] });
   });
-}
-renderPicker();
-if (D.margin) {
-  $("#agentSeg").hidden = false;
-  $$("[data-agent]").forEach(b => b.addEventListener("click", () => {
-    agentKey = b.dataset.agent;
-    $$("[data-agent]").forEach(x => x.setAttribute("aria-pressed", x === b));
-    const id = cur.c.id; renderPicker(); select(id, true);
-  }));
-}
-
-function select(id, autoplay) {
-  cur = circuit(id); t = 0;
-  const c = cur.c, row = boardRow(id), who = AGENTS[agentKey].subject;
-  $$(".pick").forEach(b => b.setAttribute("aria-pressed", b.dataset.id === id));
-  $("#hudName").textContent = c.name;
-  $("#hudSub").textContent = "Optimal lap " + lapStr(c.t_opt);
-  $("#hudDeltaSub").textContent = c.completed ? "behind the optimal lap" : "of " + Math.round(cur.L).toLocaleString("en-US") + " m";
-  const others = row.n_done + " of the 5 networks " + (row.n_done === 1 ? "finishes" : "finish") + " this circuit.";
-  if (c.completed) {
-    const worst = c.corners.map((q, i) => [q.lost, i]).sort((p, q) => q[0] - p[0])[0];
-    $("#runCaption").textContent = `${c.name}: lap ${lapStr(c.t_agent)}, ${pct(c.gap)} slower than the optimal ${lapStr(c.t_opt)}. The costliest corner group is number ${worst[1] + 1}, at ${worst[0].toFixed(2)} s. ${others}`;
-    $("#hudEndTitle").textContent = "Lap complete";
-    $("#hudEndText").textContent = `${lapStr(c.t_agent)}, ${pct(c.gap)} off the optimal lap`;
-    $("#teleTitle").textContent = "Speed and time lost along the lap";
-  } else {
-    const k = c.crash, side = k.inside === true ? "inside" : k.inside === false ? "outside" : "";
-    $("#runCaption").textContent = `${c.name}: the run ends ${Math.round(k.s).toLocaleString("en-US")} m into its first lap, ${k.t.toFixed(1)} s in. The car reaches the ${side} edge of a ${k.turn}-hand corner of ${k.r_min} m radius at ${Math.round(k.speed_kph)} km/h. ${others}`;
-    $("#hudEndTitle").textContent = "Off the road";
-    $("#hudEndText").textContent = `${side} edge, ${Math.round(k.speed_kph)} km/h, ${Math.round(k.s).toLocaleString("en-US")} m from the start`;
-    $("#teleTitle").textContent = "Speed up to the end of the run";
-  }
-  $("#replayNote").textContent = "The network shown is " + who.name + ", " + who.rule
-    + (agentKey === "margin" ? ", from the margin recipe. Its runs here are post hoc." : ".")
-    + " Corner groups are runs of corners with no straight between them, numbered from the start line; they are not official turn numbers.";
-  $("#cornerFig").hidden = !c.completed;
-  telemetry(); cornerChart();
-  if (autoplay && !reduced) play(true); else { playing = false; syncPlay(); kick(); }
-}
-
-/* ---------------------------------------------------------------- telemetry */
-let teleX = null;
-function telemetry() {
-  const box = $("#tele"); box.replaceChildren();
-  const k = cur, c = k.c, P = c.plot, n = P.va.length, W = Math.max(280, box.clientWidth);
-  const ml = 40, mr = 12, top = 16, h1 = 150, gapTop = top + h1 + 34, h2 = c.completed ? 92 : 0, Hh = (h2 ? gapTop + h2 : top + h1) + 26;
-  const x = s => ml + (W - ml - mr) * s / P.s_end;
-  teleX = s => x(clamp(s, 0, P.s_end));
-  let vmaxRaw = 0; for (let i = 0; i < n; i++) vmaxRaw = Math.max(vmaxRaw, P.va[i], P.vo[i]);
-  const vmax = Math.ceil(vmaxRaw * 0.36 / 100) * 100, y1 = v => top + h1 * (1 - v / vmax);
-  const svg = S("svg", { width: W, height: Hh, viewBox: `0 0 ${W} ${Hh}`, role: "img", "aria-label": "Speed of the network and of the optimal lap against distance" });
-  for (let v = 0; v <= vmax; v += 100) { svg.append(S("line", { class: v ? "grid" : "base", x1: ml, x2: W - mr, y1: y1(v), y2: y1(v) }), T(ml - 6, y1(v) + 4, v, "", "end")); }
-  svg.append(T(ml, top - 5, "Speed, km/h", "lab"));
-  let dA = "", dO = "";
-  for (let i = 0; i < n; i++) { const px = x(k.gs(i)).toFixed(1); dA += (i ? "L" : "M") + px + "," + y1(P.va[i] * 0.36).toFixed(1); dO += (i ? "L" : "M") + px + "," + y1(P.vo[i] * 0.36).toFixed(1); }
-  svg.append(S("path", { class: "l0", d: dO }), S("path", { class: "l1", d: dA }));
-  let y2 = null;
-  if (h2) {
-    let lo = 0, hi = 0; for (let i = 0; i < n; i++) { lo = Math.min(lo, P.dt[i]); hi = Math.max(hi, P.dt[i]); }
-    lo = Math.floor(lo / 1000); hi = Math.max(1, Math.ceil(hi / 1000));
-    y2 = d => gapTop + h2 * (1 - (d - lo) / (hi - lo));
-    const stepS = hi - lo > 6 ? 2 : 1;
-    for (let d = lo; d <= hi; d += stepS) svg.append(S("line", { class: d ? "grid" : "base", x1: ml, x2: W - mr, y1: y2(d), y2: y2(d) }), T(ml - 6, y2(d) + 4, d, "", "end"));
-    svg.append(T(ml, gapTop - 7, "Seconds behind the optimal lap", "lab"));
-    let dG = "";
-    for (let i = 0; i < n; i++) dG += (i ? "L" : "M") + x(k.gs(i)).toFixed(1) + "," + y2(P.dt[i] / 1000).toFixed(1);
-    svg.append(S("path", { class: "a1", d: dG + `L${x(P.s_end).toFixed(1)},${y2(0)}L${ml},${y2(0)}Z` }), S("path", { class: "l1", d: dG }));
-    svg.append(T(W - mr, y2(P.dt[n - 1] / 1000) - 7, "+" + (P.dt[n - 1] / 1000).toFixed(2) + " s", "val", "end"));
-  }
-  const bottom = Hh - 26, kmStep = W < 520 ? 2 : 1;
-  for (let km = 0; km * 1000 <= P.s_end; km += kmStep) svg.append(T(x(km * 1000), bottom + 16, km ? km + " km" : "Start", "", km ? "middle" : "start"));
-  const crossLine = S("line", { class: "cross", y1: top, y2: bottom, x1: ml, x2: ml, visibility: "hidden" });
-  const headLine = S("line", { class: "head", id: "playhead", y1: top, y2: bottom, x1: ml, x2: ml });
-  const hit = S("rect", { class: "hit", x: ml, y: top, width: W - ml - mr, height: bottom - top });
-  const at = e => { const b = svg.getBoundingClientRect(); return clamp((e.clientX - b.left - ml) / (W - ml - mr), 0, 1) * P.s_end; };
-  hit.addEventListener("pointermove", e => {
-    const s = at(e), i = clamp(Math.round(s / P.ds), 0, n - 1), px = x(k.gs(i));
-    crossLine.setAttribute("x1", px); crossLine.setAttribute("x2", px); crossLine.setAttribute("visibility", "visible");
-    const rows = [[(k.gs(i) / 1000).toFixed(2) + " km", "from the start line"], [Math.round(P.va[i] * 0.36) + " km/h", "network"], [Math.round(P.vo[i] * 0.36) + " km/h", "optimal lap"]];
-    if (h2) rows.push([(P.dt[i] >= 0 ? "+" : "−") + Math.abs(P.dt[i] / 1000).toFixed(2) + " s", "behind the optimal lap"]);
-    showTip(e.clientX, e.clientY, rows);
+  marksAt.forEach(mk => { if (mk.q.lost >= 0.05) svg.append(S("line", { class: "pl-spike", x1: mk.sp[0], y1: mk.sp[1], x2: mk.tip[0], y2: mk.tip[1] })); });
+  const frame = S("path", { class: "pl-frame", d: "" });
+  svg.append(frame);
+  marksAt.forEach(mk => svg.append(S("circle", { class: "pl-dot", cx: mk.sp[0], cy: mk.sp[1], r: 2.6 })));
+  // north and a scale bar, bottom right
+  const room = q => pts.reduce((best, r) => Math.min(best, Math.hypot(r[0] - q[0], r[1] - q[1])), Infinity);
+  const freest = list => list.map(q => [room(q), q]).sort((u, v) => v[0] - u[0])[0][1];
+  const nd = dirPx(m, 0, 1), na = freest([[W - 40, Hh - 38], [40, Hh - 38], [W - 40, 34], [40, 34]]);
+  svg.append(S("line", { class: "tick", x1: na[0] - 11 * nd[0], y1: na[1] - 11 * nd[1], x2: na[0] + 8 * nd[0], y2: na[1] + 8 * nd[1] }),
+             S("path", { class: "f-ink", d: `M${na[0] + 13 * nd[0]},${na[1] + 13 * nd[1]}L${na[0] + 6 * nd[0] - 3 * nd[1]},${na[1] + 6 * nd[1] + 3 * nd[0]}L${na[0] + 6 * nd[0] + 3 * nd[1]},${na[1] + 6 * nd[1] - 3 * nd[0]}Z` }),
+             T(na[0] + 22 * nd[0], na[1] + 22 * nd[1] + 3.5, "N", "name", "middle"));
+  const bm = [250, 500, 1000, 2000].find(v => v * m.zoom >= 56) || 2000, bl = bm * m.zoom, by = Hh - 12;
+  const bx = freest([[W - 84 - bl / 2, by], [84 + bl / 2, by], [W / 2, by]].filter(q => Math.abs(q[0] - na[0]) > bl / 2 + 34 || Math.abs(q[1] - na[1]) > 40))[0] - bl / 2;
+  svg.append(S("path", { class: "tick", fill: "none", d: `M${bx},${by - 5}V${by}H${bx + bl}V${by - 5}` }), T(bx + bl / 2, by - 8, bm >= 1000 ? bm / 1000 + " km" : bm + " m", "", "middle"));
+  // name the costliest corner groups, each label kept clear of the track, the spikes and the others
+  const placed = [{ x: bx - 6, y: by - 22, w: bl + 12, h: 26 }, { x: na[0] - 30, y: na[1] - 30, w: 60, h: 60 }];
+  const inRect = (q, r, pad) => q[0] > r.x - pad && q[0] < r.x + r.w + pad && q[1] > r.y - pad && q[1] < r.y + r.h + pad;
+  const segHits = (p, q, r) => { for (let j = 0; j <= 6; j++) if (inRect([p[0] + (q[0] - p[0]) * j / 6, p[1] + (q[1] - p[1]) * j / 6], r, 2)) return true; return false; };
+  const nameFont = "600 11px " + SANS, valFont = "500 11px " + MONO;
+  marksAt.filter(mk => mk.q.lost >= 0.25).sort((p, q) => q.q.lost - p.q.lost).slice(0, 6).forEach(mk => {
+    const name = cname(mk.q.name), val = "+" + mk.q.lost.toFixed(2), w = meas(name, nameFont) + 5 + meas(val, valFont), h = 13, cands = [];
+    for (const extra of [7, 15, 25]) {
+      const cx = mk.tip[0] + extra * mk.nv[0], cy = mk.tip[1] + extra * mk.nv[1];
+      cands.push({ x: mk.nv[0] >= 0 ? cx : cx - w, y: cy - h / 2 }, { x: cx - w / 2, y: mk.nv[1] >= 0 ? cy : cy - h },
+                 { x: cx - w, y: cy - h / 2 }, { x: cx, y: cy - h / 2 }, { x: cx - w / 2, y: cy - h }, { x: cx - w / 2, y: cy });
+    }
+    const ok = cands.map(q => ({ x: q.x, y: q.y, w, h })).find(r => r.x >= 3 && r.y >= 2 && r.x + r.w <= W - 3 && r.y + r.h <= Hh - 2
+      && !pts.some(q => inRect(q, r, 3)) && !placed.some(s => r.x < s.x + s.w + 4 && s.x < r.x + r.w + 4 && r.y < s.y + s.h + 2 && s.y < r.y + r.h + 2)
+      && !marksAt.some(o => o.q.lost >= 0.05 && segHits(o.sp, o === mk ? [o.tip[0] - 3 * o.nv[0], o.tip[1] - 3 * o.nv[1]] : o.tip, r)));
+    if (!ok) return;
+    placed.push(ok);
+    const tx = S("text", { x: ok.x, y: ok.y + 10, class: "name" }), a1 = S("tspan"), a2 = S("tspan", { class: "red", dx: 5, style: `font: ${valFont}` });
+    a1.textContent = name; a2.textContent = val; tx.append(a1, a2); svg.append(tx);
   });
-  hit.addEventListener("pointerleave", () => { hideTip(); crossLine.setAttribute("visibility", "hidden"); });
-  hit.addEventListener("click", e => seek(timeAtS(k.agent, at(e))));
-  svg.append(crossLine, headLine, hit);
-  box.append(svg);
-}
-
-function colPath(x, y0, w, hgt, up) {
-  const r = Math.min(4, w / 2, hgt);
-  return up ? `M${x},${y0}v${-(hgt - r)}a${r},${r} 0 0 1 ${r},${-r}h${w - 2 * r}a${r},${r} 0 0 1 ${r},${r}v${hgt - r}z`
-            : `M${x},${y0}v${hgt - r}a${r},${r} 0 0 0 ${r},${r}h${w - 2 * r}a${r},${r} 0 0 0 ${r},${-r}v${-(hgt - r)}z`;
-}
-const TYPE = { slow: "slow, under 120 km/h", medium: "medium speed", fast: "fast, over 200 km/h" };
-function cornerChart() {
-  const box = $("#corners"), tb = $("#cornerTable"); box.replaceChildren(); tb.replaceChildren();
-  const k = cur, c = k.c; if (!c.completed) return;
-  const cs = c.corners, n = cs.length, W = Math.max(280, box.clientWidth), ml = 40, mr = 12, top = 24, ph = 132, Hh = top + ph + 30;
-  const vals = cs.map(q => q.lost), hi = Math.max(0.5, Math.ceil(Math.max(...vals) * 2) / 2), lo = Math.min(0, Math.floor(Math.min(...vals) * 2) / 2);
-  const y = v => top + ph * (1 - (v - lo) / (hi - lo)), band = (W - ml - mr) / n, bw = Math.min(22, band * 0.5);
-  const svg = S("svg", { width: W, height: Hh, viewBox: `0 0 ${W} ${Hh}`, role: "img", "aria-label": "Seconds lost to the optimal lap in each corner group" });
-  for (let v = lo; v <= hi + 1e-9; v += 0.5) svg.append(S("line", { class: Math.abs(v) < 1e-9 ? "base" : "grid", x1: ml, x2: W - mr, y1: y(v), y2: y(v) }), T(ml - 6, y(v) + 4, v.toFixed(1), "", "end"));
-  svg.append(T(ml, top - 10, "Seconds lost", "lab"));
-  const top3 = vals.map((v, i) => [v, i]).sort((p, q) => q[0] - p[0]).slice(0, 3).map(p => p[1]);
-  cs.forEach((q, i) => {
-    const cx = ml + (i + 0.5) * band, hgt = Math.abs(y(q.lost) - y(0));
-    if (hgt > 0.6) svg.append(S("path", { class: "f1", d: colPath(cx - bw / 2, y(0), bw, hgt, q.lost >= 0) }));
-    if (top3.includes(i)) svg.append(T(cx, y(q.lost) - 6, "+" + q.lost.toFixed(2), "val", "middle"));
-    svg.append(T(cx, top + ph + 18, i + 1, "", "middle"));
-    const hit = S("rect", { class: "hit", x: cx - band / 2, y: top - 4, width: band, height: ph + 26, tabindex: 0, role: "button",
-                             "aria-label": `Corner group ${i + 1}: ${q.lost.toFixed(2)} seconds lost. Watch it.` });
-    hover(hit, () => [[(q.lost >= 0 ? "+" : "−") + Math.abs(q.lost).toFixed(2) + " s", "in corner group " + (i + 1)], [Math.round(q.va) + " km/h", "network's slowest point"], [Math.round(q.vo) + " km/h", "optimal lap's slowest point"], [TYPE[q.type], ""]]);
-    const go = () => { seek(timeAtS(k.agent, q.apex) - 3.5); if (!reduced) play(true); $("#screen").scrollIntoView({ block: "nearest" }); };
+  marksAt.forEach(mk => {
+    const q = mk.q, hit = S("circle", { class: "hit", cx: mk.sp[0] + 0.3 * mk.len * mk.nv[0], cy: mk.sp[1] + 0.3 * mk.len * mk.nv[1], r: 10, tabindex: 0, role: "button",
+      "aria-label": `Corner group ${cname(q.name)}: ${q.lost.toFixed(2)} seconds lost. Watch it.` });
+    hover(hit, () => [[signed(q.lost, 2) + " s", "at corner group " + cname(q.name)], [Math.round(q.va) + " km/h", "the network's slowest point"], [Math.round(q.vo) + " km/h", "the optimal lap's slowest point"]]);
+    const go = () => { seek(timeAtS(k.agent, q.apex) - 3.5); if (!reduced) play(true); };
     hit.addEventListener("click", go); hit.addEventListener("keydown", e => { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); go(); } });
     svg.append(hit);
   });
+  if (c.crash) {
+    const e = sample(k.agent, k.agent.T), q = P(e.x, e.y), r = 5;
+    svg.append(S("path", { class: "pl-x", d: `M${q[0] - r},${q[1] - r}L${q[0] + r},${q[1] + r}M${q[0] - r},${q[1] + r}L${q[0] + r},${q[1] - r}` }));
+  }
+  const dotO = S("circle", { class: "pl-opt", r: 3.6 }), dotA = S("circle", { class: "pl-net", r: 3.6 });
+  svg.append(dotO, dotA);
   box.append(svg);
-  tb.append(table([["Corner group"], ["Type"], ["Network's slowest, km/h", 1], ["Optimal lap's slowest, km/h", 1], ["Seconds lost", 1]],
-    cs.map((q, i) => [i + 1, q.type, Math.round(q.va), Math.round(q.vo), q.lost.toFixed(2)])));
+  planLive = (a, o, SW, SH) => {
+    const qa = P(a.x, a.y), qo = P(o.x, o.y);
+    dotA.setAttribute("cx", qa[0].toFixed(1)); dotA.setAttribute("cy", qa[1].toFixed(1));
+    dotO.setAttribute("cx", qo[0].toFixed(1)); dotO.setAttribute("cy", qo[1].toFixed(1));
+    frame.setAttribute("d", stageM ? dOf([[0, 0], [SW, 0], [SW, SH], [0, SH]].map(([u, v]) => { const w = fromPx(stageM, u, v); return P(w[0], w[1]); }), true) : "");
+  };
 }
 
-/* ---------------------------------------------------------------- scoreboard */
-const ICON_MISS = () => S("svg", { viewBox: "0 0 13 13", "aria-hidden": "true" }, S("path", { d: "M2.5,2.5L10.5,10.5M2.5,10.5L10.5,2.5", fill: "none", stroke: "var(--critical)", "stroke-width": 2.4, "stroke-linecap": "round" }));
+/* ---------------------------------------------------------------- the trace */
+let teleLive = null;
+function telemetry() {
+  const box = $("#tele"); box.replaceChildren(); teleLive = null;
+  const k = cur, c = k.c, P = c.plot, n = P.va.length, W = Math.max(280, box.clientWidth), Hh = Math.max(170, box.clientHeight);
+  const ml = 46, mr = 18, top = 20, axis = 20, h2 = c.completed ? 46 : 0, gap = h2 ? 22 : 16, h1 = Hh - top - axis - h2 - gap;
+  const x = s => ml + (W - ml - mr) * s / P.s_end;
+  let vraw = 0; for (let i = 0; i < n; i++) vraw = Math.max(vraw, P.va[i], P.vo[i]);
+  const vtop = Math.ceil(vraw * 0.36 / 20) * 20 + 20, y1 = v => top + h1 * (1 - v / vtop), base = top + h1;
+  const svg = S("svg", { width: W, height: Hh, viewBox: `0 0 ${W} ${Hh}`, role: "img",
+    "aria-label": "Speed of the network and of the optimal lap against distance" + (h2 ? ", and the time lost along the lap" : "") });
+  for (let v = 100; v < vtop - 10; v += 100) svg.append(S("line", { class: "grid", x1: ml, x2: W - mr, y1: y1(v), y2: y1(v) }), T(ml - 6, y1(v) + 3.5, v, "", "end"));
+  svg.append(S("line", { class: "base", x1: ml, x2: W - mr, y1: base, y2: base }));
+  let lastX = -99;
+  c.corners.forEach(q => {
+    if (q.apex > P.s_end) return;
+    const cx = x(q.apex); svg.append(S("line", { class: "tick", x1: cx, x2: cx, y1: base, y2: base + 5 }));
+    if (cx - lastX >= 15) {
+      const first = lastX < 0 && cx - ml > 46, lab = cname(q.name).split("–")[0];
+      svg.append(first ? T(cx + 3, base + 15, "corner " + lab, "", "end") : T(cx, base + 15, lab, "", "middle")); lastX = cx;
+    }
+  });
+  let dA = "", dO = "";
+  for (let i = 0; i < n; i++) { const sx = x(k.gs(i)).toFixed(1); dA += (i ? "L" : "M") + sx + "," + y1(P.va[i] * 0.36).toFixed(1); dO += (i ? "L" : "M") + sx + "," + y1(P.vo[i] * 0.36).toFixed(1); }
+  svg.append(S("path", { class: "l-opt", d: dO }), S("path", { class: "l-net", d: dA }));
+  let y2 = null, zero = base;
+  if (h2) {
+    let lo = 0, hi = 0; for (let i = 0; i < n; i++) { lo = Math.min(lo, P.dt[i]); hi = Math.max(hi, P.dt[i]); }
+    lo = Math.floor(lo / 1000); hi = Math.max(1, Math.ceil(hi / 1000));
+    const y0 = base + gap + h2;
+    y2 = v => y0 - h2 * (v - lo) / (hi - lo); zero = y2(0);
+    svg.append(T(ml + 4, base + gap + 9, "TIME LOST TO THE OPTIMAL LAP, S", "caps"));
+    let dG = "";
+    for (let i = 0; i < n; i++) dG += (i ? "L" : "M") + x(k.gs(i)).toFixed(1) + "," + y2(P.dt[i] / 1000).toFixed(1);
+    svg.append(S("path", { class: "a-lost", d: dG + `L${x(P.s_end).toFixed(1)},${zero}L${ml},${zero}Z` }), S("path", { class: "l-lost", d: dG }),
+               S("line", { class: "base", x1: ml, x2: W - mr, y1: zero, y2: zero }));
+    const end = P.dt[n - 1] / 1000, ye = y2(end);
+    svg.append(T(W - mr - 5, zero - ye >= 20 ? zero - 7 : ye - 6, signed(end, 2) + " s", "val", "end"));
+  } else {
+    const xe = x(P.s_end), ye = y1(P.va[n - 1] * 0.36), r = 4.5;
+    svg.append(S("path", { class: "pl-x", d: `M${xe - r},${ye - r}L${xe + r},${ye + r}M${xe - r},${ye + r}L${xe + r},${ye - r}` }));
+  }
+  const kmStep = P.s_end < 1500 ? 0.2 : W < 520 ? 2 : 1, bottom = h2 ? zero : base;
+  for (let km = 0; km * 1000 <= P.s_end + 1; km += kmStep) {
+    const lab = kmStep < 1 ? (km ? km.toFixed(1) : "0") : String(km), lastOne = (km + kmStep) * 1000 > P.s_end + 1;
+    svg.append(T(x(km * 1000), Hh - 5, lab + (lastOne ? " km" : ""), "", "middle"));
+  }
+  const crossLine = S("line", { class: "cross", y1: top - 6, y2: bottom, x1: ml, x2: ml, visibility: "hidden" });
+  const head = S("line", { class: "head", y1: top - 8, y2: bottom, x1: ml, x2: ml });
+  const dotO = S("circle", { class: "pt o", r: 3 }), dotA = S("circle", { class: "pt", r: 3 }), dotL = h2 ? S("circle", { class: "pt l", r: 3 }) : null;
+  const headLab = T(ml, top - 1, "", "val");
+  const hit = S("rect", { class: "hit", x: ml, y: top - 8, width: W - ml - mr, height: bottom - top + 8 });
+  const sAt = e => { const b = svg.getBoundingClientRect(); return clamp((e.clientX - b.left - ml) / (W - ml - mr), 0, 1) * P.s_end; };
+  let dragging = false;
+  hit.addEventListener("pointerdown", e => { dragging = true; hit.setPointerCapture(e.pointerId); seek(timeAtS(k.agent, sAt(e))); });
+  hit.addEventListener("pointerup", () => { dragging = false; });
+  hit.addEventListener("pointercancel", () => { dragging = false; });
+  hit.addEventListener("pointermove", e => {
+    const s = sAt(e), i = clamp(Math.round(s / P.ds), 0, n - 1), sx = x(k.gs(i));
+    if (dragging) { seek(timeAtS(k.agent, s)); return; }
+    crossLine.setAttribute("x1", sx); crossLine.setAttribute("x2", sx); crossLine.setAttribute("visibility", "visible");
+    const rows = [[(k.gs(i) / 1000).toFixed(2) + " km", "from the start line"], [Math.round(P.va[i] * 0.36) + " km/h", "network"], [Math.round(P.vo[i] * 0.36) + " km/h", "optimal lap"]];
+    if (h2) rows.push([signed(P.dt[i] / 1000, 2) + " s", "behind the optimal lap"]);
+    showTip(e.clientX, e.clientY, rows);
+  });
+  hit.addEventListener("pointerleave", () => { hideTip(); crossLine.setAttribute("visibility", "hidden"); });
+  svg.append(crossLine, head, dotO, dotA, dotL, headLab, hit);
+  box.append(svg);
+  teleLive = a => {
+    const s = clamp(a.s, 0, P.s_end), sx = x(s);
+    head.setAttribute("x1", sx); head.setAttribute("x2", sx);
+    dotA.setAttribute("cx", sx); dotA.setAttribute("cy", y1(plotAt(k, "va", s) * 0.36));
+    dotO.setAttribute("cx", sx); dotO.setAttribute("cy", y1(plotAt(k, "vo", s) * 0.36));
+    if (dotL) { dotL.setAttribute("cx", sx); dotL.setAttribute("cy", y2(lostAt(k, s))); }
+    const right = sx > W - mr - 70;
+    headLab.setAttribute("x", sx + (right ? -6 : 6)); headLab.setAttribute("text-anchor", right ? "end" : "start");
+    set(headLab, (s / 1000).toFixed(2) + " km");
+  };
+}
+
+/* ---------------------------------------------------------------- the lap sheet and the twelve */
+const lapBody = $("#lapBody");
+(function lapSheet() {
+  if (!D.margin) $("#thMargin").hidden = true;
+  D.circuits.forEach(base => {
+    const tr = H("tr", { "data-id": base.id }), nm = H("td"), to = H("td", { class: "t" });
+    nm.textContent = base.name; to.textContent = lapStr(base.t_opt); tr.append(nm, to);
+    Object.keys(AGENTS).forEach(key => {
+      const run = circuit(base.id, key).c, td = H("td");
+      const b = H("button", { type: "button", class: "pickb" + (run.completed ? "" : " out"), "data-id": base.id, "data-agent": key, "aria-pressed": "false" });
+      b.textContent = run.completed ? "+" + pct(run.gap, 2) : "out, corner " + cname(run.crash.corner);
+      b.setAttribute("aria-label", `${base.name}, ${AGENTS[key].label.toLowerCase()}: ` + (run.completed ? pct(run.gap, 2) + " slower than the optimal lap" : "the run ends at corner " + cname(run.crash.corner)) + ". Watch it.");
+      b.addEventListener("click", () => { agentKey = key; select(base.id, true); });
+      td.append(b); tr.append(td);
+    });
+    lapBody.append(tr);
+  });
+})();
+function thumb(k) {
+  const W = 96, Hh = 62, f = fitRot(k, W, Hh, 6), m = M(f.zoom, f.rot, f.cx, f.cy, W / 2, Hh / 2), step = Math.max(1, Math.floor(k.n / 240)), pts = [];
+  for (let i = 0; i < k.n; i += step) pts.push(toPx(m, k.mx[i], k.my[i]));
+  const dOf = (arr, close) => arr.map((q, i) => (i ? "L" : "M") + q[0].toFixed(1) + "," + q[1].toFixed(1)).join("") + (close ? "Z" : "");
+  const g = S("svg", { viewBox: `0 0 ${W} ${Hh}`, "aria-hidden": "true" });
+  if (k.c.crash) {
+    const cut = clamp(Math.floor(k.c.crash.s / k.ds / step), 1, pts.length - 1), e = sample(k.agent, k.agent.T), q = toPx(m, e.x, e.y), r = 3.6;
+    g.append(S("path", { class: "rest", d: dOf(pts.slice(cut).concat([pts[0]])) }), S("path", { d: dOf(pts.slice(0, cut + 1)) }),
+             S("path", { class: "x", d: `M${q[0] - r},${q[1] - r}L${q[0] + r},${q[1] + r}M${q[0] - r},${q[1] + r}L${q[0] + r},${q[1] - r}` }));
+  } else g.append(S("path", { d: dOf(pts, true) }));
+  return g;
+}
+function minis() {
+  const box = $("#minis"); box.replaceChildren();
+  D.circuits.forEach(base => {
+    const k = circuit(base.id), c = k.c;
+    const b = H("button", { class: "mini", type: "button", "aria-pressed": String(!!cur && cur.c.id === c.id) });
+    const nm = H("span", { class: "nm" }), st = H("span", { class: "st" + (c.completed ? "" : " out") });
+    nm.textContent = c.name; st.textContent = c.completed ? "+" + pct(c.gap) : "out";
+    b.append(thumb(k), nm, st);
+    b.setAttribute("aria-label", c.name + (c.completed ? ", lap completed, " + pct(c.gap) + " slower than optimal" : ", the run ended early") + ". Watch it.");
+    b.addEventListener("click", () => { select(c.id, true); toSheet(); });
+    box.append(b);
+  });
+}
+
+function select(id, autoplay) {
+  cur = circuit(id); t = 0; zoomS = 0;
+  const c = cur.c, idx = D.circuits.findIndex(q => q.id === id), row = boardRow(id), who = AGENTS[agentKey].subject, nAll = D.circuits.length;
+  $$(".pickb").forEach(b => b.setAttribute("aria-pressed", String(b.dataset.id === id && b.dataset.agent === agentKey)));
+  $$("#lapBody tr").forEach(r => r.classList.toggle("on", r.dataset.id === id));
+  set($("#roName"), c.name);
+  set($("#roMeta"), (cur.L / 1000).toFixed(3) + " km · held-out circuit " + (idx + 1) + " of " + nAll);
+  set($("#roOpt"), lapStr(c.t_opt)); set($("#roWho"), AGENTS[agentKey].label);
+  set($("#sheetNo"), "Sheet " + (idx + 1) + " / " + nAll);
+  const others = row.n_done + " of the 5 networks " + (row.n_done === 1 ? "finishes" : "finish") + " this circuit.";
+  const end = $("#stEnd");
+  if (c.completed) {
+    set($("#roLap"), lapStr(c.t_agent)); $("#roLap").className = ""; set($("#roLost"), "+" + (c.t_agent - c.t_opt).toFixed(3));
+    const worst = c.corners.slice().sort((p, q) => q.lost - p.lost)[0];
+    set($("#runCaption"), `${c.name}: lap ${lapStr(c.t_agent)}, ${pct(c.gap)} slower than the optimal ${lapStr(c.t_opt)}. The costliest corner group is ${cname(worst.name)}, at ${worst.lost.toFixed(2)} s. ${others}`);
+    end.classList.add("done"); set($("#stEndTitle"), "Lap complete"); set($("#stEndText"), `${lapStr(c.t_agent)}, ${pct(c.gap)} off the optimal lap`);
+    set($("#teleTitle"), "Speed, km/h"); set($("#planCap"), "Plan · seconds lost at each corner group");
+  } else {
+    const kk = c.crash, side = kk.inside === true ? "inside " : kk.inside === false ? "outside " : "";
+    set($("#roLap"), "out, corner " + cname(kk.corner)); $("#roLap").className = "out"; set($("#roLost"), "");
+    set($("#runCaption"), `${c.name}: the run ends ${metres(kk.s)} m into its first lap, ${kk.t.toFixed(1)} s in. The car reaches the ${side}edge of a ${kk.turn}-hand corner of ${kk.r_min} m radius at ${Math.round(kk.speed_kph)} km/h. ${others}`);
+    end.classList.remove("done"); set($("#stEndTitle"), "Off the road"); set($("#stEndText"), `${side}edge, ${Math.round(kk.speed_kph)} km/h, ${metres(kk.s)} m from the start`);
+    set($("#teleTitle"), "Speed up to the end of the run, km/h"); set($("#planCap"), "Plan · where the run ended");
+  }
+  set($("#replayNote"), "The twelve circuits. A cross marks where a run ended. The network shown is " + who.name + ", " + who.rule
+    + (agentKey === "margin" ? ", from the margin recipe; its runs here are post hoc." : "."));
+  plan(); telemetry(); minis();
+  if (autoplay && !reduced) play(true); else { playing = false; syncPlay(); kick(); }
+}
+const stepCircuit = d => { const i = D.circuits.findIndex(q => q.id === cur.c.id), n = D.circuits.length; select(D.circuits[(i + d + n) % n].id, true); };
+$("#btnPrev").addEventListener("click", () => stepCircuit(-1));
+$("#btnNext").addEventListener("click", () => stepCircuit(1));
+
+/* ---------------------------------------------------------------- the registered test */
+const num = x => Number.isInteger(x) ? String(x) : x.toFixed(1);
+(function strip() {
+  const h = D.scoreboard.headline;
+  let s = "Median of five networks: " + num(h.circuits_completed) + " of 12 circuits, " + pct(h.median_gap) + " off the optimal lap";
+  if (D.margin) { const m = D.margin.result.median; s += " · with a training margin: " + num(m.circuits_completed) + " of 12, " + pct(m.median_gap) + " (post hoc)"; }
+  $("#stripMid").textContent = s;
+})();
 (function targets() {
   const h = D.scoreboard.headline, box = $("#targets");
-  [[pct(h.laps_completed_share), "of laps completed by the median network", "Target: 90% or more"],
-   [pct(h.median_gap, 2), "slower than the optimal lap, median over the laps it finished", "Target: 4% or less"]].forEach(r => {
-    const d = H("div", { class: "target" }), a = H("div", { class: "num" }), b = H("div", { class: "lab" }), e = H("div", { class: "res" });
-    a.textContent = r[0]; b.textContent = r[1]; e.append(ICON_MISS(), document.createTextNode("Missed. " + r[2]));
-    d.append(a, b, e); box.append(d);
+  [[pct(h.laps_completed_share), "of laps completed by the median network.", "Target: 90% or more."],
+   [pct(h.median_gap, 2), "slower than the optimal lap, median over the laps it finished.", "Target: 4% or less."]].forEach(r => {
+    const a = H("span", { class: "n" }), b = H("span"), e = H("span", { class: "miss" });
+    a.textContent = r[0]; e.textContent = " Missed."; b.append(document.createTextNode(r[1] + " " + r[2]), e); box.append(a, b);
   });
-  $("#factDone").textContent = Math.round(h.circuits_completed) + " of 12";
-  $("#factGap").textContent = pct(h.median_gap);
 })();
 (function scoreboard() {
   const sb = D.scoreboard, rows = sb.circuits.slice().sort((p, q) => q.n_done - p.n_done || (p.median_gap || 9) - (q.median_gap || 9));
   const maxGap = Math.max(...rows.map(r => r.median_gap || 0));
   const t = H("table"), hd = H("tr");
-  [["Circuit"], ["Five networks"], ["Finished", 1], ["Gap to the optimal lap"], [""]].forEach(([x, num]) => { const c = H("th", num ? { class: "num" } : {}); c.textContent = x; hd.append(c); });
+  [["Circuit"], ["Five networks"], ["Finished", 1], ["Gap to the optimal lap"], [""]].forEach(([x, isNum]) => { const c = H("th", isNum ? { class: "num" } : {}); c.textContent = x; hd.append(c); });
   t.append(H("thead", {}, hd));
   const tb = H("tbody");
   rows.forEach(r => {
     const tr = H("tr"), nm = H("td"), dots = H("td"), fin = H("td", { class: "num" }), gap = H("td"), act = H("td", { class: "num" });
-    nm.textContent = r.name;
-    dots.append(dotRow(r, shownIdx)); fin.textContent = r.n_done + " of 5";
+    nm.textContent = r.name; dots.append(marks(r, shownIdx)); fin.textContent = r.n_done + " of 5";
     if (r.median_gap != null) {
       const gb = H("span", { class: "gapbar" }), tr_ = H("i"), fill = H("b"), lab = H("span");
       fill.style.width = (100 * r.median_gap / (maxGap * 1.05)).toFixed(1) + "%"; lab.textContent = pct(r.median_gap, 2); tr_.append(fill); gb.append(tr_, lab); gap.append(gb);
-    } else gap.textContent = "none finished";
+    } else { gap.textContent = "none finished"; gap.className = "dim"; }
     const b = H("button", { class: "watch", type: "button" }); b.textContent = "Watch"; b.setAttribute("aria-label", "Watch " + r.name);
-    b.addEventListener("click", () => { select(r.id, true); $("#replay").scrollIntoView(); });
+    b.addEventListener("click", () => { agentKey = "e0"; select(r.id, true); toSheet(); });
     act.append(b); tr.append(nm, dots, fin, gap, act); tb.append(tr);
   });
   t.append(tb); $("#scoreTable").append(t);
-  $("#scoreSub").textContent = "Pre-registered result, 12 circuits, 5 networks, 10 laps each";
 })();
 
-/* ---------------------------------------------------------------- story charts */
+/* ---------------------------------------------------------------- the essay's charts */
 function followChart() {
   const box = $("#follow"); box.replaceChildren();
-  const f = D.story.follow, W = Math.max(280, box.clientWidth), ml = 40, mr = 14, top = 26, ph = 210, Hh = top + ph + 64;
+  const f = D.story.follow, W = Math.max(280, box.clientWidth), ml = 34, mr = 12, top = 28, ph = 216, Hh = top + ph + 62;
   const cats = [{ a: "Real", b: "edges", v: f.real_change, real: 1, tipL: "of the real edge changes at its crash corners" }]
     .concat(f.by_width.map(w => ({ a: w.width_m + " m", b: "", v: w.follow, tipL: "of an edge change about " + w.width_m + " m long" })))
     .concat([{ a: "Whole", b: "corner", v: f.corner_wide, tipL: "of an edge change across the whole corner" }]);
-  const band = (W - ml - mr) / cats.length, x = i => ml + (i + 0.5) * band, y = v => top + ph * (1 - v / 1.05);
+  const band = (W - ml - mr) / cats.length, x = i => ml + (i + 0.5) * band, y = v => top + ph * (1 - v / 1.08);
   const svg = S("svg", { width: W, height: Hh, viewBox: `0 0 ${W} ${Hh}`, role: "img", "aria-label": "Share of an inside-edge move that the driving line follows, by the length of the change" });
-  [0, 0.25, 0.5, 0.75, 1].forEach(v => svg.append(S("line", { class: v ? "grid" : "base", x1: ml, x2: W - mr, y1: y(v), y2: y(v) }), T(ml - 6, y(v) + 4, v.toFixed(2).replace(/0$/, "").replace(/\.$/, ""), "", "end")));
-  svg.append(S("line", { class: "rule-ink", x1: ml, x2: W - mr, y1: y(1), y2: y(1) }), T(W - mr, y(1) - 7, "The optimal line: 1.0", "val", "end"));
+  [0, 0.25, 0.5, 0.75].forEach(v => svg.append(S("line", { class: v ? "grid" : "base", x1: ml, x2: W - mr, y1: y(v), y2: y(v) }), T(ml - 7, y(v) + 3.5, v ? String(v) : "0", "", "end")));
+  svg.append(S("line", { class: "l-opt", x1: ml, x2: W - mr, y1: y(1), y2: y(1) }), T(ml - 7, y(1) + 3.5, "1", "", "end"), T(W - mr, y(1) - 8, "the optimal line follows all of it", "lab purple", "end"));
   let d = "";
   cats.forEach((c, i) => { if (!c.real) d += (d ? "L" : "M") + x(i).toFixed(1) + "," + y(c.v).toFixed(1); });
-  svg.append(S("path", { class: "l1", d }));
+  svg.append(S("path", { class: "l-net", d }));
   cats.forEach((c, i) => {
-    svg.append(S("circle", { class: (c.real ? "fi" : "f1") + " ring", cx: x(i), cy: y(c.v), r: 5 }));
-    svg.append(T(x(i), top + ph + 18, c.a, "lab", "middle"));
-    if (c.b) svg.append(T(x(i), top + ph + 32, c.b, "lab", "middle"));
-    if (c.real || i === 1 || i === cats.length - 1) svg.append(T(x(i), y(c.v) - 11, c.v.toFixed(2), "val", "middle"));
+    svg.append(c.real ? S("circle", { class: "f-lost", cx: x(i), cy: y(c.v), r: 5 }) : S("circle", { class: "pt", cx: x(i), cy: y(c.v), r: 4.5 }));
+    svg.append(T(x(i), top + ph + 18, c.a, "lab ink", "middle"));
+    if (c.b) svg.append(T(x(i), top + ph + 32, c.b, "lab ink", "middle"));
+    if (c.real || i === 1 || i === cats.length - 1) svg.append(T(x(i), y(c.v) - 11, c.v.toFixed(2), c.real ? "val red" : "val", "middle"));
     const hit = S("rect", { class: "hit", x: x(i) - band / 2, y: top, width: band, height: ph + 36, tabindex: 0, "aria-label": `${c.a} ${c.b}: follows ${c.v.toFixed(2)}` });
     hover(hit, () => [[c.v.toFixed(2), c.tipL]]);
     svg.append(hit);
   });
-  svg.append(T((x(1) + x(cats.length - 2)) / 2, top + ph + 54, "Length of the edge change, sharp to gradual", "", "middle"));
+  svg.append(T((x(1) + x(cats.length - 2)) / 2, top + ph + 54, "length of the edge change, sharp to gradual", "lab", "middle"));
   box.append(svg);
-  const tb = $("#followTable"); tb.replaceChildren(table([["Edge change"], ["Share the line follows", 1]], cats.map(c => [(c.a + " " + c.b).trim() + (c.real ? " (real crash corners)" : ""), c.v.toFixed(2)])));
+  $("#followTable").replaceChildren(table([["Edge change"], ["Share the line follows", 1]], cats.map(c => [(c.a + " " + c.b).trim() + (c.real ? " (real crash corners)" : ""), c.v.toFixed(2)])));
 }
-function barPath(x0, y, w, hgt) { const r = Math.min(4, w, hgt / 2); return `M${x0},${y}h${w - r}a${r},${r} 0 0 1 ${r},${r}v${hgt - 2 * r}a${r},${r} 0 0 1 ${-r},${r}h${-(w - r)}z`; }
 function ladderChart() {
   const box = $("#ladder"); box.replaceChildren();
-  const st = D.story, rows = st.ladder, W = Math.max(280, box.clientWidth), ml = 4, mr = 46, top = 22, rh = 56, Hh = top + rows.length * rh + 26;
+  const st = D.story, rows = st.ladder, W = Math.max(280, box.clientWidth), ml = 2, mr = 44, top = 24, rh = 50, Hh = top + rows.length * rh + 22;
   const x = v => ml + (W - ml - mr) * v / 12;
   const names = { default: "Default track generator", widths: "Real track-width profiles", e0: "Same recipe, 5× the training (the final agent)", margin: "Plus a 1.4 m training margin", margin1b: "Margin recipe, 5× the training" };
   const svg = S("svg", { width: W, height: Hh, viewBox: `0 0 ${W} ${Hh}`, role: "img", "aria-label": "Development circuits completed, of 12, for five training recipes" });
-  [0, 3, 6, 9, 12].forEach(v => svg.append(S("line", { class: v ? "grid" : "base", x1: x(v), x2: x(v), y1: top, y2: Hh - 22 }), T(x(v), Hh - 6, v, "", v === 12 ? "end" : v ? "middle" : "start")));
+  [0, 3, 6, 9, 12].forEach(v => svg.append(S("line", { class: v ? "grid" : "base", x1: x(v), x2: x(v), y1: top, y2: Hh - 20 }), T(x(v), Hh - 5, v, "", v === 12 ? "end" : v ? "middle" : "start")));
   const pm = st.gate.pass_mark;
-  svg.append(S("line", { class: "rule-ink", x1: x(pm), x2: x(pm), y1: top - 8, y2: Hh - 22 }), T(x(pm) - 6, top - 2, "Pass mark, " + pm, "val", "end"));
+  svg.append(S("line", { class: "pm", x1: x(pm), x2: x(pm), y1: top - 10, y2: Hh - 20 }), T(x(pm) - 6, top - 3, "pass mark, " + pm, "lab", "end"));
   rows.forEach((r, i) => {
     const y0 = top + i * rh + 14, m = mean(r.circuits), hot = r.key.indexOf("margin") === 0;
-    svg.append(T(ml, y0 + 6, names[r.key] + " · " + r.steps + " steps", "lab"));
-    svg.append(S("path", { class: hot ? "f1" : "f0", d: barPath(x(0), y0 + 13, x(m) - x(0), 12) }));
-    svg.append(T(x(m) + 6, y0 + 23, m.toFixed(1), "val"));
-    r.circuits.forEach(v => svg.append(S("line", { class: "cross", x1: x(v), x2: x(v), y1: y0 + 29, y2: y0 + 36 })));
-    const hit = S("rect", { class: "hit", x: ml, y: y0 - 6, width: W - ml, height: rh - 4, tabindex: 0, "aria-label": `${names[r.key]}: mean ${m.toFixed(1)} of 12` });
+    svg.append(T(ml, y0 + 5, names[r.key] + " · " + r.steps + " steps", "lab ink"));
+    svg.append(S("rect", { class: hot ? "f-ink" : "f-hollow", x: x(0) + (hot ? 0 : 0.6), y: y0 + 12, width: Math.max(1, x(m) - x(0) - (hot ? 0 : 0.6)), height: 7 }));
+    svg.append(T(x(m) + 7, y0 + 19, m.toFixed(1), "val"));
+    r.circuits.forEach(v => svg.append(S("line", { class: "tick", x1: x(v), x2: x(v), y1: y0 + 23, y2: y0 + 29 })));
+    const hit = S("rect", { class: "hit", x: ml, y: y0 - 8, width: W - ml, height: rh - 4, tabindex: 0, "aria-label": `${names[r.key]}: mean ${m.toFixed(1)} of 12` });
     hover(hit, () => [[m.toFixed(1) + " of 12", "circuits completed, mean"], [r.circuits.join(", "), "by seed"], [r.steps, "training steps"]]);
     svg.append(hit);
   });
@@ -950,28 +1200,29 @@ function ladderChart() {
 }
 function dialChart() {
   const box = $("#dial"); box.replaceChildren();
-  const st = D.story, arms = [st.dial_ref].concat(st.dial), W = Math.max(280, box.clientWidth), stackd = W < 640, gap = 26;
-  const pw = stackd ? W : (W - 2 * gap) / 3, ph = 150, top = 34, ml = 36, mr = 8, panelH = top + ph + 30;
+  const st = D.story, arms = [st.dial_ref].concat(st.dial), W = Math.max(280, box.clientWidth), stackd = W < 470, gap = 22;
+  const pw = stackd ? W : (W - 2 * gap) / 3, ph = 126, top = 30, ml = 26, mr = 4, panelH = top + ph + 26;
   const Hh = stackd ? 3 * panelH + 2 * 14 : panelH;
   const svg = S("svg", { width: W, height: Hh, viewBox: `0 0 ${W} ${Hh}`, role: "img", "aria-label": "Circuits completed, lap gap and clearance against the training margin" });
   const panels = [
-    { key: "circuits", title: "Circuits completed, of 12", lo: 4, hi: 12, ticks: [4, 6, 8, 10, 12], f: v => v, fmt: v => v.toFixed(1) },
-    { key: "gap", title: "Gap to the optimal lap, %", lo: 7, hi: 10, ticks: [7, 8, 9, 10], f: v => 100 * v, fmt: v => v.toFixed(2) + "%" },
-    { key: "clearance_m", title: "Clearance at the crash corners, m", lo: 0.4, hi: 2.4, ticks: [0.5, 1, 1.5, 2], f: v => v, fmt: v => v.toFixed(2) + " m" }];
+    { key: "circuits", title: "Circuits, of 12", lo: 4, hi: 12, ticks: [4, 6, 8, 10, 12], f: v => v, fmt: v => v.toFixed(1) },
+    { key: "gap", title: "Gap to optimal, %", lo: 7, hi: 10, ticks: [7, 8, 9, 10], f: v => 100 * v, fmt: v => v.toFixed(2) + "%" },
+    { key: "clearance_m", title: "Clearance, m", lo: 0.4, hi: 2.4, ticks: [0.5, 1, 1.5, 2], f: v => v, fmt: v => v.toFixed(2) + " m" }];
   panels.forEach((p, pi) => {
     const ox = stackd ? 0 : pi * (pw + gap), oy = stackd ? pi * (panelH + 14) : 0;
     const x = i => ox + ml + (pw - ml - mr) * (i + 0.5) / arms.length, y = v => oy + top + ph * (1 - (v - p.lo) / (p.hi - p.lo));
-    svg.append(T(ox, oy + 12, p.title, "val"));
-    p.ticks.forEach(v => svg.append(S("line", { class: "grid", x1: ox + ml, x2: ox + pw - mr, y1: y(v), y2: y(v) }), T(ox + ml - 6, y(v) + 4, v, "", "end")));
+    svg.append(T(ox, oy + 11, p.title, "lab ink"));
+    p.ticks.forEach(v => svg.append(S("line", { class: "grid", x1: ox + ml, x2: ox + pw - mr, y1: y(v), y2: y(v) }), T(ox + ml - 6, y(v) + 3.5, v, "", "end")));
     let d = "";
     arms.forEach((a, i) => { if (i) d += (d ? "L" : "M") + x(i).toFixed(1) + "," + y(mean(a[p.key].map(p.f))).toFixed(1); });
-    svg.append(S("path", { class: "l1", d }));
+    svg.append(S("path", { class: "l-net", d, style: "stroke-width: 1" }));
     arms.forEach((a, i) => {
       const vs = a[p.key].map(p.f), m = mean(vs);
-      vs.forEach((v, j) => svg.append(S("circle", { class: (i ? "f1" : "f0") + " ring", cx: x(i) + (j - (vs.length - 1) / 2) * 6, cy: y(clamp(v, p.lo, p.hi)), r: 4.2 })));
-      svg.append(S("line", { class: "rule-ink", x1: x(i) - 17, x2: x(i) + 17, y1: y(m), y2: y(m) }));
-      svg.append(T(x(i), oy + top + ph + 20, a.margin_m.toFixed(1) + " m", "lab", "middle"));
-      const hit = S("rect", { class: "hit", x: x(i) - (pw - ml - mr) / arms.length / 2, y: oy + top - 6, width: (pw - ml - mr) / arms.length, height: ph + 30, tabindex: 0,
+      const jit = stackd ? 6 : 3.2;
+      vs.forEach((v, j) => svg.append(S("circle", { class: i ? "f-ink" : "f-ref", cx: x(i) + (j - (vs.length - 1) / 2) * jit, cy: y(clamp(v, p.lo, p.hi)), r: i ? 2.7 : 2.5 })));
+      svg.append(S("line", { class: "tick", style: "stroke-width: 2", x1: x(i) - 3 * jit - 2, x2: x(i) + 3 * jit + 2, y1: y(m), y2: y(m) }));
+      svg.append(T(x(i), oy + top + ph + 18, a.margin_m.toFixed(1) + (i === arms.length - 1 ? " m" : ""), "", "middle"));
+      const hit = S("rect", { class: "hit", x: x(i) - (pw - ml - mr) / arms.length / 2, y: oy + top - 6, width: (pw - ml - mr) / arms.length, height: ph + 28, tabindex: 0,
                                "aria-label": `${p.title}, margin ${a.margin_m.toFixed(1)} m: mean ${p.fmt(m)}` });
       hover(hit, () => [[p.fmt(m), "mean at a " + a.margin_m.toFixed(1) + " m margin"], [vs.map(v => p.key === "circuits" ? v : v.toFixed(2)).join(", "), "by seed"]].concat(i ? [] : [["Earlier round", "other seeds, another machine"]]));
       svg.append(hit);
@@ -983,19 +1234,17 @@ function dialChart() {
 }
 (function facts() {
   const f = D.story.follow, st = D.story, lad = {}; st.ladder.forEach(r => { lad[r.key] = r; });
-  pair($("#intrusion"), [[f.crash_wide_1m + " of " + f.unit_phases, "crashes when the edge comes in by 1 m across the whole corner"],
-                         [f.crash_local_1m + " of " + f.unit_phases, "crashes when the same 1 m comes in over a few metres"]]);
-  pair($("#fixPair"), [[mean(lad.e0.circuits).toFixed(1) + " to " + mean(lad.margin1b.circuits).toFixed(1), "development circuits completed, of 12, at a billion steps"],
-                       [pct(st.ladder_gap.e0) + " to " + pct(st.ladder_gap.margin1b), "gap to the optimal lap: the price of the extra room"]]);
+  $("#intrusion").textContent = `Bring the inside edge in by 1 m across the whole corner and ${f.crash_wide_1m} of ${f.unit_phases} runs crash. Bring the same 1 m in over a few metres and ${f.crash_local_1m} of ${f.unit_phases} do.`;
+  $("#fixPair").textContent = `At a billion steps the recipe goes from ${mean(lad.e0.circuits).toFixed(1)} to ${mean(lad.margin1b.circuits).toFixed(1)} of the 12 development circuits, and from ${pct(st.ladder_gap.e0)} to ${pct(st.ladder_gap.margin1b)} off the optimal lap: the price of the extra room.`;
 })();
 
 /* The margin recipe on the held-out circuits: present only once that post hoc run exists. */
 (function heldOut() {
   if (!D.margin) return;
-  const R = D.margin.result, m = R.median, e = R.e0_median, t = R.circuits.test, mc = R.circuits.margin, ec = R.circuits.e0;
+  const R = D.margin.result, m = R.median, e = R.e0_median, tt = R.circuits.test, mc = R.circuits.margin, ec = R.circuits.e0;
   $("#rtest").hidden = false;
   $("#fixNote").textContent = "These are the twelve development circuits, whose width profiles the track generator borrows, so they are not an independent test. The held-out circuits follow.";
-  const p = t.p_one_sided < 0.1 ? t.p_one_sided.toFixed(3) : t.p_one_sided.toFixed(2), a = mean(mc).toFixed(1), b = mean(ec).toFixed(1);
+  const p = tt.p_one_sided < 0.1 ? tt.p_one_sided.toFixed(3) : tt.p_one_sided.toFixed(2), a = mean(mc).toFixed(1), b = mean(ec).toFixed(1);
   const verdict = {
     "the completion gain transfers": `The gain held: the margin networks complete ${a} circuits on average against the final agent's ${b} (exact permutation p = ${p}).`,
     "partly": `The margin networks complete more circuits, ${a} on average against ${b}, but five networks against five do not establish it (exact permutation p = ${p}).`,
@@ -1004,49 +1253,53 @@ function dialChart() {
   const held = R.predictions.filter(x => x.held).length;
   $("#rtestText").textContent = "After the project closed, the margin recipe's five networks were run once on the twelve held-out circuits, with the plan and its predictions committed first. This is one look after the test was spent, not a second test. "
     + verdict + (held === R.predictions.length ? ` All ${held} predictions written down beforehand held.` : ` ${held} of the ${R.predictions.length} predictions written down beforehand held.`);
-  const n = x => Number.isInteger(x) ? String(x) : x.toFixed(1);
   if (R.circuits.reading === "the completion gain transfers")
-    $("#introNote").textContent = "Both targets were set before the test and both were missed. The rest of this page is what that miss taught: where the policy fails, why, and a change to training that, in one later look, took the median network from " + n(e.circuits_completed) + " of these circuits to " + n(m.circuits_completed) + ".";
-  pair($("#rtestPair"), [[n(e.circuits_completed) + " to " + n(m.circuits_completed) + " of 12", "held-out circuits completed by the median network"],
-                         [pct(e.median_gap) + " to " + pct(m.median_gap), "gap to the optimal lap, on the laps finished"]]);
+    $("#introNote").textContent = "Both targets were set before the test and both were missed. The rest of this page is what that miss taught: where the policy fails, why, and a change to training that, in one later look, took the median network from " + num(e.circuits_completed) + " of these circuits to " + num(m.circuits_completed) + ".";
+  $("#rtestPair").textContent = `The median network goes from ${num(e.circuits_completed)} to ${num(m.circuits_completed)} of the 12 held-out circuits, and from ${pct(e.median_gap)} to ${pct(m.median_gap)} off the optimal lap on the laps it finishes. The margin buys completion with lap time.`;
   const eb = D.scoreboard, mb = D.margin.scoreboard, ring = mb.subjects.indexOf(D.margin.subject.name);
   const rows = eb.circuits.map(r => ({ e: r, m: mb.circuits.find(x => x.id === r.id) })).sort((x, y) => y.m.n_done - x.m.n_done || y.e.n_done - x.e.n_done);
   const tb = H("table"), hd = H("tr");
-  [["Circuit"], ["The final agent"], ["With the margin"], ["Gap, final agent", 1], ["Gap, with the margin", 1]].forEach(([x, num]) => { const c = H("th", num ? { class: "num" } : {}); c.textContent = x; hd.append(c); });
+  [["Circuit"], ["Final agent"], ["Gap", 1], ["With margin"], ["Gap", 1]].forEach(([x, isNum]) => { const c = H("th", isNum ? { class: "num" } : {}); c.textContent = x; hd.append(c); });
   tb.append(H("thead", {}, hd));
   const body = H("tbody");
   rows.forEach(r => {
     const tr = H("tr"), nm = H("td"), d1 = H("td"), d2 = H("td"), g1 = H("td", { class: "num" }), g2 = H("td", { class: "num" });
-    nm.textContent = r.e.name; d1.append(dotRow(r.e, shownIdx)); d2.append(dotRow(r.m, ring));
+    nm.textContent = r.e.name; d1.append(marks(r.e, shownIdx)); d2.append(marks(r.m, ring));
     g1.textContent = r.e.median_gap == null ? "none finished" : pct(r.e.median_gap, 2);
     g2.textContent = r.m.median_gap == null ? "none finished" : pct(r.m.median_gap, 2);
-    tr.append(nm, d1, d2, g1, g2); body.append(tr);
+    tr.append(nm, d1, g1, d2, g2); body.append(tr);
   });
   tb.append(body); $("#rtestTable").append(tb);
 })();
 
-function charts() { followChart(); ladderChart(); dialChart(); if (cur) { telemetry(); cornerChart(); kick(); } }
-let rz = 0, lastW = 0;
-new ResizeObserver(() => { const w = document.documentElement.clientWidth; if (w === lastW) return; lastW = w; clearTimeout(rz); rz = setTimeout(charts, 120); }).observe(document.documentElement);
+function charts() { followChart(); ladderChart(); dialChart(); if (cur) { plan(); telemetry(); kick(); } }
+const setMast = () => document.documentElement.style.setProperty("--mast", $("#mast").offsetHeight + "px");
+setMast();
+let rz = 0, lastW = 0, lastH = 0;
+new ResizeObserver(() => {
+  const w = document.documentElement.clientWidth, h = $("#sheet").clientHeight;
+  if (w === lastW && h === lastH) return;
+  lastW = w; lastH = h; setMast(); clearTimeout(rz); rz = setTimeout(charts, 120);
+}).observe(document.documentElement);
 window.addEventListener("resize", kick);
-lastW = document.documentElement.clientWidth;
+lastW = document.documentElement.clientWidth; lastH = $("#sheet").clientHeight;
 followChart(); ladderChart(); dialChart();
 
-/* Deep links, where the host passes a query string: ?c=Spa&t=41.5&cam=whole opens that circuit
-   paused at that time; ?view=<element id> shows that one element alone and ?theme=light|dark
-   fixes the theme (both used for the stills). */
+/* Deep links: ?c=Spa&t=41.5&cam=whole&net=margin opens that circuit and network paused at that
+   time; ?view=<element id> shows that one element alone (used for the stills). */
 const q = new URLSearchParams(location.search), has = id => D.circuits.some(c => c.id === id);
-if (q.get("theme") === "light" || q.get("theme") === "dark") document.documentElement.setAttribute("data-theme", q.get("theme"));
-select(has(q.get("c")) ? q.get("c") : has("Suzuka") ? "Suzuka" : D.circuits[0].id, false);
-if (q.get("cam") === "whole") { cam = "whole"; $$("[data-cam]").forEach(x => x.setAttribute("aria-pressed", x.dataset.cam === cam)); }
+if (q.get("net") === "margin" && AGENTS.margin) agentKey = "margin";
 const solo = q.get("view") && document.getElementById(q.get("view"));
 if (solo) {
   document.body.classList.add("solo");
   for (let e = solo; e && e !== document.body; e = e.parentElement)
     Array.from(e.parentElement.children).forEach(s => { if (s !== e && s.tagName !== "SCRIPT") s.hidden = true; });
-  charts();
 }
+select(has(q.get("c")) ? q.get("c") : has("Spa") ? "Spa" : D.circuits[0].id, false);
+if (q.get("cam") === "whole") setCam("whole");
+if (solo) charts();
 if (q.has("t")) seek(parseFloat(q.get("t")) || 0); else if (!reduced && !solo) play(true);
+if (document.fonts && document.fonts.ready) document.fonts.ready.then(() => { if (cur) { plan(); kick(); } });
 })();
 </script>
 </body>

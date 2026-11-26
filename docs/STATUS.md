@@ -37,6 +37,10 @@ Nothing was trained, and no study's result changed, after 30 Oct. The wrap-up ad
     which compiles to a different float32 program: it drifted by up to 0.83 ms on E0's laps
     and by 23 ms on one of the margin network's, and the check caught it.)
   - The showcase itself evaluates no new subject, checkpoint or metric on R_TEST.
+  - Its design was redone on 26 Nov 2026, at the user's request. The first screen is now a lap
+    report drawn like an engineering sheet (detail drawing, plan, speed trace, lap sheet) and
+    the findings follow as an essay beside their charts. `data.js` and every number are
+    unchanged; the page no longer shows the pedal and grip readouts.
 - **The margin recipe on R_TEST (POST HOC, 26 Nov 2026; the user asked for it;
   [findings](findings/margin-rtest.md), [plan](findings/margin-rtest-plan.md)).** The plan, its
   subjects, its predictions and its script were committed and pushed in `f0567ad` before the
@@ -66,6 +70,13 @@ Nothing was trained, and no study's result changed, after 30 Oct. The wrap-up ad
   refused to run since `p4-b2-prereg-v1` was placed on 27 Oct. It is now skipped once that tag
   exists, as the costate tests already were. With the wrap-up's 15 new tests the suite has
   2,088 tests in 92 files.
+  - The full suite ran again on 26 Nov 2026, at `v1.0`: 2,078 passed, 8 skipped and 2 failed.
+  - `test_showcase.py::test_rollout_run0_is_run_0_of_the_lockbox_batch` failed inside the whole
+    suite and passed alone. An earlier module leaves the process in float64, and the test
+    called the float32 lap harness without the guard `rollout_run0` itself carries. The test
+    now applies that guard and passes in both modes.
+  - `test_costate_stages.py::test_post_tag_bodies_end_to_end_on_random_stand_ins` ran past its
+    600 s limit while the machine was busy with other work. It passes on its own.
 - **The showcase is public** at <https://adrian0729.github.io/apexzero/showcase/>, by the user's
   decision of 26 Nov 2026 (see "Decisions taken" for what that changed about track geometry).
 

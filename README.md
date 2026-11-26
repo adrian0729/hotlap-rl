@@ -4,7 +4,7 @@ A racing policy trained only on computer-generated tracks, tested on twelve real
 circuits it had never seen, and scored on every lap against the fastest lap the same car can
 physically drive.
 
-![The network (blue) and the optimal lap (white outline) at Spa's first corner](docs/showcase/img/replay-spa.png)
+![The lap report for Spa: the network's car, in black, 0.62 s behind the optimal car, in purple, with a plan of the time lost at each corner, the speed trace and the lap sheet of all twelve circuits](docs/showcase/img/replay-spa.png)
 
 **Status: complete.** The work ran from 18 October to 1 November 2026 and was wrapped up on
 25 November 2026. Every study that was started has been run and written up.
@@ -86,11 +86,13 @@ Three smaller results:
 
 ## The showcase
 
-[docs/showcase](docs/showcase/README.md) is an interactive page: pick any of the 12 held-out
-circuits and watch a network's lap beside the optimal lap, with live speed, pedals, grip, time
-lost and the forty points of road the network sees, the crashes included. You can switch
-between the final agent and the margin recipe. Below the replay are the scoreboard of all
-five networks and the findings above as charts.
+[docs/showcase](docs/showcase/README.md) is an interactive page. Its first screen is a lap
+report drawn like an engineering sheet: the road to scale with the network's car and the
+optimal car, the gap between them as a dimension line, the forty road points the network
+sees, a plan with a red spike for the time lost at each corner, the speed trace, and a lap
+sheet of all twelve circuits for the final agent and the margin recipe. Pick any cell of that
+sheet to watch its lap, the crashes included. Below it the findings read as a short essay
+beside their charts.
 
 ![A crash on a held-out circuit: the car reaches the inside edge of a hairpin](docs/showcase/img/replay-crash.png)
 

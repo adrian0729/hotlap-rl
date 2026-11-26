@@ -3,7 +3,7 @@
     uv run python scripts/showcase_stills.py
 
 Serves ``docs/showcase/`` on a local port, opens the page in headless Chrome at fixed states
-(``?view=<element>&c=<circuit>&t=<seconds>``, see the end of the page's script), trims each
+(``?view=<element>&c=<circuit>&t=<seconds>&net=margin``, see the end of the page's script), trims each
 screenshot to its content and writes ``docs/showcase/img/*.png``. Stills that show circuit
 geometry get the TUMFTM attribution in a footer, as the repository's other committed figures
 do. Needs ``docs/showcase/data.js`` (``scripts/showcase.py``), Google Chrome, and network
@@ -31,15 +31,15 @@ CHROME = ("/Applications/Google Chrome.app/Contents/MacOS/Google Chrome",
 
 # name, query, window (w, h), whether it shows circuit geometry (and so gets the footer)
 SHOTS = [
-    ("replay-spa", "view=screen&theme=dark&c=Spa&t=6.9", (1180, 760), True),
-    ("replay-suzuka", "view=screen&theme=dark&c=Suzuka&t=12.0", (1180, 760), True),
-    ("replay-crash", "view=screen&theme=dark&c=MexicoCity&t=999", (1180, 760), True),
-    ("circuits", "view=picker&theme=light", (1180, 420), True),
-    ("heldout-margin", "view=rtest&theme=light", (1000, 1100), False),
-    ("scoreboard", "view=scoreTable&theme=light", (980, 900), False),
-    ("follow", "view=follow&theme=light", (760, 520), False),
-    ("ladder", "view=ladder&theme=light", (760, 520), False),
-    ("dial", "view=dial&theme=light", (1180, 420), False),
+    ("replay-spa", "view=sheet&c=Spa&t=33.43", (1440, 900), True),
+    ("replay-suzuka", "view=sheet&c=Suzuka&t=12.0&net=margin", (1440, 900), True),
+    ("replay-crash", "view=sheet&c=MexicoCity&t=999", (1440, 900), True),
+    ("circuits", "view=twelve", (760, 560), True),
+    ("heldout-margin", "view=heldoutFig", (760, 900), False),
+    ("scoreboard", "view=scoreFig", (760, 900), False),
+    ("follow", "view=followFig", (660, 560), False),
+    ("ladder", "view=ladderFig", (660, 560), False),
+    ("dial", "view=dialFig", (660, 460), False),
 ]
 
 
