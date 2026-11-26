@@ -35,6 +35,7 @@ SHOTS = [
     ("replay-suzuka", "view=sheet&c=Suzuka&t=12.0&net=margin", (1440, 900), True),
     ("replay-crash", "view=sheet&c=MexicoCity&t=999", (1440, 900), True),
     ("circuits", "view=twelve", (760, 560), True),
+    ("network", "view=netFig", (1200, 760), False),
     ("heldout-margin", "view=heldoutFig", (760, 900), False),
     ("scoreboard", "view=scoreFig", (760, 900), False),
     ("follow", "view=followFig", (660, 560), False),

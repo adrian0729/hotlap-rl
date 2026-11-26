@@ -215,6 +215,32 @@ svg .pl-x { fill: none; stroke: var(--lost); stroke-width: 2; }
 #tip { position: fixed; z-index: 10; pointer-events: none; max-width: 280px; padding: 6px 9px; background: var(--tip); border: 1px solid var(--ink); font: 400 12px/1.45 var(--sans); }
 #tip strong { font: 500 12px/1.45 var(--mono); }
 
+/* ---- the network and its training: one drawing across both columns ---- */
+.wide { grid-column: 1 / -1; }
+.figrow { display: flex; align-items: baseline; justify-content: space-between; flex-wrap: wrap; gap: 6px 24px; margin-bottom: 0.9rem; }
+.figrow .figtitle { margin: 0; }
+.modes { display: flex; gap: 18px; }
+.modes button { appearance: none; background: none; border: 0; border-bottom: 1px solid transparent; border-radius: 0; padding: 0 0 1px;
+                font: 600 10.5px/1.2 var(--sans); letter-spacing: 0.1em; text-transform: uppercase; color: var(--muted); cursor: pointer; }
+.modes button[aria-pressed="true"] { color: var(--ink); border-bottom-color: var(--ink); }
+.modes button:hover { color: var(--opt); }
+.netwrap { overflow-x: auto; }
+.netwrap svg { display: block; width: 100%; min-width: 900px; height: auto; }
+#net text { font: 400 12.5px var(--sans); fill: var(--muted); }
+#net text.ink { fill: var(--ink); }
+#net text.cap { font: 600 12px var(--sans); letter-spacing: 0.1em; fill: var(--ink); }
+#net text.num { font: 400 10.5px var(--mono); fill: var(--muted); }
+#net text.band { font: 400 11px var(--sans); letter-spacing: 0.1em; fill: var(--muted); }
+#net .w, #net .bx { fill: none; stroke: var(--ink); stroke-width: 1; }
+#net .dot, #net .ah { fill: var(--ink); }
+#net .nd, #net .bg { fill: var(--paper); }
+#net .nd { stroke: var(--ink); stroke-width: 1; }
+#net .learn .w, #net .learn .bx, #net .learn .nd { stroke-dasharray: 4 3; }
+#net .learn { transition: opacity 0.25s; }
+#net svg.lap .learn { opacity: 0.13; }
+#net .hit { cursor: help; }
+@media (prefers-reduced-motion: reduce) { #net .learn { transition: none; } }
+
 /* ---- narrower windows ---- */
 @media (max-width: 1099px) {
   .sheet { height: auto; grid-template-columns: minmax(0, 1fr); grid-template-rows: none;
@@ -333,6 +359,49 @@ body.solo .essay section { display: block; padding: 0; }
     <figure id="twelve">
       <div class="minis" id="minis"></div>
       <figcaption id="replayNote"></figcaption>
+    </figure>
+  </div>
+</section>
+
+<section id="driver">
+  <h2>The driver, and how it learned</h2>
+  <figure class="wide" id="netFig">
+    <div class="figrow">
+      <p class="figtitle">The network, and the loop that trained it</p>
+      <div class="modes" role="group" aria-label="Which parts to show">
+        <button type="button" id="modeAll" aria-pressed="true">In training</button>
+        <button type="button" id="modeLap" aria-pressed="false">On a lap</button>
+      </div>
+    </div>
+    <div class="netwrap" id="net"></div>
+    <p class="sr" id="netText">Diagram in two rows. The driving loop: the simulated car reports 222 numbers, which are 200 for the road ahead (40 points on each edge, 5 numbers each), 16 for what the car feels and 6 for which car it is. The network passes them through three layers of 256 units to two commands, steer and pedal, each from minus 1 to plus 1. The links carry 57,088, 65,792, 65,792 and 514 learned numbers, 189,186 in all. The car moves on 0.05 seconds and reports again, twenty times a second. Only in training: generated strips of road and randomised cars feed the simulator, each command gets a random nudge, a reward is paid for progress and charged for jerky commands and for a crash, a critic network of the same shape predicts the reward to come, and after every 131,072 decisions an update makes the commands that beat the critic's expectation a little more likely.</p>
+    <figcaption>Solid lines run on every lap, twenty times a second. Dashed parts ran only in training, where they changed the network's numbers. Each dot is one number the network is told, or one unit inside it; the figure under a link counts the learned numbers on it. Point at any part for its details.</figcaption>
+  </figure>
+  <div class="txt">
+    <p>The driver is a small neural network. 222 numbers go in, they pass through three layers of 256 units, and two commands come out: how far to turn the wheel and how hard to press the pedal. In between are 189,186 learned numbers, and those numbers are the whole driver.</p>
+    <p>It is told only what the first group shows: forty points on each edge of the road ahead, sixteen things the car can feel, and six numbers that describe the car. It is never told which circuit it is on, or how far round the lap it is.</p>
+    <p>It learned by trial and error. 2,048 simulated cars drove at once on computer-generated strips of road, with every command nudged at random so that new things were tried. A second network, the critic, predicted how much reward each moment would bring. Commands that turned out better than the critic expected were made a little more likely, and the others a little less.</p>
+    <p>That update ran 7,629 times, a billion decisions in all: a year and seven months of driving, simulated in two and a quarter hours. On the laps above, none of the training machinery runs. The network drives alone, with the same numbers on all twelve circuits.</p>
+  </div>
+  <div class="figs">
+    <figure id="trainFig">
+      <p class="figtitle">The training in numbers</p>
+      <div class="tbl"><table>
+        <tbody>
+          <tr><td>Decisions made in training</td><td class="num">999,948,288</td></tr>
+          <tr><td>Cars driving at once</td><td class="num">2,048</td></tr>
+          <tr><td>Decisions behind each update</td><td class="num">131,072</td></tr>
+          <tr><td>Updates to the network</td><td class="num">7,629</td></tr>
+          <tr><td>Strips of generated road</td><td class="num">1,957,120</td></tr>
+          <tr><td>Driving simulated</td><td class="num">1.6 years</td></tr>
+          <tr><td>Computing time</td><td class="num">2 h 14 min</td></tr>
+          <tr><td>Average run when training began</td><td class="num">0.6 s</td></tr>
+          <tr><td>Average run when it ended</td><td class="num">44 s</td></tr>
+          <tr><td>Learned numbers in the driver</td><td class="num">189,186</td></tr>
+          <tr><td>Learned numbers in the critic</td><td class="num">271,494</td></tr>
+        </tbody>
+      </table></div>
+      <figcaption>The final agent's training run (seed 52). A run in training stops after 60 s, or sooner where its strip of road ends.</figcaption>
     </figure>
   </div>
 </section>
@@ -1272,6 +1341,147 @@ function dialChart() {
   tb.append(body); $("#rtestTable").append(tb);
 })();
 
+/* ---------------------------------------------------------------- the network and its training
+   One drawing, fixed in its own coordinates and scaled to the column. The top row is the loop
+   that drives; everything in the "learn" group ran only in training. Counts are the registered
+   recipe's: env/racing.py, agents/ppo.py and the run's config.json. */
+function netChart() {
+  const box = $("#net"); box.replaceChildren();
+  const W = 1140, Hh = 486, yc = 150.5;
+  const svg = S("svg", { viewBox: `-24 0 ${W + 24} ${Hh}`, role: "img", "aria-labelledby": "netText" });
+  const learn = S("g", { class: "learn" });
+  const put = (el, g) => { (g || svg).append(el); return el; };
+  const wire = (d, g) => put(S("path", { class: "w", d }), g);
+  const head = (x, y, dir, g) => {
+    const a = { r: [[-7, -3], [-7, 3]], l: [[7, -3], [7, 3]], d: [[-3, -7], [3, -7]], u: [[-3, 7], [3, 7]] }[dir];
+    put(S("path", { class: "ah", d: `M${x} ${y}L${x + a[0][0]} ${y + a[0][1]}L${x + a[1][0]} ${y + a[1][1]}Z` }), g);
+  };
+  const txt = (x, y, s, cls, anchor, g) => put(T(x, y, s, cls, anchor), g);
+  const lines = (x, y, rows, g) => rows.forEach((r, i) => txt(x, y + i * 17, r[0], r[1] ? "ink" : "", null, g));
+  const boxed = (x, y, w, h, g) => put(S("rect", { class: "bx", x, y, width: w, height: h }), g);
+  const count = (x, y, n, below, g) => {       // a schematic's width mark, and the learned numbers on the link
+    put(S("line", { class: "w", x1: x - 4, y1: y + 4, x2: x + 4, y2: y - 4 }), g);
+    txt(x, y - 9, n, "num", "middle", g);
+    if (below) txt(x, y + 20, below, "num", "middle", g);
+  };
+  const dots = (x0, y0, cols, rows, pitch, r, g) => {
+    let d = "";
+    for (let i = 0; i < cols; i++) for (let j = 0; j < rows; j++) d += `M${(x0 + i * pitch - r).toFixed(2)} ${(y0 + j * pitch).toFixed(2)}a${r} ${r} 0 1 0 ${2 * r} 0a${r} ${r} 0 1 0 ${-2 * r} 0`;
+    return put(S("path", { class: "dot", d }), g);
+  };
+  const notes = [];
+  const note = (x, y, w, h, label, rows, g) => notes.push([S("rect", { class: "hit", x, y, width: w, height: h, tabindex: 0, "aria-label": label }), rows, g]);
+
+  /* ---- the loop that drives ---- */
+  txt(0, 48, "THE CAR AND THE ROAD", "cap");
+  boxed(0.5, 78.5, 168, 144);
+  lines(12, 104, [["one car on one road", 1], ["800 kg, 695 kW,"], ["tyres with limited grip"], [""], ["each step moves it on", 1], ["0.05 s and reports back"]]);
+  note(0, 60, 170, 164, "The car and the road", [["0.05 s", "of driving per decision, worked out in ten smaller steps"], ["the car", "a single-track model: 800 kg, 695 kW, downforce and drag, tyres with limited grip"],
+    ["the wheels", "follow each command 0.05 s behind; the steering turns at most 86° a second"], ["a run ends", "within 1 m of a road edge, when the car turns more than 90° from the road or slides past 10° of tyre slip, or after 2 s below 2 m/s"]]);
+  wire(`M168.5 ${yc}H212`); head(220, yc, "r");
+
+  txt(232, 48, "WHAT IT IS TOLD", "cap"); txt(512, 48, "222 numbers", "num", "end");
+  wire("M230 64.5H224.5V232.5H230"); wire("M518 64.5H524.5V232.5H518");
+  txt(232, 78, "the road ahead", "ink"); txt(512, 78, "200", "num", "end");
+  dots(235.5, 90, 40, 5, 7, 1.8);
+  lines(232, 137, [["40 points, nearest to farthest,"], ["with 5 numbers for each"]]);
+  txt(232, 181, "what the car feels", "ink"); txt(512, 181, "16", "num", "end");
+  dots(235.5, 191, 16, 1, 7, 1.8);
+  txt(232, 214, "which car it is", "ink"); txt(512, 214, "6", "num", "end");
+  dots(235.5, 224, 6, 1, 7, 1.8);
+  txt(232, 254, "each number is first rescaled to its usual range");
+  note(226, 62, 292, 96, "The road ahead, 200 numbers", [["40 points", "on each edge of the road. The farthest is 6 seconds of driving away, kept between 150 m and 500 m"],
+    ["5 numbers", "for each: where the left and the right edge are, seen from the car, and how sharply the road bends there"], ["spacing", "close together near the car and wider apart far away"]]);
+  note(226, 166, 292, 32, "What the car feels, 16 numbers", [["speeds", "forward, sideways, and how fast it is turning; its slide angle"], ["on the road", "where it sits between the edges, and its angle to the road"],
+    ["controls", "steering angle and pedal now, and its last two commands"], ["forces", "the push forward and sideways; grip used and tyre slip, front and rear"]]);
+  note(226, 200, 292, 34, "Which car it is, 6 numbers", [["in training", "mass 750–850 kg, power 550–800 kW, downforce area 3–6 m², drag area 1.0–1.9 m², grip × 0.85–1.10, front share of downforce 40–50%"],
+    ["on the test", "one car: 800 kg, 695 kW, 4.88 m², 1.56 m², × 1.00, 45%"]]);
+  note(226, 238, 292, 22, "Rescaling", [["rescaled", "each number has its training average taken off and is divided by its usual spread, then cut off at ±10"]]);
+
+  wire(`M524.5 ${yc}H576`); head(584, yc, "r"); count(552, yc, "222", "57,088");
+  txt(584, 48, "THE NETWORK", "cap"); txt(973.5, 48, "189,186 learned numbers", "num", "end");
+  [592, 739, 886].forEach((x0, i) => {
+    boxed(x0 - 7.5, 102.5, 95, 95);
+    dots(x0 + 2.5, 112.5, 16, 16, 5, 1.25);
+    txt(x0 + 40, 216, "256 units", "ink", "middle");
+    if (i < 2) { wire(`M${x0 + 87.5} ${yc}H${x0 + 131}`); head(x0 + 139, yc, "r"); count(x0 + 109.5, yc, "256", "65,792"); }
+    note(x0 - 8, 100, 96, 122, `Layer ${i + 1}, 256 units`, [["256 units", "each multiplies what comes in by its own weights, adds it up, and squashes the sum to between −1 and +1"],
+      [i ? "65,792" : "57,088", `learned numbers on the way in: ${i ? 256 : 222} × 256 weights and 256 offsets`]]);
+  });
+  wire("M584.5 226V232.5H973.5V226");
+
+  txt(1002, 48, "TWO COMMANDS", "cap");
+  wire(`M973.5 ${yc}H994`); head(1002, yc, "r"); txt(988, yc + 20, "514", "num", "middle");
+  boxed(1002.5, 128.5, 24, 44); dots(1014.5, 140.5, 1, 2, 20, 2.2);
+  wire("M1026.5 140.5H1124.5"); wire("M1026.5 160.5H1124.5");
+  txt(1036, 134, "steer", "ink"); txt(1118, 134, "−1 … +1", "num", "end");
+  txt(1036, 178, "pedal", "ink"); txt(1118, 178, "−1 … +1", "num", "end");
+  note(996, 118, 130, 66, "Two commands, steer and pedal", [["steer", "−1 is full right and +1 full left; the road wheels turn up to 25.8°"], ["pedal", "−1 is full brake and +1 full throttle"],
+    ["514", "learned numbers: 256 weights and an offset for each command"], ["then", "both are cut off at ±1 and handed to the car"]]);
+  wire(`M1124.5 160.5V14.5H-15.5V${yc}H-8`); head(0, yc, "r");
+  put(S("rect", { class: "bg", x: 484, y: 6, width: 152, height: 17 })); txt(560, 19, "twenty times a second", "ink", "middle");
+
+  /* ---- only in training ---- */
+  const band = txt(0, 294, "ONLY IN TRAINING", "band", null, learn);
+  put(S("circle", { class: "nd", cx: 1124.5, cy: 84, r: 7.5 }), learn); txt(1124.5, 88.5, "+", "ink", "middle", learn);
+  txt(1110, 81, "a random", "", "end", learn); txt(1110, 96, "nudge", "", "end", learn);
+  note(1056, 66, 78, 36, "A random nudge on each command", [["exploring", "in training each command is nudged at random, so that new things are tried"],
+    ["0.61 → 0.01, 0.05", "the size of the nudge on steer and pedal: large at first, and the network shrinks it itself"], ["on a lap", "no nudge: the command is used as it comes"]], learn);
+
+  txt(0, 318, "TRACKS AND CARS", "cap", null, learn);
+  boxed(0.5, 330.5, 168, 96, learn);
+  lines(12, 354, [["4,096 generated strips", 1], ["of road, 256 of them new"], ["before each update;"], ["a different car each run"]], learn);
+  wire("M156.5 330.5V231", learn); head(156.5, 223, "u", learn);
+  note(0, 304, 170, 124, "Tracks and cars in training", [["4,096", "strips of computer-generated road in use at a time; 256 are replaced before every update, 1,957,120 in all"],
+    ["each run", "a strip at random, a car drawn from the ranges it is told about, and grip moved by up to 2% that it is not told about"], ["widths", "borrowed from twelve development circuits, none of them in the test; every layout is generated"]], learn);
+
+  txt(232, 318, "REWARD", "cap", null, learn);
+  boxed(232.5, 330.5, 280, 96, learn);
+  lines(244, 356, [["+1 for every 10 m gained along the road", 1], ["−0.02 × the change in its commands, squared"], ["−5 or worse when a run ends in a crash"]], learn);
+  wire("M168.5 200.5H200.5V378.5H224", learn); head(232, 378.5, "r", learn);
+  note(232, 304, 281, 124, "The reward", [["+1", "for every 10 m gained along the road"], ["−0.02 ×", "the squared change in the two commands, which keeps them smooth"],
+    ["−5 − 5 (v / 50)²", "when a run ends, with v the speed in m/s: leaving the road at 180 km/h costs 10"], ["1.0 m", "from an edge ends a run for the final agent; the margin recipe ends it at 1.4 m in training"]], learn);
+
+  txt(584, 318, "THE CRITIC", "cap", null, learn); txt(832.5, 318, "271,494 learned numbers", "num", "end", learn);
+  wire("M524.5 232.5V371.5H582", learn); head(590, 371.5, "r", learn);
+  [596, 686, 776].forEach((x0, i) => {
+    boxed(x0 - 5.5, 340.5, 62, 62, learn); dots(x0, 346, 16, 16, 3.4, 0.95, learn);
+    wire(`M${x0 + 56.5} 371.5H${i < 2 ? x0 + 76 : 852}`, learn); head(i < 2 ? x0 + 84 : 860, 371.5, "r", learn);
+  });
+  put(S("circle", { class: "dot", cx: 868.5, cy: 371.5, r: 2.4 }), learn);
+  wire("M876.5 371.5H888", learn); head(896, 371.5, "r", learn);
+  lines(590, 424, [["the same shape as the driver, with one number out:"], ["how much reward it expects from here on"]], learn);
+  note(584, 304, 300, 142, "The critic", [["222 → 256 → 256 → 256 → 1", "the same shape as the driver, with one number out"], ["it predicts", "how much reward is still to come from this moment"],
+    ["271,494", "learned numbers, counting five small extra outputs kept for a side study"], ["on a lap", "it is not used at all"]], learn);
+
+  put(S("circle", { class: "nd", cx: 905.5, cy: 371.5, r: 9 }), learn);
+  txt(905.5, 334, "better than", "", "middle", learn); txt(905.5, 349, "expected?", "", "middle", learn);
+  txt(889, 366, "−", "num", "middle", learn); txt(915, 394, "+", "num", "middle", learn);
+  wire("M372.5 426.5V462.5H905.5V389", learn); head(905.5, 381, "u", learn);
+  note(868, 322, 76, 76, "Better than expected?", [["the surprise", "the reward that came, less the reward the critic predicted"], ["0.995, 0.95", "how far ahead it counts reward, and how it blends short and long views"]], learn);
+
+  txt(966, 318, "THE UPDATE", "cap", null, learn);
+  boxed(966.5, 330.5, 173, 96, learn);
+  lines(978, 354, [["every 131,072 decisions,", 1], ["commands that beat what"], ["the critic expected are"], ["made a little more likely"]], learn);
+  wire("M914.5 371.5H958", learn); head(966, 371.5, "r", learn);
+  wire("M1060.5 330.5V262.5H779.5V241", learn); head(779.5, 233.5, "u", learn);
+  put(S("rect", { class: "bg", x: 838, y: 254, width: 166, height: 17 }), learn); txt(921, 267, "adjusts the learned numbers", "", "middle", learn);
+  note(966, 304, 174, 124, "The update", [["PPO", "proximal policy optimisation"], ["131,072", "decisions behind each update: 64 steps from each of 2,048 cars"], ["4 × 8", "four passes over them, in eight batches"],
+    ["0.2", "the clip: moving a command's odds by more than 20% in one update earns nothing extra"], ["0.0003 → 0", "the learning rate, falling in a straight line"], ["7,629", "updates in all; the critic is corrected at the same time"]], learn);
+
+  wire("M0 472.5H28"); txt(36, 476.5, "runs on every lap");
+  wire("M170 472.5H198", learn); txt(206, 476.5, "ran only in training", "", null, learn);
+
+  svg.append(learn);
+  notes.forEach(([hit, rows, g]) => { hover(hit, () => rows); (g || svg).append(hit); });
+  box.append(svg);
+  const mode = lap => {
+    svg.classList.toggle("lap", lap); band.textContent = lap ? "ONLY IN TRAINING: SWITCHED OFF ON A LAP" : "ONLY IN TRAINING";
+    $("#modeAll").setAttribute("aria-pressed", String(!lap)); $("#modeLap").setAttribute("aria-pressed", String(lap));
+  };
+  $("#modeAll").onclick = () => mode(false); $("#modeLap").onclick = () => mode(true);
+}
+
 function charts() { followChart(); ladderChart(); dialChart(); if (cur) { plan(); telemetry(); kick(); } }
 const setMast = () => document.documentElement.style.setProperty("--mast", $("#mast").offsetHeight + "px");
 setMast();
@@ -1283,7 +1493,7 @@ new ResizeObserver(() => {
 }).observe(document.documentElement);
 window.addEventListener("resize", kick);
 lastW = document.documentElement.clientWidth; lastH = $("#sheet").clientHeight;
-followChart(); ladderChart(); dialChart();
+followChart(); ladderChart(); dialChart(); netChart();
 
 /* Deep links: ?c=Spa&t=41.5&cam=whole&net=margin opens that circuit and network paused at that
    time; ?view=<element id> shows that one element alone (used for the stills). */

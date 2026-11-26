@@ -92,9 +92,11 @@ optimal car, the gap between them as a dimension line, the forty road points the
 sees, a plan with a red spike for the time lost at each corner, the speed trace, and a lap
 sheet of all twelve circuits for the final agent and the margin recipe. Pick any cell of that
 sheet to watch its lap, the crashes included. Below it the findings read as a short essay
-beside their charts.
+beside their charts, with a drawing of the network itself and of the loop that trained it.
 
 ![A crash on a held-out circuit: the car reaches the inside edge of a hairpin](docs/showcase/img/replay-crash.png)
+
+![The network and its training loop: 222 numbers in, three layers of 256 units, two commands out, and under it the reward, the critic and the update that ran only in training](docs/showcase/img/network.png)
 
 **Live: <https://adrian0729.github.io/apexzero/showcase/>**
 

@@ -41,6 +41,10 @@ Nothing was trained, and no study's result changed, after 30 Oct. The wrap-up ad
     report drawn like an engineering sheet (detail drawing, plan, speed trace, lap sheet) and
     the findings follow as an essay beside their charts. `data.js` and every number are
     unchanged; the page no longer shows the pedal and grip readouts.
+  - A drawing of the network and of its training loop was added to the page on 26 Nov 2026, at
+    the user's request. It shows structure and settings only, read from `env/racing.py`,
+    `agents/ppo.py` and the final agent's `config.json` and `metrics.csv`. No network runs in
+    the page, no weights are shipped with it and nothing was evaluated for it.
 - **The margin recipe on R_TEST (POST HOC, 26 Nov 2026; the user asked for it;
   [findings](findings/margin-rtest.md), [plan](findings/margin-rtest-plan.md)).** The plan, its
   subjects, its predictions and its script were committed and pushed in `f0567ad` before the
@@ -77,6 +81,9 @@ Nothing was trained, and no study's result changed, after 30 Oct. The wrap-up ad
     now applies that guard and passes in both modes.
   - `test_costate_stages.py::test_post_tag_bodies_end_to_end_on_random_stand_ins` ran past its
     600 s limit while the machine was busy with other work. It passes on its own.
+  - The full suite ran a third time on 26 Nov 2026, at `284ab3b` (the redesigned page and that
+    fix), on a lightly loaded machine: 2,080 passed, 8 skipped and none failed, in 54 minutes.
+    The costate end-to-end test took 361 s of its 600 s.
 - **The showcase is public** at <https://adrian0729.github.io/apexzero/showcase/>, by the user's
   decision of 26 Nov 2026 (see "Decisions taken" for what that changed about track geometry).
 

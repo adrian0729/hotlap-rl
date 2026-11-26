@@ -43,10 +43,21 @@ Below it the findings read as an essay: text on the left, unframed figures on th
 Three colours carry meaning and nothing else is coloured: ink for the network, purple for the
 optimal lap, red for time lost and for a run that ended.
 
+The essay's second section, "The driver, and how it learned", has one drawing of the network
+and of the loop that trained it. The top row is what runs on a lap: the 222 numbers the network
+is told, its three layers of 256 units and its two commands. Under it, dashed, are the parts
+that ran only in training: the generated tracks and cars, the reward, the critic and the
+update. A switch fades the training-only parts, and each part shows its numbers when pointed
+at. It is a drawing of structure and settings (`src/apexzero/env/racing.py`,
+`src/apexzero/agents/ppo.py` and the run's `config.json` and `metrics.csv`): no network runs
+in the page and no weights are shipped with it. `?view=netFig` shows it alone.
+
 The design was redone on 26 Nov 2026. It borrows from Bret Victor's "Up and Down the Ladder of
 Abstraction" and Bartosz Ciechanowski's essays (figures without frames, coloured words for
 legends), from lap-coaching tools (time lost pinned to the corner, one large delta) and from
-technical drawing (dimension lines, a plan with a scale bar and a north arrow).
+technical drawing (dimension lines, a plan with a scale bar and a north arrow). The network
+drawing takes from Chris Olah's LSTM diagrams (one line carries a whole set of numbers) and
+from schematics (a slash and a count on a line for how many).
 
 ## Rebuilding it
 
