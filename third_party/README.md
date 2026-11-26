@@ -9,5 +9,6 @@ is edited or linted here.
 | [`jaxued_examples/`](jaxued_examples/README.md) | `examples/maze_plr.py` of DramaCow/jaxued | `scripts/run_jaxued_maze.py` |
 | [`sfl/`](sfl/README.md) | The MiniGrid maze code of amacrutherford/sampling-for-learnability (Rutherford et al. 2024) | `scripts/run_sfl_maze.py` |
 
-Each folder's note names the commit it was copied from. The audit that uses them is
+Each folder's note names the commit it was copied from, and each folder holds the licence's
+text (`LICENSE`). The rest of the repository is under MIT. The audit that uses them is
 [maze E5](../docs/findings/maze-e5.md).

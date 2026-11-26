@@ -1,14 +1,17 @@
-# ApexZero
+# Hotlap RL
 
-A racing policy trained only on computer-generated tracks, tested on twelve real Grand Prix
-circuits it had never seen, and scored on every lap against the fastest lap the same car can
-physically drive.
+A racing policy trained by reinforcement learning, only on computer-generated tracks. It was
+tested on twelve real Grand Prix circuits it had never seen, and scored on every lap against
+the fastest lap the same car can physically drive.
 
 ![The lap report for Spa: the network's car, in black, 0.62 s behind the optimal car, in purple, with a plan of the time lost at each corner, the speed trace and the lap sheet of all twelve circuits](docs/showcase/img/replay-spa.png)
 
 **Status: complete.** The work ran from 18 October to 1 November 2026 and was wrapped up on
 25 November 2026. Every study that was started has been run and written up.
 [docs/STATUS.md](docs/STATUS.md) tells the whole story in order.
+
+The project's working name was ApexZero. The repository, the Python package (`apexzero`) and
+the documents written during the work still use it.
 
 ## Start here
 
@@ -176,7 +179,12 @@ editable-install `.pth` file. Tests and scripts work around it; to fix the venv 
 
 ## Licences
 
-Code: Apache-2.0 ([LICENSE](LICENSE)). Data is fetched by script and not committed: the
+Code: MIT ([LICENSE](LICENSE)); until 26 November 2026 it was offered under Apache-2.0. The
+`license` field in `pyproject.toml` still says Apache-2.0, because that file is pinned by
+`protocol-v1` and was left untouched: the `LICENSE` file is what applies. The two vendored
+folders under `third_party/` keep their own licence, Apache-2.0, with its text beside them.
+
+Data is fetched by script and not committed: the
 TUMFTM racetrack-database (LGPL-3.0), OpenF1 (CC BY-NC-SA 4.0) and jolpica-f1. The one
 exception is the showcase's data file, whose circuit geometry is derived from the TUMFTM
 database and is distributed under LGPL-3.0

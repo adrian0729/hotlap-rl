@@ -71,6 +71,12 @@ Nothing was trained, and no study's result changed, after 30 Oct. The wrap-up ad
   - The same audit found nothing to remove from git: only `main` exists, locally and on
     GitHub; no tracked file is a duplicate, a leftover or empty; all 340 relative links
     resolve; and neither the tree nor its history holds a key, a token or a personal address.
+  - On 26 Nov 2026 the user changed the licence of the project's own code from Apache-2.0 to
+    MIT and gave the project the public title "Hotlap RL". `LICENSE` is now the MIT text. The
+    Apache-2.0 text moved beside the vendored JaxUED file, which stays under that licence, as
+    the vendored SFL code does. `pyproject.toml` still declares Apache-2.0 and the package is
+    still `apexzero`, because `protocol-v1` pins both. The repository's address and the
+    documents written during the work keep the working name, ApexZero.
 - **One defect, found and worked around.** `viz.sectors.carry_over_split` stops on Austin and Spa,
   where a sector boundary lands within 1e-12 m of a grid station. `scripts/showcase.py` snaps
   such boundaries first, with a test. The fix is not in `src/`, for the next reason.

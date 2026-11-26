@@ -15,7 +15,7 @@ edges were computed from it, and the coordinates were rounded to 0.1 m and delta
 `scripts/showcase.py` does this. The unmodified source files are not in this repository;
 `scripts/fetch_tracks.py` fetches them.
 
-**Everything else: Apache-2.0.** The laps, the optimal laps, the scoreboard and the chart data
+**Everything else: MIT.** The laps, the optimal laps, the scoreboard and the chart data
 are this project's own results, under the repository's licence.
 
 Until 26 Nov 2026 the repository committed no geometry derived from that database. `data.js`
