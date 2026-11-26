@@ -1,0 +1,35 @@
+{
+ "label": "POST HOC (docs/findings/margin-rtest-plan.md). GW-6's five networks, the 1.4 m training-margin recipe at 1B steps, each at its final checkpoint. None is chosen or dropped.",
+ "subjects": [
+  {
+   "name": "gw6-margin-s80",
+   "checkpoint": "runs/gw6-margin-s80/ckpt/000999948288.pkl",
+   "sha256": "d948fd2a909a953fdc1eb677a398d5b2bdbb98ab09e2f9690fd53391097fafab",
+   "timesteps": 999948288
+  },
+  {
+   "name": "gw6-margin-s81",
+   "checkpoint": "runs/gw6-margin-s81/ckpt/000999948288.pkl",
+   "sha256": "2ef89c6221bc854367171d852b1dc3b5530952d0c7a9120a8f9e6ab054a5aade",
+   "timesteps": 999948288
+  },
+  {
+   "name": "gw6-margin-s82",
+   "checkpoint": "runs/gw6-margin-s82/ckpt/000999948288.pkl",
+   "sha256": "61ce2159a43c780de4ede209fff038f1c47cf7431843ff68ec029764f248c9e1",
+   "timesteps": 999948288
+  },
+  {
+   "name": "gw6-margin-s83",
+   "checkpoint": "runs/gw6-margin-s83/ckpt/000999948288.pkl",
+   "sha256": "58c45d87bec1d41704d29ec806b0c152e641fb3b3e6b318019b9f4ff08300b6e",
+   "timesteps": 999948288
+  },
+  {
+   "name": "gw6-margin-s84",
+   "checkpoint": "runs/gw6-margin-s84/ckpt/000999948288.pkl",
+   "sha256": "b17fcf683b78e7d8e9ea9546feb9132839b4579bc185a998e1e831c69b627b6c",
+   "timesteps": 999948288
+  }
+ ]
+}

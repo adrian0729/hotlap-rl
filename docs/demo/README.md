@@ -1,7 +1,10 @@
 # Demo exports
 
-Viewer v0 and the ghost exports from plan section 3.2, built on what exists now (the K4
-Hockenheim specialist and the s-domain OCP). Re-run them on final agents with the same script.
+**The project's final demo is the [showcase page](../showcase/README.md)**, which replays the
+final agent on the 12 held-out circuits. This folder holds the earlier single-lap exports.
+
+Viewer v0 and the ghost exports from plan section 3.2, built on what existed in October 2026
+(the K4 Hockenheim specialist and the s-domain OCP).
 
 | File | What | In git |
 |---|---|---|

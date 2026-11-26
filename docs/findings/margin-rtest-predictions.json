@@ -1,0 +1,18 @@
+{
+ "label": "POST HOC (docs/findings/margin-rtest-plan.md). Written on 26 Nov 2026, before any margin network was run on an R_TEST circuit.",
+ "basis": "E0 under the same harness: R-dev to R_TEST, the median network's circuits completed went 8 to 8 and its median gap 6.35% to 5.16% (a factor 0.81). The margin networks on R-dev: 11, 12, 12, 11, 11 circuits; the median network completes 94.2% of laps at a median gap of 7.16%.",
+ "e0_rtest": {"circuits_completed": [6, 10, 8, 10, 7], "median_network": {"circuits_completed": 8, "laps_completed_share": 0.6667, "median_gap": 0.0516}},
+ "predictions": [
+  {"id": "circuits", "quantity": "circuits completed of 12, median network", "value": 11, "interval": [9, 12]},
+  {"id": "lap_share", "quantity": "share of laps completed, median network", "value": 0.92, "interval": [0.75, 1.0]},
+  {"id": "median_gap", "quantity": "median gap to the reference lap, median network", "value": 0.059, "interval": [0.052, 0.068]},
+  {"id": "gap_cost", "quantity": "median gap of the median network, margin minus E0's 0.0516", "value": 0.007, "interval": [0.001, 0.016]},
+  {"id": "min_circuits", "quantity": "circuits completed by the weakest of the five networks", "value": 9, "interval": [8, 12]}
+ ],
+ "reading_rule": {
+  "transfers": "the one-sided exact permutation p for circuits completed, margin above E0, five against five, is at most 0.05, and the median margin network completes at least 10 of 12",
+  "does_not_transfer": "the margin networks' mean circuits completed is less than 1.0 above E0's 8.2",
+  "partly": "anything else",
+  "h1_as_written": "read on the median margin network, descriptively: at least 90% of laps and a median gap of at most 4%. Expected: the lap part is close to call, the gap part fails."
+ }
+}

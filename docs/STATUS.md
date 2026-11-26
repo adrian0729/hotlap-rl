@@ -1,4 +1,4 @@
-# Status (30 Oct 2026)
+# Status (final: last study 30 Oct 2026, wrapped up 25 Nov 2026)
 
 Phases follow [the two-track plan](plan/two-track-plan.md): K = shared core, P = paper, D = demo.
 Since 25 Oct the work has followed [the follow-through plan](plan/follow-through.md), whose
@@ -6,6 +6,8 @@ Section 11 records every decision round and the lead's notes on each round.
 
 ## In brief
 
+- **The project is closed.** It was wrapped up on 25 Nov 2026 without the paper; the
+  [showcase page](showcase/README.md) is its public face (see Wrap-up below).
 - **Every study started has been run, analysed and written up.** No GPU box is up.
 - **The final agent misses its gate.** E0 (5 seeds × 1B on `generator-v1` and `sim-v1`) completes
   a median 8 of 12 R-dev circuits against a pass mark of 10, in-sample for widths
@@ -17,7 +19,36 @@ Section 11 records every decision round and the lead's notes on each round.
   completes 11.4 of 12 R-dev circuits against E0's 7.2, for about 1 point of lap gap
   ([gw5](findings/gw5.md) Section 5; the margin sweep in [gw8](findings/gw8.md)). E0 and the tags
   are unchanged.
-- **Paused by choice:** the paper, the drivers study and the full demo.
+- **Not pursued:** the paper, the drivers study and the wider demo.
+
+## Wrap-up (25 Nov 2026)
+
+Nothing was trained, and no study's result changed, after 30 Oct. The wrap-up added:
+- **The showcase page** ([showcase](showcase/README.md)). E0's median network (`e0-s52`, 8 of
+  12) is replayed on the 12 R_TEST circuits beside the lockbox's reference laps, with the
+  scoreboard of all five networks and the main findings as charts.
+  - Its scoreboard and headline figures are `outputs/lockbox/analysis.json` as it is.
+  - Its replays are POST HOC. The lockbox stored no crash trace and no pedal or steering, so
+    each replay is a fresh single rollout of the registered checkpoint under run 0's protocol.
+    `scripts/showcase.py` stops unless each one reproduces the stored run 0. The largest
+    differences were 0.83 ms in lap time and 0.06 m in crash station.
+  - No new subject, checkpoint or metric was evaluated on R_TEST.
+- **Indexes and a licence file:** [docs/README.md](README.md),
+  [findings/README.md](findings/README.md), `scripts/README.md`, `paper/README.md` and `LICENSE`
+  (Apache-2.0, as the README and `pyproject.toml` already said).
+- **One defect, found and worked around.** `viz.sectors.carry_over_split` stops on Austin and Spa,
+  where a sector boundary lands within 1e-12 m of a grid station. `scripts/showcase.py` snaps
+  such boundaries first, with a test. The fix is not in `src/`, for the next reason.
+- **The code `protocol-v1` pins is unchanged.** At the wrap-up,
+  `git diff protocol-v1 -- scripts/lockbox.py scripts/_bootstrap.py src/apexzero uv.lock pyproject.toml`
+  is empty.
+- **Tests.** The full suite ran on 25 Nov 2026: 2,065 passed, 7 skipped and 1 failed. The failure
+  was `test_p4_b2.py::test_manifest_stage_rehearsal`, which rehearses a pre-tag stage that has
+  refused to run since `p4-b2-prereg-v1` was placed on 27 Oct. It is now skipped once that tag
+  exists, as the costate tests already were. With the wrap-up's 14 new tests the suite has
+  2,087 tests in 92 files.
+- **The showcase is public** at <https://adrian0729.github.io/apexzero/showcase/>, by the user's
+  decision of 26 Nov 2026 (see "Decisions taken" for what that changed about track geometry).
 
 ## Built first (18–24 Oct)
 
@@ -281,13 +312,14 @@ explicitly and exclude `outputs/sealed/`.
 ## Decisions taken (reversible, recorded here)
 
 - **Driver registration gate.** The plan's gate (RMS <= 3 m, length within 1%) rejects 8 of 12 current layouts because the OpenF1 track model behaves like a racing line (inside offsets of 0.6-2.8 m), not a centreline. Adopted instead: excursion beyond the TUMFTM edges at the 99th percentile <= 8 m, with RMS and length reported as diagnostics. It passes all current layouts and no old layout in 2023, 2024 and 2025. Applied in code in `884280f` (DV-A).
-- **Track geometry stays out of git**, including derived trajectory JSON; figures are committed with attribution.
+- **Track geometry stays out of git**, including derived trajectory JSON; figures are committed with attribution. **One exception, the user's decision of 26 Nov 2026:** `docs/showcase/data.js` is committed, so that the showcase page can be served publicly. Its geometry is distributed under LGPL-3.0 with a notice (`docs/showcase/DATA-LICENSE.md`).
 - **Human telemetry from lockbox circuits is allowed** (snapping audit, driver study); the lockbox covers agent and optimum evaluation only.
 
-## What is left
+## What was left undone
 
-Every study started has been run and written up. What remains:
-- **Paused by choice:**
+Every study started has been run and written up. The project closed on 25 Nov 2026 with these
+open:
+- **Not pursued:**
   - the paper. It is a draft with placeholder results. PA-1's label pilot, PA-2 and PA-4 to PA-7
     were not run; PA-5 is the production labels and PA-6 the racing curriculum runs.
   - the full demo;

@@ -11,6 +11,8 @@
 /docs/demo/*.apng
 /docs/demo/*.mp4
 /docs/demo/*-frames/
+# The one exception (26 Nov 2026): docs/showcase/data.js is committed so the showcase page can be
+# served publicly. Its geometry is under LGPL-3.0, see docs/showcase/DATA-LICENSE.md.
 *.parquet
 *.json.gz
 

@@ -27,6 +27,11 @@ ROOT = Path(__file__).resolve().parents[1]
 SCRIPTS = ROOT / "scripts"
 CONST, AFTER = A.F1_SINGLE["width"], A.F1_SINGLE["after"]
 S2_RUN = ROOT / "runs" / "hockenheim-specialist-mlp-200M-s2"
+# The manifest stage is a pre-tag stage. In this repository it refuses to run once
+# p4-b2-prereg-v1 exists (tagged 27 Oct 2026), so its rehearsal can no longer be observed here.
+TAGGED = subprocess.run(["git", "-C", str(ROOT), "rev-parse", "-q", "--verify",
+                         "refs/tags/p4-b2-prereg-v1"], check=False,
+                        capture_output=True).returncode == 0
 
 
 @pytest.fixture(scope="module")
@@ -762,6 +767,7 @@ def _args(**kw):
     return argparse.Namespace(**{**base, **kw})
 
 
+@pytest.mark.skipif(TAGGED, reason="pre-tag stage: refuses once p4-b2-prereg-v1 exists")
 @pytest.mark.skipif(not (S2_RUN / "agent.pkl").exists(), reason="S2's run directory is local")
 def test_manifest_stage_rehearsal(b2, tmp_path, monkeypatch):
     """The manifest stage on S2's run standing in for S4, with S5 failing twice in the queue
