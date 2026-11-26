@@ -35,6 +35,7 @@ SHOTS = [
     ("replay-suzuka", "view=screen&theme=dark&c=Suzuka&t=12.0", (1180, 760), True),
     ("replay-crash", "view=screen&theme=dark&c=MexicoCity&t=999", (1180, 760), True),
     ("circuits", "view=picker&theme=light", (1180, 420), True),
+    ("heldout-margin", "view=rtest&theme=light", (1000, 1100), False),
     ("scoreboard", "view=scoreTable&theme=light", (980, 900), False),
     ("follow", "view=follow&theme=light", (760, 520), False),
     ("ladder", "view=ladder&theme=light", (760, 520), False),

@@ -1,0 +1,141 @@
+{
+ "label": "POST HOC (docs/findings/margin-rtest-plan.md): the lockbox was spent on E0 under protocol-v1; these numbers decide nothing about E0",
+ "mode": "lockbox",
+ "subject": "gw6-margin-s80",
+ "circuit": "Spielberg",
+ "variant": "original",
+ "checkpoint_sha256": "d948fd2a909a953fdc1eb677a398d5b2bdbb98ab09e2f9690fd53391097fafab",
+ "plan_commit": "f0567ad791fe8e3aabe6ee72010103493707b657",
+ "protocol_laps": {
+  "runs": 10,
+  "laps": 2,
+  "start_fraction": 0.9,
+  "seed": 0,
+  "completion_min": 0.5,
+  "completed_when": "completion fraction > completion_min",
+  "context": "default car (racing.default_context), grip 1, no observation noise"
+ },
+ "v_start": 69.04925424830225,
+ "length_m": 4315.672532416126,
+ "completed": [
+  true,
+  true,
+  true,
+  true,
+  true,
+  true,
+  true,
+  true,
+  true,
+  true
+ ],
+ "lap_time_s": [
+  68.57839515171943,
+  68.57841833233832,
+  68.57671881206332,
+  68.57701648417859,
+  68.57785430401563,
+  68.57684478946028,
+  68.57713991259223,
+  68.57778458315877,
+  68.57646551467478,
+  68.57735437843948
+ ],
+ "s_reached": [
+  24183.712890625,
+  24176.291015625,
+  24189.2734375,
+  24177.10546875,
+  24187.341796875,
+  24179.10546875,
+  24189.412109375,
+  24184.552734375,
+  24181.126953125,
+  24182.8828125
+ ],
+ "crash": [
+  false,
+  false,
+  false,
+  false,
+  false,
+  false,
+  false,
+  false,
+  false,
+  false
+ ],
+ "timeout": [
+  false,
+  false,
+  false,
+  false,
+  false,
+  false,
+  false,
+  false,
+  false,
+  false
+ ],
+ "term_s": [
+  null,
+  null,
+  null,
+  null,
+  null,
+  null,
+  null,
+  null,
+  null,
+  null
+ ],
+ "term_lap": [
+  -1,
+  -1,
+  -1,
+  -1,
+  -1,
+  -1,
+  -1,
+  -1,
+  -1,
+  -1
+ ],
+ "cause": [
+  "",
+  "",
+  "",
+  "",
+  "",
+  "",
+  "",
+  "",
+  "",
+  ""
+ ],
+ "seconds": 2.33,
+ "provenance": {
+  "script": "scripts/lockbox.py",
+  "script_sha256": "36bbfea50836350b89b93281432b364a9b7e5ae317ea50965789b37fa236543d",
+  "git_head": "f0567ad791fe8e3aabe6ee72010103493707b657",
+  "changed_paths": [],
+  "inputs_sha256": {},
+  "argv": [
+   "scripts/lockbox.py",
+   "laps"
+  ],
+  "start": "2026-11-26T00:51:43",
+  "end": "2026-11-26T00:51:45",
+  "seconds": 2.4,
+  "environment": {
+   "python": "3.12.4",
+   "jax": "0.11.2",
+   "numpy": "2.5.4",
+   "machine": "arm64",
+   "system": "Darwin",
+   "xla_flags": "--xla_cpu_multi_thread_eigen=false intra_op_parallelism_threads=2",
+   "nice": 15,
+   "cpu_count": 12
+  }
+ }
+}

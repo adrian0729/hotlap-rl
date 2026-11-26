@@ -59,6 +59,29 @@ def test_increasing_removes_ties_and_reversals(sc):
     assert s[-1] == pytest.approx(2.0, abs=1e-6)
 
 
+def test_rollout_run0_is_run_0_of_the_lockbox_batch(sc):
+    """The replay must be the registered run, not a look-alike: run 0 of the harness's own
+    batch, state for state."""
+    import jax.numpy as jnp
+
+    track = rounded_square()
+
+    def policy(obs):                 # steer back to the middle, hold a light throttle
+        steer = jnp.clip(-1.5 * obs[:, 204] - 2.0 * obs[:, 205], -1.0, 1.0)
+        return jnp.stack([steer, jnp.full(obs.shape[0], 0.15)], axis=1)
+
+    lp = sc.lb.PROTOCOL["laps"]
+    ro = sc.rollout_run0(policy, track, v_start=18.0)
+    ref = sc.lb.rollout_laps(policy, track, 18.0, runs=lp["runs"], laps=lp["laps"],
+                             seed=lp["seed"])
+    assert ro.x.shape == (ref.s.shape[0] + 1, 8) and ro.laps == lp["laps"]
+    assert (ro.x[0, 1], ro.x[0, 3]) == (0.0, 18.0)               # run 0 starts centred
+    for col, arr in ((0, ref.s), (1, ref.n), (3, ref.vx)):
+        assert np.array_equal(ro.x[1:, col], arr[:, 0].astype(float))
+    assert np.array_equal(ro.alive[1:], ref.alive[:, 0])
+    assert np.all(np.abs(ro.action) <= 1.0)
+
+
 def analysis(counts, gaps, headline_gap=0.05):
     subs = [f"n{i}" for i in range(len(counts))]
     return {"subjects": subs,

@@ -1,0 +1,2055 @@
+{
+ "label": "POST HOC (docs/findings/margin-rtest-plan.md): the lockbox was spent on E0 under protocol-v1; these numbers decide nothing about E0",
+ "plan": "docs/findings/margin-rtest-plan.md",
+ "plan_commit": [
+  "f0567ad791fe8e3aabe6ee72010103493707b657"
+ ],
+ "subjects": [
+  "gw6-margin-s80",
+  "gw6-margin-s81",
+  "gw6-margin-s82",
+  "gw6-margin-s83",
+  "gw6-margin-s84"
+ ],
+ "circuits": [
+  "Austin",
+  "Budapest",
+  "MexicoCity",
+  "Montreal",
+  "Monza",
+  "Sakhir",
+  "SaoPaulo",
+  "Shanghai",
+  "Silverstone",
+  "Spa",
+  "Spielberg",
+  "Suzuka"
+ ],
+ "margin": {
+  "per_subject": {
+   "gw6-margin-s80": {
+    "n_circuits": 12,
+    "laps_completed_share": 1.0,
+    "circuits_completed": 12,
+    "circuits_completed_share": 1.0,
+    "median_gap": 0.06066676668852944,
+    "median_gap_crash_inf": 0.06066676668852944,
+    "median_gap_narrow": 0.050987448102383204,
+    "median_gap_crash_inf_narrow": 0.050987448102383204,
+    "median_gap_wide": 0.0720698236162931,
+    "median_gap_crash_inf_wide": 0.0720698236162931
+   },
+   "gw6-margin-s81": {
+    "n_circuits": 12,
+    "laps_completed_share": 1.0,
+    "circuits_completed": 12,
+    "circuits_completed_share": 1.0,
+    "median_gap": 0.07216423759143653,
+    "median_gap_crash_inf": 0.07216423759143653,
+    "median_gap_narrow": 0.06149274640885638,
+    "median_gap_crash_inf_narrow": 0.06149274640885638,
+    "median_gap_wide": 0.08102076201762576,
+    "median_gap_crash_inf_wide": 0.08102076201762576
+   },
+   "gw6-margin-s82": {
+    "n_circuits": 12,
+    "laps_completed_share": 1.0,
+    "circuits_completed": 12,
+    "circuits_completed_share": 1.0,
+    "median_gap": 0.06329382233592762,
+    "median_gap_crash_inf": 0.06329382233592762,
+    "median_gap_narrow": 0.054945900615265386,
+    "median_gap_crash_inf_narrow": 0.054945900615265386,
+    "median_gap_wide": 0.07135656408350943,
+    "median_gap_crash_inf_wide": 0.07135656408350943
+   },
+   "gw6-margin-s83": {
+    "n_circuits": 12,
+    "laps_completed_share": 0.8333333333333334,
+    "circuits_completed": 10,
+    "circuits_completed_share": 0.8333333333333334,
+    "median_gap": 0.06498914072444639,
+    "median_gap_crash_inf": 0.06773173166865631,
+    "median_gap_narrow": 0.05291627859429693,
+    "median_gap_crash_inf_narrow": 0.05637129656265727,
+    "median_gap_wide": 0.07455962762659729,
+    "median_gap_crash_inf_wide": 0.07881292602266954
+   },
+   "gw6-margin-s84": {
+    "n_circuits": 12,
+    "laps_completed_share": 0.9166666666666666,
+    "circuits_completed": 11,
+    "circuits_completed_share": 0.9166666666666666,
+    "median_gap": 0.06099807477812247,
+    "median_gap_crash_inf": 0.06401400169864446,
+    "median_gap_narrow": 0.04739932253807466,
+    "median_gap_crash_inf_narrow": 0.050674065546974956,
+    "median_gap_wide": 0.0747622912819812,
+    "median_gap_crash_inf_wide": 0.07545624229592551
+   }
+  },
+  "median_subject": {
+   "circuits_completed": 12.0,
+   "laps_completed_share": 1.0,
+   "median_gap": 0.06329382233592762,
+   "median_gap_narrow": 0.05291627859429693,
+   "median_gap_wide": 0.07455962762659729,
+   "median_gap_crash_inf": 0.06401400169864446
+  }
+ },
+ "e0": {
+  "per_subject": {
+   "e0-s50": {
+    "n_circuits": 12,
+    "laps_completed_share": 0.5083333333333333,
+    "circuits_completed": 6,
+    "circuits_completed_share": 0.5,
+    "median_gap": 0.05085558240413268,
+    "median_gap_crash_inf": "inf",
+    "median_gap_narrow": 0.041771360587824824,
+    "median_gap_crash_inf_narrow": "inf",
+    "median_gap_wide": 0.05922555249785344,
+    "median_gap_crash_inf_wide": "inf"
+   },
+   "e0-s51": {
+    "n_circuits": 12,
+    "laps_completed_share": 0.8333333333333334,
+    "circuits_completed": 10,
+    "circuits_completed_share": 0.8333333333333334,
+    "median_gap": 0.05453980696301519,
+    "median_gap_crash_inf": 0.05531627426448371,
+    "median_gap_narrow": 0.044960279469502096,
+    "median_gap_crash_inf_narrow": 0.04624137554734975,
+    "median_gap_wide": 0.06273622492689501,
+    "median_gap_crash_inf_wide": 0.06667292003415015
+   },
+   "e0-s52": {
+    "n_circuits": 12,
+    "laps_completed_share": 0.6666666666666666,
+    "circuits_completed": 8,
+    "circuits_completed_share": 0.6666666666666666,
+    "median_gap": 0.058485815854105394,
+    "median_gap_crash_inf": 0.0659302657776144,
+    "median_gap_narrow": 0.04894156516875503,
+    "median_gap_crash_inf_narrow": 0.05352900640154168,
+    "median_gap_wide": 0.06671215205249714,
+    "median_gap_crash_inf_wide": 0.07937490134074543
+   },
+   "e0-s53": {
+    "n_circuits": 12,
+    "laps_completed_share": 0.8333333333333334,
+    "circuits_completed": 10,
+    "circuits_completed_share": 0.8333333333333334,
+    "median_gap": 0.051632951685669504,
+    "median_gap_crash_inf": 0.05457120275062399,
+    "median_gap_narrow": 0.04350138047685903,
+    "median_gap_crash_inf_narrow": 0.04536863612154207,
+    "median_gap_wide": 0.061611745336449975,
+    "median_gap_crash_inf_wide": 0.06376289697862203
+   },
+   "e0-s54": {
+    "n_circuits": 12,
+    "laps_completed_share": 0.5833333333333334,
+    "circuits_completed": 7,
+    "circuits_completed_share": 0.5833333333333334,
+    "median_gap": 0.05102010101252863,
+    "median_gap_crash_inf": 0.06774433531335211,
+    "median_gap_narrow": 0.044706437751996564,
+    "median_gap_crash_inf_narrow": 0.05330282825691801,
+    "median_gap_wide": 0.05877585347701264,
+    "median_gap_crash_inf_wide": 0.08273888496543902
+   }
+  },
+  "median_subject": {
+   "n_circuits": 12.0,
+   "laps_completed_share": 0.6666666666666666,
+   "circuits_completed": 8.0,
+   "circuits_completed_share": 0.6666666666666666,
+   "median_gap": 0.051632951685669504,
+   "median_gap_crash_inf": 0.0659302657776144,
+   "median_gap_narrow": 0.044706437751996564,
+   "median_gap_crash_inf_narrow": 0.05330282825691801,
+   "median_gap_wide": 0.061611745336449975,
+   "median_gap_crash_inf_wide": 0.07937490134074543
+  }
+ },
+ "circuits_completed": {
+  "margin": [
+   12,
+   12,
+   12,
+   10,
+   11
+  ],
+  "e0": [
+   6,
+   10,
+   8,
+   10,
+   7
+  ],
+  "test": {
+   "mean_diff": 3.200000000000001,
+   "p_one_sided": 0.011904761904761904,
+   "n_relabellings": 252,
+   "count_ge": 3
+  },
+  "reading": "the completion gain transfers"
+ },
+ "h1_as_written_on_median_margin_network": {
+  "laps_completed_share": 1.0,
+  "median_gap": 0.06329382233592762,
+  "laps_ok": true,
+  "gap_ok": false
+ },
+ "predictions": [
+  {
+   "id": "circuits",
+   "quantity": "circuits completed of 12, median network",
+   "value": 11,
+   "interval": [
+    9,
+    12
+   ],
+   "observed": 12.0,
+   "held": true,
+   "side": "inside"
+  },
+  {
+   "id": "lap_share",
+   "quantity": "share of laps completed, median network",
+   "value": 0.92,
+   "interval": [
+    0.75,
+    1.0
+   ],
+   "observed": 1.0,
+   "held": true,
+   "side": "inside"
+  },
+  {
+   "id": "median_gap",
+   "quantity": "median gap to the reference lap, median network",
+   "value": 0.059,
+   "interval": [
+    0.052,
+    0.068
+   ],
+   "observed": 0.06329382233592762,
+   "held": true,
+   "side": "inside"
+  },
+  {
+   "id": "gap_cost",
+   "quantity": "median gap of the median network, margin minus E0's 0.0516",
+   "value": 0.007,
+   "interval": [
+    0.001,
+    0.016
+   ],
+   "observed": 0.011660870650258115,
+   "held": true,
+   "side": "inside"
+  },
+  {
+   "id": "min_circuits",
+   "quantity": "circuits completed by the weakest of the five networks",
+   "value": 9,
+   "interval": [
+    8,
+    12
+   ],
+   "observed": 10.0,
+   "held": true,
+   "side": "inside"
+  }
+ ],
+ "per_circuit": [
+  {
+   "circuit": "Austin",
+   "margin_networks_completing": 5,
+   "e0_networks_completing": 2,
+   "margin_median_gap": 0.07732213490052975,
+   "e0_median_gap": 0.05953110938285988
+  },
+  {
+   "circuit": "Budapest",
+   "margin_networks_completing": 5,
+   "e0_networks_completing": 3,
+   "margin_median_gap": 0.06852150734752893,
+   "e0_median_gap": 0.06321384966257892
+  },
+  {
+   "circuit": "MexicoCity",
+   "margin_networks_completing": 4,
+   "e0_networks_completing": 1,
+   "margin_median_gap": 0.08928609667112175,
+   "e0_median_gap": 0.0917960525164907
+  },
+  {
+   "circuit": "Montreal",
+   "margin_networks_completing": 5,
+   "e0_networks_completing": 5,
+   "margin_median_gap": 0.0821738980260367,
+   "e0_median_gap": 0.07026007194782236
+  },
+  {
+   "circuit": "Monza",
+   "margin_networks_completing": 4,
+   "e0_networks_completing": 3,
+   "margin_median_gap": 0.06190701476042959,
+   "e0_median_gap": 0.055912877098247105
+  },
+  {
+   "circuit": "Sakhir",
+   "margin_networks_completing": 5,
+   "e0_networks_completing": 2,
+   "margin_median_gap": 0.057505645442187836,
+   "e0_median_gap": 0.056817889991648496
+  },
+  {
+   "circuit": "SaoPaulo",
+   "margin_networks_completing": 5,
+   "e0_networks_completing": 5,
+   "margin_median_gap": 0.05591252624318921,
+   "e0_median_gap": 0.047957952445981
+  },
+  {
+   "circuit": "Shanghai",
+   "margin_networks_completing": 4,
+   "e0_networks_completing": 1,
+   "margin_median_gap": 0.0809646944776451,
+   "e0_median_gap": 0.0534394422501665
+  },
+  {
+   "circuit": "Silverstone",
+   "margin_networks_completing": 5,
+   "e0_networks_completing": 5,
+   "margin_median_gap": 0.054153723037320134,
+   "e0_median_gap": 0.0467459800944201
+  },
+  {
+   "circuit": "Spa",
+   "margin_networks_completing": 5,
+   "e0_networks_completing": 5,
+   "margin_median_gap": 0.05081726514453244,
+   "e0_median_gap": 0.04451128126369586
+  },
+  {
+   "circuit": "Spielberg",
+   "margin_networks_completing": 5,
+   "e0_networks_completing": 4,
+   "margin_median_gap": 0.05743443710934937,
+   "e0_median_gap": 0.04967450623427527
+  },
+  {
+   "circuit": "Suzuka",
+   "margin_networks_completing": 5,
+   "e0_networks_completing": 5,
+   "margin_median_gap": 0.06549708001677801,
+   "e0_median_gap": 0.05570296325108148
+  }
+ ],
+ "gap_on_shared_circuits": {
+  "n_circuits": 12,
+  "median_of_differences": 0.007583836908987063
+ },
+ "crashes": {
+  "runs": 30,
+  "of": 600,
+  "causes": [
+   "corridor",
+   "slip"
+  ]
+ },
+ "rows": [
+  {
+   "subject": "gw6-margin-s80",
+   "circuit": "Austin",
+   "completion": 1.0,
+   "completed": [
+    true,
+    true,
+    true,
+    true,
+    true,
+    true,
+    true,
+    true,
+    true,
+    true
+   ],
+   "n_completed": 10,
+   "median_lap_s": 97.07735008718446,
+   "gap": {
+    "+0.0": 0.0794221260678083,
+    "-0.5": 0.07023226820097794,
+    "+0.5": 0.0878535612018918
+   },
+   "crashes": 0,
+   "causes": []
+  },
+  {
+   "subject": "gw6-margin-s80",
+   "circuit": "Budapest",
+   "completion": 1.0,
+   "completed": [
+    true,
+    true,
+    true,
+    true,
+    true,
+    true,
+    true,
+    true,
+    true,
+    true
+   ],
+   "n_completed": 10,
+   "median_lap_s": 80.17242960031143,
+   "gap": {
+    "+0.0": 0.06852150734752893,
+    "-0.5": 0.054877248577986926,
+    "+0.5": 0.0823583895945934
+   },
+   "crashes": 0,
+   "causes": []
+  },
+  {
+   "subject": "gw6-margin-s80",
+   "circuit": "MexicoCity",
+   "completion": 1.0,
+   "completed": [
+    true,
+    true,
+    true,
+    true,
+    true,
+    true,
+    true,
+    true,
+    true,
+    true
+   ],
+   "n_completed": 10,
+   "median_lap_s": 78.98423996083437,
+   "gap": {
+    "+0.0": 0.0744904022404349,
+    "-0.5": 0.059683003004106006,
+    "+0.5": 0.08984452680453336
+   },
+   "crashes": 0,
+   "causes": []
+  },
+  {
+   "subject": "gw6-margin-s80",
+   "circuit": "Montreal",
+   "completion": 1.0,
+   "completed": [
+    true,
+    true,
+    true,
+    true,
+    true,
+    true,
+    true,
+    true,
+    true,
+    true
+   ],
+   "n_completed": 10,
+   "median_lap_s": 76.82234567524864,
+   "gap": {
+    "+0.0": 0.06912420331204228,
+    "-0.5": 0.05385961740969525,
+    "+0.5": 0.08530187445591864
+   },
+   "crashes": 0,
+   "causes": []
+  },
+  {
+   "subject": "gw6-margin-s80",
+   "circuit": "Monza",
+   "completion": 1.0,
+   "completed": [
+    true,
+    true,
+    true,
+    true,
+    true,
+    true,
+    true,
+    true,
+    true,
+    true
+   ],
+   "n_completed": 10,
+   "median_lap_s": 85.50031570997089,
+   "gap": {
+    "+0.0": 0.056219593123677525,
+    "-0.5": 0.04268208641238913,
+    "+0.5": 0.06992181888729365
+   },
+   "crashes": 0,
+   "causes": []
+  },
+  {
+   "subject": "gw6-margin-s80",
+   "circuit": "Sakhir",
+   "completion": 1.0,
+   "completed": [
+    true,
+    true,
+    true,
+    true,
+    true,
+    true,
+    true,
+    true,
+    true,
+    true
+   ],
+   "n_completed": 10,
+   "median_lap_s": 90.2293036318384,
+   "gap": {
+    "+0.0": 0.055582789948205535,
+    "-0.5": 0.04805649054556538,
+    "+0.5": 0.06296913787321201
+   },
+   "crashes": 0,
+   "causes": []
+  },
+  {
+   "subject": "gw6-margin-s80",
+   "circuit": "SaoPaulo",
+   "completion": 1.0,
+   "completed": [
+    true,
+    true,
+    true,
+    true,
+    true,
+    true,
+    true,
+    true,
+    true,
+    true
+   ],
+   "n_completed": 10,
+   "median_lap_s": 71.24056689394638,
+   "gap": {
+    "+0.0": 0.05591252624318921,
+    "-0.5": 0.04811527879507116,
+    "+0.5": 0.06370438119420352
+   },
+   "crashes": 0,
+   "causes": []
+  },
+  {
+   "subject": "gw6-margin-s80",
+   "circuit": "Shanghai",
+   "completion": 1.0,
+   "completed": [
+    true,
+    true,
+    true,
+    true,
+    true,
+    true,
+    true,
+    true,
+    true,
+    true
+   ],
+   "n_completed": 10,
+   "median_lap_s": 96.88535566930659,
+   "gap": {
+    "+0.0": 0.07640881770560792,
+    "-0.5": 0.07017037085394451,
+    "+0.5": 0.08209944767315558
+   },
+   "crashes": 0,
+   "causes": []
+  },
+  {
+   "subject": "gw6-margin-s80",
+   "circuit": "Silverstone",
+   "completion": 1.0,
+   "completed": [
+    true,
+    true,
+    true,
+    true,
+    true,
+    true,
+    true,
+    true,
+    true,
+    true
+   ],
+   "n_completed": 10,
+   "median_lap_s": 88.16749906875191,
+   "gap": {
+    "+0.0": 0.04545987823819053,
+    "-0.5": 0.039378010009706754,
+    "+0.5": 0.05149369673648296
+   },
+   "crashes": 0,
+   "causes": []
+  },
+  {
+   "subject": "gw6-margin-s80",
+   "circuit": "Spa",
+   "completion": 1.0,
+   "completed": [
+    true,
+    true,
+    true,
+    true,
+    true,
+    true,
+    true,
+    true,
+    true,
+    true
+   ],
+   "n_completed": 10,
+   "median_lap_s": 107.42027219720183,
+   "gap": {
+    "+0.0": 0.05107680571699258,
+    "-0.5": 0.04248533330910331,
+    "+0.5": 0.05950581805680377
+   },
+   "crashes": 0,
+   "causes": []
+  },
+  {
+   "subject": "gw6-margin-s80",
+   "circuit": "Spielberg",
+   "completion": 1.0,
+   "completed": [
+    true,
+    true,
+    true,
+    true,
+    true,
+    true,
+    true,
+    true,
+    true,
+    true
+   ],
+   "n_completed": 10,
+   "median_lap_s": 68.57724714551586,
+   "gap": {
+    "+0.0": 0.05250804523089592,
+    "-0.5": 0.04199147345126386,
+    "+0.5": 0.06313276307139715
+   },
+   "crashes": 0,
+   "causes": []
+  },
+  {
+   "subject": "gw6-margin-s80",
+   "circuit": "Suzuka",
+   "completion": 1.0,
+   "completed": [
+    true,
+    true,
+    true,
+    true,
+    true,
+    true,
+    true,
+    true,
+    true,
+    true
+   ],
+   "n_completed": 10,
+   "median_lap_s": 91.1852427262027,
+   "gap": {
+    "+0.0": 0.06511394025338135,
+    "-0.5": 0.05457155730295393,
+    "+0.5": 0.07421782834529256
+   },
+   "crashes": 0,
+   "causes": []
+  },
+  {
+   "subject": "gw6-margin-s81",
+   "circuit": "Austin",
+   "completion": 1.0,
+   "completed": [
+    true,
+    true,
+    true,
+    true,
+    true,
+    true,
+    true,
+    true,
+    true,
+    true
+   ],
+   "n_completed": 10,
+   "median_lap_s": 96.63751549012193,
+   "gap": {
+    "+0.0": 0.07453151877936226,
+    "-0.5": 0.0653832979929454,
+    "+0.5": 0.08292475306771263
+   },
+   "crashes": 0,
+   "causes": []
+  },
+  {
+   "subject": "gw6-margin-s81",
+   "circuit": "Budapest",
+   "completion": 1.0,
+   "completed": [
+    true,
+    true,
+    true,
+    true,
+    true,
+    true,
+    true,
+    true,
+    true,
+    true
+   ],
+   "n_completed": 10,
+   "median_lap_s": 80.54797733500598,
+   "gap": {
+    "+0.0": 0.07352672963600515,
+    "-0.5": 0.0598185577419883,
+    "+0.5": 0.08742842730414413
+   },
+   "crashes": 0,
+   "causes": []
+  },
+  {
+   "subject": "gw6-margin-s81",
+   "circuit": "MexicoCity",
+   "completion": 1.0,
+   "completed": [
+    true,
+    true,
+    true,
+    true,
+    true,
+    true,
+    true,
+    true,
+    true,
+    true
+   ],
+   "n_completed": 10,
+   "median_lap_s": 79.31155026499181,
+   "gap": {
+    "+0.0": 0.07894308521296156,
+    "-0.5": 0.06407432418660686,
+    "+0.5": 0.09436083719417065
+   },
+   "crashes": 0,
+   "causes": []
+  },
+  {
+   "subject": "gw6-margin-s81",
+   "circuit": "Montreal",
+   "completion": 1.0,
+   "completed": [
+    true,
+    true,
+    true,
+    true,
+    true,
+    true,
+    true,
+    true,
+    true,
+    true
+   ],
+   "n_completed": 10,
+   "median_lap_s": 77.76003668922931,
+   "gap": {
+    "+0.0": 0.0821738980260367,
+    "-0.5": 0.06672299309233276,
+    "+0.5": 0.09854903328957021
+   },
+   "crashes": 0,
+   "causes": []
+  },
+  {
+   "subject": "gw6-margin-s81",
+   "circuit": "Monza",
+   "completion": 1.0,
+   "completed": [
+    true,
+    true,
+    true,
+    true,
+    true,
+    true,
+    true,
+    true,
+    true,
+    true
+   ],
+   "n_completed": 10,
+   "median_lap_s": 86.03428705895783,
+   "gap": {
+    "+0.0": 0.06281595474273671,
+    "-0.5": 0.04919390283812897,
+    "+0.5": 0.07660375441230105
+   },
+   "crashes": 0,
+   "causes": []
+  },
+  {
+   "subject": "gw6-margin-s81",
+   "circuit": "Sakhir",
+   "completion": 1.0,
+   "completed": [
+    true,
+    true,
+    true,
+    true,
+    true,
+    true,
+    true,
+    true,
+    true,
+    true
+   ],
+   "n_completed": 10,
+   "median_lap_s": 91.53019237192346,
+   "gap": {
+    "+0.0": 0.07080174554686791,
+    "-0.5": 0.06316693507572446,
+    "+0.5": 0.07829458677792078
+   },
+   "crashes": 0,
+   "causes": []
+  },
+  {
+   "subject": "gw6-margin-s81",
+   "circuit": "SaoPaulo",
+   "completion": 1.0,
+   "completed": [
+    true,
+    true,
+    true,
+    true,
+    true,
+    true,
+    true,
+    true,
+    true,
+    true
+   ],
+   "n_completed": 10,
+   "median_lap_s": 71.31243070103227,
+   "gap": {
+    "+0.0": 0.056977676302964575,
+    "-0.5": 0.04917256339404452,
+    "+0.5": 0.06477739127510795
+   },
+   "crashes": 0,
+   "causes": []
+  },
+  {
+   "subject": "gw6-margin-s81",
+   "circuit": "Shanghai",
+   "completion": 1.0,
+   "completed": [
+    true,
+    true,
+    true,
+    true,
+    true,
+    true,
+    true,
+    true,
+    true,
+    true
+   ],
+   "n_completed": 10,
+   "median_lap_s": 97.70548596587031,
+   "gap": {
+    "+0.0": 0.08552057124968226,
+    "-0.5": 0.07922931621838014,
+    "+0.5": 0.09125937215091406
+   },
+   "crashes": 0,
+   "causes": []
+  },
+  {
+   "subject": "gw6-margin-s81",
+   "circuit": "Silverstone",
+   "completion": 1.0,
+   "completed": [
+    true,
+    true,
+    true,
+    true,
+    true,
+    true,
+    true,
+    true,
+    true,
+    true
+   ],
+   "n_completed": 10,
+   "median_lap_s": 88.90068316236137,
+   "gap": {
+    "+0.0": 0.054153723037320134,
+    "-0.5": 0.04802127915350263,
+    "+0.5": 0.06023771761856134
+   },
+   "crashes": 0,
+   "causes": []
+  },
+  {
+   "subject": "gw6-margin-s81",
+   "circuit": "Spa",
+   "completion": 1.0,
+   "completed": [
+    true,
+    true,
+    true,
+    true,
+    true,
+    true,
+    true,
+    true,
+    true,
+    true
+   ],
+   "n_completed": 10,
+   "median_lap_s": 107.26352109325526,
+   "gap": {
+    "+0.0": 0.049543040755698486,
+    "-0.5": 0.04096410529969807,
+    "+0.5": 0.05795975321055846
+   },
+   "crashes": 0,
+   "causes": []
+  },
+  {
+   "subject": "gw6-margin-s81",
+   "circuit": "Spielberg",
+   "completion": 1.0,
+   "completed": [
+    true,
+    true,
+    true,
+    true,
+    true,
+    true,
+    true,
+    true,
+    true,
+    true
+   ],
+   "n_completed": 10,
+   "median_lap_s": 70.1022887289524,
+   "gap": {
+    "+0.0": 0.07591403778222561,
+    "-0.5": 0.06516359529551918,
+    "+0.5": 0.08677503131464337
+   },
+   "crashes": 0,
+   "causes": []
+  },
+  {
+   "subject": "gw6-margin-s81",
+   "circuit": "Suzuka",
+   "completion": 1.0,
+   "completed": [
+    true,
+    true,
+    true,
+    true,
+    true,
+    true,
+    true,
+    true,
+    true,
+    true
+   ],
+   "n_completed": 10,
+   "median_lap_s": 91.60109066721051,
+   "gap": {
+    "+0.0": 0.06997136482945043,
+    "-0.5": 0.059380903614249414,
+    "+0.5": 0.07911677096753889
+   },
+   "crashes": 0,
+   "causes": []
+  },
+  {
+   "subject": "gw6-margin-s82",
+   "circuit": "Austin",
+   "completion": 1.0,
+   "completed": [
+    true,
+    true,
+    true,
+    true,
+    true,
+    true,
+    true,
+    true,
+    true,
+    true
+   ],
+   "n_completed": 10,
+   "median_lap_s": 98.13191344868392,
+   "gap": {
+    "+0.0": 0.0911480232489803,
+    "-0.5": 0.08185833480998195,
+    "+0.5": 0.09967105011449506
+   },
+   "crashes": 0,
+   "causes": []
+  },
+  {
+   "subject": "gw6-margin-s82",
+   "circuit": "Budapest",
+   "completion": 1.0,
+   "completed": [
+    true,
+    true,
+    true,
+    true,
+    true,
+    true,
+    true,
+    true,
+    true,
+    true
+   ],
+   "n_completed": 10,
+   "median_lap_s": 80.69782621487975,
+   "gap": {
+    "+0.0": 0.0755238844159627,
+    "-0.5": 0.06179021027755183,
+    "+0.5": 0.08945144435765373
+   },
+   "crashes": 0,
+   "causes": []
+  },
+  {
+   "subject": "gw6-margin-s82",
+   "circuit": "MexicoCity",
+   "completion": 1.0,
+   "completed": [
+    true,
+    true,
+    true,
+    true,
+    true,
+    true,
+    true,
+    true,
+    true,
+    true
+   ],
+   "n_completed": 10,
+   "median_lap_s": 80.83214997854083,
+   "gap": {
+    "+0.0": 0.09962910812928194,
+    "-0.5": 0.0844752759666052,
+    "+0.5": 0.11534245676908439
+   },
+   "crashes": 0,
+   "causes": []
+  },
+  {
+   "subject": "gw6-margin-s82",
+   "circuit": "Montreal",
+   "completion": 1.0,
+   "completed": [
+    true,
+    true,
+    true,
+    true,
+    true,
+    true,
+    true,
+    true,
+    true,
+    true
+   ],
+   "n_completed": 10,
+   "median_lap_s": 78.07070962167344,
+   "gap": {
+    "+0.0": 0.08649748315573369,
+    "-0.5": 0.07098484756771128,
+    "+0.5": 0.10293804163031606
+   },
+   "crashes": 0,
+   "causes": []
+  },
+  {
+   "subject": "gw6-margin-s82",
+   "circuit": "Monza",
+   "completion": 1.0,
+   "completed": [
+    true,
+    true,
+    true,
+    true,
+    true,
+    true,
+    true,
+    true,
+    true,
+    true
+   ],
+   "n_completed": 10,
+   "median_lap_s": 87.08062547761946,
+   "gap": {
+    "+0.0": 0.07574179167855966,
+    "-0.5": 0.061954070053936494,
+    "+0.5": 0.08969727687207318
+   },
+   "crashes": 0,
+   "causes": []
+  },
+  {
+   "subject": "gw6-margin-s82",
+   "circuit": "Sakhir",
+   "completion": 1.0,
+   "completed": [
+    true,
+    true,
+    true,
+    true,
+    true,
+    true,
+    true,
+    true,
+    true,
+    true
+   ],
+   "n_completed": 10,
+   "median_lap_s": 90.39366583427181,
+   "gap": {
+    "+0.0": 0.057505645442187836,
+    "-0.5": 0.04996563609060445,
+    "+0.5": 0.06490544837974621
+   },
+   "crashes": 0,
+   "causes": []
+  },
+  {
+   "subject": "gw6-margin-s82",
+   "circuit": "SaoPaulo",
+   "completion": 1.0,
+   "completed": [
+    true,
+    true,
+    true,
+    true,
+    true,
+    true,
+    true,
+    true,
+    true,
+    true
+   ],
+   "n_completed": 10,
+   "median_lap_s": 71.45211363658308,
+   "gap": {
+    "+0.0": 0.059048027056490815,
+    "-0.5": 0.051227625914191055,
+    "+0.5": 0.06686301968882713
+   },
+   "crashes": 0,
+   "causes": []
+  },
+  {
+   "subject": "gw6-margin-s82",
+   "circuit": "Shanghai",
+   "completion": 1.0,
+   "completed": [
+    true,
+    true,
+    true,
+    true,
+    true,
+    true,
+    true,
+    true,
+    true,
+    true
+   ],
+   "n_completed": 10,
+   "median_lap_s": 95.50659104881925,
+   "gap": {
+    "+0.0": 0.06109056465507723,
+    "-0.5": 0.054940896440251796,
+    "+0.5": 0.06670021190636866
+   },
+   "crashes": 0,
+   "causes": []
+  },
+  {
+   "subject": "gw6-margin-s82",
+   "circuit": "Silverstone",
+   "completion": 1.0,
+   "completed": [
+    true,
+    true,
+    true,
+    true,
+    true,
+    true,
+    true,
+    true,
+    true,
+    true
+   ],
+   "n_completed": 10,
+   "median_lap_s": 89.12323059011248,
+   "gap": {
+    "+0.0": 0.05679261388912349,
+    "-0.5": 0.050644818496592636,
+    "+0.5": 0.06289183869465931
+   },
+   "crashes": 0,
+   "causes": []
+  },
+  {
+   "subject": "gw6-margin-s82",
+   "circuit": "Spa",
+   "completion": 1.0,
+   "completed": [
+    true,
+    true,
+    true,
+    true,
+    true,
+    true,
+    true,
+    true,
+    true,
+    true
+   ],
+   "n_completed": 10,
+   "median_lap_s": 108.00425275415182,
+   "gap": {
+    "+0.0": 0.05679088934240939,
+    "-0.5": 0.048152710174807156,
+    "+0.5": 0.06526572524252305
+   },
+   "crashes": 0,
+   "causes": []
+  },
+  {
+   "subject": "gw6-margin-s82",
+   "circuit": "Spielberg",
+   "completion": 1.0,
+   "completed": [
+    true,
+    true,
+    true,
+    true,
+    true,
+    true,
+    true,
+    true,
+    true,
+    true
+   ],
+   "n_completed": 10,
+   "median_lap_s": 68.89823128897696,
+   "gap": {
+    "+0.0": 0.05743443710934937,
+    "-0.5": 0.04686864123680978,
+    "+0.5": 0.06810888523354541
+   },
+   "crashes": 0,
+   "causes": []
+  },
+  {
+   "subject": "gw6-margin-s82",
+   "circuit": "Suzuka",
+   "completion": 1.0,
+   "completed": [
+    true,
+    true,
+    true,
+    true,
+    true,
+    true,
+    true,
+    true,
+    true,
+    true
+   ],
+   "n_completed": 10,
+   "median_lap_s": 91.21804362289839,
+   "gap": {
+    "+0.0": 0.06549708001677801,
+    "-0.5": 0.054950904790278976,
+    "+0.5": 0.07460424293347345
+   },
+   "crashes": 0,
+   "causes": []
+  },
+  {
+   "subject": "gw6-margin-s83",
+   "circuit": "Austin",
+   "completion": 1.0,
+   "completed": [
+    true,
+    true,
+    true,
+    true,
+    true,
+    true,
+    true,
+    true,
+    true,
+    true
+   ],
+   "n_completed": 10,
+   "median_lap_s": 96.10276161753572,
+   "gap": {
+    "+0.0": 0.06858548541986509,
+    "-0.5": 0.05948788727692156,
+    "+0.5": 0.07693227486206555
+   },
+   "crashes": 0,
+   "causes": []
+  },
+  {
+   "subject": "gw6-margin-s83",
+   "circuit": "Budapest",
+   "completion": 1.0,
+   "completed": [
+    true,
+    true,
+    true,
+    true,
+    true,
+    true,
+    true,
+    true,
+    true,
+    true
+   ],
+   "n_completed": 10,
+   "median_lap_s": 80.04911364773287,
+   "gap": {
+    "+0.0": 0.06687797791744754,
+    "-0.5": 0.05325470584839298,
+    "+0.5": 0.08069357718327352
+   },
+   "crashes": 0,
+   "causes": []
+  },
+  {
+   "subject": "gw6-margin-s83",
+   "circuit": "MexicoCity",
+   "completion": 0.0,
+   "completed": [
+    false,
+    false,
+    false,
+    false,
+    false,
+    false,
+    false,
+    false,
+    false,
+    false
+   ],
+   "n_completed": 0,
+   "median_lap_s": null,
+   "gap": {
+    "+0.0": null,
+    "-0.5": null,
+    "+0.5": null
+   },
+   "crashes": 10,
+   "causes": [
+    "corridor"
+   ]
+  },
+  {
+   "subject": "gw6-margin-s83",
+   "circuit": "Montreal",
+   "completion": 1.0,
+   "completed": [
+    true,
+    true,
+    true,
+    true,
+    true,
+    true,
+    true,
+    true,
+    true,
+    true
+   ],
+   "n_completed": 10,
+   "median_lap_s": 78.62688790350512,
+   "gap": {
+    "+0.0": 0.09423772666478247,
+    "-0.5": 0.07861457855484466,
+    "+0.5": 0.1107954082141911
+   },
+   "crashes": 0,
+   "causes": []
+  },
+  {
+   "subject": "gw6-margin-s83",
+   "circuit": "Monza",
+   "completion": 0.0,
+   "completed": [
+    false,
+    false,
+    false,
+    false,
+    false,
+    false,
+    false,
+    false,
+    false,
+    false
+   ],
+   "n_completed": 0,
+   "median_lap_s": null,
+   "gap": {
+    "+0.0": null,
+    "-0.5": null,
+    "+0.5": null
+   },
+   "crashes": 10,
+   "causes": [
+    "slip"
+   ]
+  },
+  {
+   "subject": "gw6-margin-s83",
+   "circuit": "Sakhir",
+   "completion": 1.0,
+   "completed": [
+    true,
+    true,
+    true,
+    true,
+    true,
+    true,
+    true,
+    true,
+    true,
+    true
+   ],
+   "n_completed": 10,
+   "median_lap_s": 90.58074666205793,
+   "gap": {
+    "+0.0": 0.059694283658283,
+    "-0.5": 0.052138669328430476,
+    "+0.5": 0.06710940139966337
+   },
+   "crashes": 0,
+   "causes": []
+  },
+  {
+   "subject": "gw6-margin-s83",
+   "circuit": "SaoPaulo",
+   "completion": 1.0,
+   "completed": [
+    true,
+    true,
+    true,
+    true,
+    true,
+    true,
+    true,
+    true,
+    true,
+    true
+   ],
+   "n_completed": 10,
+   "median_lap_s": 71.06428382908925,
+   "gap": {
+    "+0.0": 0.05329969615967389,
+    "-0.5": 0.04552174281234045,
+    "+0.5": 0.06107227035350782
+   },
+   "crashes": 0,
+   "causes": []
+  },
+  {
+   "subject": "gw6-margin-s83",
+   "circuit": "Shanghai",
+   "completion": 1.0,
+   "completed": [
+    true,
+    true,
+    true,
+    true,
+    true,
+    true,
+    true,
+    true,
+    true,
+    true
+   ],
+   "n_completed": 10,
+   "median_lap_s": 97.86090524116298,
+   "gap": {
+    "+0.0": 0.08724729947615906,
+    "-0.5": 0.08094603699964575,
+    "+0.5": 0.09299522903857405
+   },
+   "crashes": 0,
+   "causes": []
+  },
+  {
+   "subject": "gw6-margin-s83",
+   "circuit": "Silverstone",
+   "completion": 1.0,
+   "completed": [
+    true,
+    true,
+    true,
+    true,
+    true,
+    true,
+    true,
+    true,
+    true,
+    true
+   ],
+   "n_completed": 10,
+   "median_lap_s": 88.90261270068585,
+   "gap": {
+    "+0.0": 0.05417660283909598,
+    "-0.5": 0.04804402585410217,
+    "+0.5": 0.06026072946994909
+   },
+   "crashes": 0,
+   "causes": []
+  },
+  {
+   "subject": "gw6-margin-s83",
+   "circuit": "Spa",
+   "completion": 1.0,
+   "completed": [
+    true,
+    true,
+    true,
+    true,
+    true,
+    true,
+    true,
+    true,
+    true,
+    true
+   ],
+   "n_completed": 10,
+   "median_lap_s": 107.39374709571709,
+   "gap": {
+    "+0.0": 0.05081726514453244,
+    "-0.5": 0.042227914214022055,
+    "+0.5": 0.05924419612294729
+   },
+   "crashes": 0,
+   "causes": []
+  },
+  {
+   "subject": "gw6-margin-s83",
+   "circuit": "Spielberg",
+   "completion": 1.0,
+   "completed": [
+    true,
+    true,
+    true,
+    true,
+    true,
+    true,
+    true,
+    true,
+    true,
+    true
+   ],
+   "n_completed": 10,
+   "median_lap_s": 70.37586232041937,
+   "gap": {
+    "+0.0": 0.08011278325491422,
+    "-0.5": 0.0693203872569279,
+    "+0.5": 0.09101616172313731
+   },
+   "crashes": 0,
+   "causes": []
+  },
+  {
+   "subject": "gw6-margin-s83",
+   "circuit": "Suzuka",
+   "completion": 1.0,
+   "completed": [
+    true,
+    true,
+    true,
+    true,
+    true,
+    true,
+    true,
+    true,
+    true,
+    true
+   ],
+   "n_completed": 10,
+   "median_lap_s": 91.01285370159894,
+   "gap": {
+    "+0.0": 0.06310030353144525,
+    "-0.5": 0.052577851340200876,
+    "+0.5": 0.07218698039112903
+   },
+   "crashes": 0,
+   "causes": []
+  },
+  {
+   "subject": "gw6-margin-s84",
+   "circuit": "Austin",
+   "completion": 1.0,
+   "completed": [
+    true,
+    true,
+    true,
+    true,
+    true,
+    true,
+    true,
+    true,
+    true,
+    true
+   ],
+   "n_completed": 10,
+   "median_lap_s": 96.88848831309006,
+   "gap": {
+    "+0.0": 0.07732213490052975,
+    "-0.5": 0.06815015569292138,
+    "+0.5": 0.08573716686954769
+   },
+   "crashes": 0,
+   "causes": []
+  },
+  {
+   "subject": "gw6-margin-s84",
+   "circuit": "Budapest",
+   "completion": 1.0,
+   "completed": [
+    true,
+    true,
+    true,
+    true,
+    true,
+    true,
+    true,
+    true,
+    true,
+    true
+   ],
+   "n_completed": 10,
+   "median_lap_s": 80.10186661072075,
+   "gap": {
+    "+0.0": 0.06758105846284046,
+    "-0.5": 0.05394880855587525,
+    "+0.5": 0.08140576231163443
+   },
+   "crashes": 0,
+   "causes": []
+  },
+  {
+   "subject": "gw6-margin-s84",
+   "circuit": "MexicoCity",
+   "completion": 1.0,
+   "completed": [
+    true,
+    true,
+    true,
+    true,
+    true,
+    true,
+    true,
+    true,
+    true,
+    true
+   ],
+   "n_completed": 10,
+   "median_lap_s": 81.02841273997036,
+   "gap": {
+    "+0.0": 0.10229903891012904,
+    "-0.5": 0.08710841281153336,
+    "+0.5": 0.11805054000778603
+   },
+   "crashes": 0,
+   "causes": []
+  },
+  {
+   "subject": "gw6-margin-s84",
+   "circuit": "Montreal",
+   "completion": 1.0,
+   "completed": [
+    true,
+    true,
+    true,
+    true,
+    true,
+    true,
+    true,
+    true,
+    true,
+    true
+   ],
+   "n_completed": 10,
+   "median_lap_s": 76.89865909619255,
+   "gap": {
+    "+0.0": 0.07018624489189151,
+    "-0.5": 0.05490649552689231,
+    "+0.5": 0.08637998653474899
+   },
+   "crashes": 0,
+   "causes": []
+  },
+  {
+   "subject": "gw6-margin-s84",
+   "circuit": "Monza",
+   "completion": 1.0,
+   "completed": [
+    true,
+    true,
+    true,
+    true,
+    true,
+    true,
+    true,
+    true,
+    true,
+    true
+   ],
+   "n_completed": 10,
+   "median_lap_s": 85.88713081236929,
+   "gap": {
+    "+0.0": 0.06099807477812247,
+    "-0.5": 0.04739932253807466,
+    "+0.5": 0.0747622912819812
+   },
+   "crashes": 0,
+   "causes": []
+  },
+  {
+   "subject": "gw6-margin-s84",
+   "circuit": "Sakhir",
+   "completion": 1.0,
+   "completed": [
+    true,
+    true,
+    true,
+    true,
+    true,
+    true,
+    true,
+    true,
+    true,
+    true
+   ],
+   "n_completed": 10,
+   "median_lap_s": 89.96694947466602,
+   "gap": {
+    "+0.0": 0.05251353725495056,
+    "-0.5": 0.04500912160688819,
+    "+0.5": 0.059878408353621904
+   },
+   "crashes": 0,
+   "causes": []
+  },
+  {
+   "subject": "gw6-margin-s84",
+   "circuit": "SaoPaulo",
+   "completion": 1.0,
+   "completed": [
+    true,
+    true,
+    true,
+    true,
+    true,
+    true,
+    true,
+    true,
+    true,
+    true
+   ],
+   "n_completed": 10,
+   "median_lap_s": 71.01933271083979,
+   "gap": {
+    "+0.0": 0.052633440248222474,
+    "-0.5": 0.044860406780212525,
+    "+0.5": 0.06040109796527138
+   },
+   "crashes": 0,
+   "causes": []
+  },
+  {
+   "subject": "gw6-margin-s84",
+   "circuit": "Shanghai",
+   "completion": 0.0,
+   "completed": [
+    false,
+    false,
+    false,
+    false,
+    false,
+    false,
+    false,
+    false,
+    false,
+    false
+   ],
+   "n_completed": 0,
+   "median_lap_s": null,
+   "gap": {
+    "+0.0": null,
+    "-0.5": null,
+    "+0.5": null
+   },
+   "crashes": 10,
+   "causes": [
+    "slip"
+   ]
+  },
+  {
+   "subject": "gw6-margin-s84",
+   "circuit": "Silverstone",
+   "completion": 1.0,
+   "completed": [
+    true,
+    true,
+    true,
+    true,
+    true,
+    true,
+    true,
+    true,
+    true,
+    true
+   ],
+   "n_completed": 10,
+   "median_lap_s": 88.57238706382921,
+   "gap": {
+    "+0.0": 0.05026090082025947,
+    "-0.5": 0.044151103077392895,
+    "+0.5": 0.05632242817612676
+   },
+   "crashes": 0,
+   "causes": []
+  },
+  {
+   "subject": "gw6-margin-s84",
+   "circuit": "Spa",
+   "completion": 1.0,
+   "completed": [
+    true,
+    true,
+    true,
+    true,
+    true,
+    true,
+    true,
+    true,
+    true,
+    true
+   ],
+   "n_completed": 10,
+   "median_lap_s": 107.25903118308634,
+   "gap": {
+    "+0.0": 0.049499108261935376,
+    "-0.5": 0.04092053190891032,
+    "+0.5": 0.057915468404262205
+   },
+   "crashes": 0,
+   "causes": []
+  },
+  {
+   "subject": "gw6-margin-s84",
+   "circuit": "Spielberg",
+   "completion": 1.0,
+   "completed": [
+    true,
+    true,
+    true,
+    true,
+    true,
+    true,
+    true,
+    true,
+    true,
+    true
+   ],
+   "n_completed": 10,
+   "median_lap_s": 68.87446199567057,
+   "gap": {
+    "+0.0": 0.05706963138331389,
+    "-0.5": 0.04650748061887677,
+    "+0.5": 0.06774039691532141
+   },
+   "crashes": 0,
+   "causes": []
+  },
+  {
+   "subject": "gw6-margin-s84",
+   "circuit": "Suzuka",
+   "completion": 1.0,
+   "completed": [
+    true,
+    true,
+    true,
+    true,
+    true,
+    true,
+    true,
+    true,
+    true,
+    true
+   ],
+   "n_completed": 10,
+   "median_lap_s": 91.34927199818193,
+   "gap": {
+    "+0.0": 0.06702992861916646,
+    "-0.5": 0.0564685814224577,
+    "+0.5": 0.07615019330986983
+   },
+   "crashes": 0,
+   "causes": []
+  }
+ ],
+ "provenance": {
+  "script": "scripts/lockbox.py",
+  "script_sha256": "36bbfea50836350b89b93281432b364a9b7e5ae317ea50965789b37fa236543d",
+  "git_head": "f0567ad791fe8e3aabe6ee72010103493707b657",
+  "changed_paths": [],
+  "inputs_sha256": {
+   "outputs/lockbox/analysis.json": "deab99fc3c14b7383845ecf7ec19a015eae41f79ff35780cfa2e7c08e50234af",
+   "outputs/lockbox/ocp/Austin__w+0.0.json": "833d895062a2811473c7b3a7197dbc6214ffa6abb3de07f539abd0a90b15ac59",
+   "outputs/lockbox/ocp/Austin__w+0.5.json": "494c5570820fa7e3ad5014e42b11c4ec6e98080a7919172f95afad333bdcf617",
+   "outputs/lockbox/ocp/Austin__w-0.5.json": "35c1d72ca14ad54d43d283aede504140e95af3d07eebadfcc39afd05cbc5507a",
+   "outputs/lockbox/ocp/Budapest__w+0.0.json": "bda3b721e64cd08e2d297cc929a5c0fdcf74e3e5ef335f739d305c041b52236a",
+   "outputs/lockbox/ocp/Budapest__w+0.5.json": "3f0fc0667ca19d016e5ed605b23fa24383eb269b33aa1042bb0ef68de0b919da",
+   "outputs/lockbox/ocp/Budapest__w-0.5.json": "d2b81107b35686da4c09f19e9cade81fdb810f71df36390abc7c68915c19aded",
+   "outputs/lockbox/ocp/MexicoCity__w+0.0.json": "7cf6e575c9a83b0cb85cd85bd2caac4e35282f04596acdf9b245d29bf00497f8",
+   "outputs/lockbox/ocp/MexicoCity__w+0.5.json": "709fa1435be56648ac806ba9f7814dce9cf9508fa3efba56281a875f2fb9e0cf",
+   "outputs/lockbox/ocp/MexicoCity__w-0.5.json": "ec2e9f719500bc64713a39ac9155f6c61fce8272bc4a8468a60cbf48dc15f6f7",
+   "outputs/lockbox/ocp/Montreal__w+0.0.json": "a36c8a16654cf79f65633d84f4958e1fe64c9ef926a41f2f6ef953f85d295478",
+   "outputs/lockbox/ocp/Montreal__w+0.5.json": "1e666a728d9966d416312569b3807119c947ade5e138199e18528436419921a1",
+   "outputs/lockbox/ocp/Montreal__w-0.5.json": "78043c5b8d3786d17a166fcc761e3d9139bd113d81d3e13deb6d710f02e23de3",
+   "outputs/lockbox/ocp/Monza__w+0.0.json": "60f3856e02109dc6659e1f917a35f280b3a98f7c3e5014f9c39d5968ce8c9d37",
+   "outputs/lockbox/ocp/Monza__w+0.5.json": "38471affc44fcbb701c14a84c87d46407db58851860e7c04262c59d32ebe7406",
+   "outputs/lockbox/ocp/Monza__w-0.5.json": "55b95fbde073e2412bcc5fcfc26aec60b30ccb641ea062827a9caed21f04a39c",
+   "outputs/lockbox/ocp/Sakhir__w+0.0.json": "690ce82d8caead061bda78c30590d67c23169e01be6acf5067ecc97f8fc8f578",
+   "outputs/lockbox/ocp/Sakhir__w+0.5.json": "88d54e38838e65ef0d8e3fcbf2008fb894cadacaf613c7f1215351055d8bb2ef",
+   "outputs/lockbox/ocp/Sakhir__w-0.5.json": "0a712368d6ff5d796dffdcecf00c1d2f37c156288e66e207b4c208f996710e85",
+   "outputs/lockbox/ocp/SaoPaulo__w+0.0.json": "a81035476d2d1b75908692ae7062abdd2a24db8b217234c592d9d07074f0607c",
+   "outputs/lockbox/ocp/SaoPaulo__w+0.5.json": "7d44566e36bd1339457debdd2b8df6f5ace88396e81ded970f244537bf493faf",
+   "outputs/lockbox/ocp/SaoPaulo__w-0.5.json": "b64c606596ed57916bbe370f570d9156d963249c7b31f99d492d02471e0de641",
+   "outputs/lockbox/ocp/Shanghai__w+0.0.json": "210aae39e90b6523a338e542824621ce8e05bff75148799ae73d175ef8854fcb",
+   "outputs/lockbox/ocp/Shanghai__w+0.5.json": "3c3c878857102c89b09d68ecaeb3636a048413086168ba93888245f08ad5f99b",
+   "outputs/lockbox/ocp/Shanghai__w-0.5.json": "932c2fc5b5f0153cbbec4a968d04dc45810507fcd69cc2eb7022ecb0cda2fdba",
+   "outputs/lockbox/ocp/Silverstone__w+0.0.json": "4a7ca890b18d430226b4bc5df3ec83b4e2f65ab1f455b86941c67b6ba6f71f6b",
+   "outputs/lockbox/ocp/Silverstone__w+0.5.json": "f76e6bfaa382899d17395d3d4e769d66e1158c6bd8acecef61b385a7d3f7a4d3",
+   "outputs/lockbox/ocp/Silverstone__w-0.5.json": "0beac0df87d3e68b8b3216602afdde6289560f64d367fc3e0b9047be4ec74d13",
+   "outputs/lockbox/ocp/Spa__w+0.0.json": "b512ff044df28dcdc1cbfb9b7ac4cf2d476f4730c7348c42dbcfb2f4f275088f",
+   "outputs/lockbox/ocp/Spa__w+0.5.json": "87e15a2f614a1661fb9b39e64a3b0aa360a485b2d20ce7a1edd52db7bbd25cb2",
+   "outputs/lockbox/ocp/Spa__w-0.5.json": "2d0e6a69dfe5f4046ff9d5f2be57ded5bc823d7c0bcf769659954cda1bed005d",
+   "outputs/lockbox/ocp/Spielberg__w+0.0.json": "e6d9808ad37f9fe7fdcb9fde25660c5652bfa5d2d46d055501cdb2b2a673571a",
+   "outputs/lockbox/ocp/Spielberg__w+0.5.json": "f9e8503c2c4e75796d09bf3984f83aafc4bda31d5a432a72ef0b18c09c789d3a",
+   "outputs/lockbox/ocp/Spielberg__w-0.5.json": "03634c4254691512b8dd029c74c0d5505904f368f03caea223cc770955dc90cf",
+   "outputs/lockbox/ocp/Suzuka__w+0.0.json": "05e7ed0cb3881e803ebdee86b266c578de1c4881336e0f2397689ba877529d6c",
+   "outputs/lockbox/ocp/Suzuka__w+0.5.json": "bb9ecae8989274c3d30ebc22d925ec0e4b947b0450e309ffb8f46504d17f3b20",
+   "outputs/lockbox/ocp/Suzuka__w-0.5.json": "2a0cc615a8e35f6f51ff7f746b7e545e6d1b01b9b16acb6f3013499718400ee1",
+   "outputs/posthoc/margin-rtest/laps/gw6-margin-s80/Austin.json": "c2c8a7e3b8fba7d77a3c140a399c7ab1a5259f9d908c4428f34f4ca516f304a0",
+   "outputs/posthoc/margin-rtest/laps/gw6-margin-s80/Budapest.json": "f6ab78c6462e203489da00dbfb6d6ff36bf7154eee4baed1c540b70d8933368d",
+   "outputs/posthoc/margin-rtest/laps/gw6-margin-s80/MexicoCity.json": "f8776e41a01ba8f0f00fb35349330ecb3e18a92f109fcb67213f318bcf33f5f8",
+   "outputs/posthoc/margin-rtest/laps/gw6-margin-s80/Montreal.json": "878b1f8a57d80269d976d9d6bb337d67ea3db9880bda34454d3ab7e94cfc8f0e",
+   "outputs/posthoc/margin-rtest/laps/gw6-margin-s80/Monza.json": "fe460295b3cac0a143be8ff2d56ff3c49b0f7602d7ce6e41cb5654acb10798b9",
+   "outputs/posthoc/margin-rtest/laps/gw6-margin-s80/Sakhir.json": "2a1e238c5661d47bcbf3608c7462bbc04de9685f572a3688a83701c7ab5e12fd",
+   "outputs/posthoc/margin-rtest/laps/gw6-margin-s80/SaoPaulo.json": "b25120766b268bf732715f7da1f3c267cdb6ae3112200556667cc7c5ef04ece8",
+   "outputs/posthoc/margin-rtest/laps/gw6-margin-s80/Shanghai.json": "e961a5b67a9d0c25d330f523e3d1a7217a7a28b75a9ab97cc44031b9948ba0cb",
+   "outputs/posthoc/margin-rtest/laps/gw6-margin-s80/Silverstone.json": "7c599b07a41c8afebb083fe41334122c7bf869e42fd4c45e8058ede8b6ec01b8",
+   "outputs/posthoc/margin-rtest/laps/gw6-margin-s80/Spa.json": "aaef2cc4ad60ca1b6bddbc9fe9f2d0c3d7a982c3b9aa9f2b74e12da0049e05fd",
+   "outputs/posthoc/margin-rtest/laps/gw6-margin-s80/Spielberg.json": "b6b2da94b1f9d4e32914eb2f540cc755276a58877b469f2a8e0245fae2b77cad",
+   "outputs/posthoc/margin-rtest/laps/gw6-margin-s80/Suzuka.json": "e9b7f092883263fe4fa54e47b9819697d7ddaffcb622f0a18d95df9b3c270119",
+   "outputs/posthoc/margin-rtest/laps/gw6-margin-s81/Austin.json": "a8155dd7b375f16286ef4e935c507cfd44e14aa72918336addd04bd8203d4ded",
+   "outputs/posthoc/margin-rtest/laps/gw6-margin-s81/Budapest.json": "11506faadc65de7bfc4b213a62d8b4fd97b3fea08dfc4dc5076b053b42e8f0a9",
+   "outputs/posthoc/margin-rtest/laps/gw6-margin-s81/MexicoCity.json": "11c3c95179be03803ce1b0487b25492523fe77d7ded017a8467d6f31aefa3a6b",
+   "outputs/posthoc/margin-rtest/laps/gw6-margin-s81/Montreal.json": "13dff5e46c5ad6044b2272496431746711b3a1bd8671d95deae8d75cb9ed63d4",
+   "outputs/posthoc/margin-rtest/laps/gw6-margin-s81/Monza.json": "8a98921c101782a6b52c14e8f8aa2687e38f62fb17b73058e49878de7f1f4c19",
+   "outputs/posthoc/margin-rtest/laps/gw6-margin-s81/Sakhir.json": "cb90959b1cd61c22a89357cb138690629810c7430baafd8bd4428d594efd7216",
+   "outputs/posthoc/margin-rtest/laps/gw6-margin-s81/SaoPaulo.json": "f39e37f24dc040eef069a8c51a15a9a9dd67df8adbb098d519fb7a2f8f67e22f",
+   "outputs/posthoc/margin-rtest/laps/gw6-margin-s81/Shanghai.json": "a9c66fca93457901af3927ba55b6dd35fc230a51d9f0bd310145ff265282562f",
+   "outputs/posthoc/margin-rtest/laps/gw6-margin-s81/Silverstone.json": "2959bff42117324d826431d6590facf31e96762d88cb0a229eca0200dfa1beb5",
+   "outputs/posthoc/margin-rtest/laps/gw6-margin-s81/Spa.json": "636330144bac969c690edd108d39158925ea903f5692f9c742491fe0e737d33b",
+   "outputs/posthoc/margin-rtest/laps/gw6-margin-s81/Spielberg.json": "f212d03f040fe0eabc8cac9a596896edc8417fe7164ec5b84a6f5a98e787b099",
+   "outputs/posthoc/margin-rtest/laps/gw6-margin-s81/Suzuka.json": "bbe95881e07a5ae23cac9acf11edaa163309d78dd264b1fc8812cdc8491ba8a2",
+   "outputs/posthoc/margin-rtest/laps/gw6-margin-s82/Austin.json": "85df0656f4a373cc45f31e1567738fb64b4562f3b4652c4924af841303c900e4",
+   "outputs/posthoc/margin-rtest/laps/gw6-margin-s82/Budapest.json": "78a9822a9024c53e7a12f42794f2dcbccfd455abb09d8f009f1a7af02b6176a5",
+   "outputs/posthoc/margin-rtest/laps/gw6-margin-s82/MexicoCity.json": "8358a2691376b8a6fbc5d201a80f7f1a913dfa90e62bb60db293dc367df7df7c",
+   "outputs/posthoc/margin-rtest/laps/gw6-margin-s82/Montreal.json": "07b92d34c87e64693935bf258e7d9ee5c23c2cb3e772dc8b18e79cd721a431b0",
+   "outputs/posthoc/margin-rtest/laps/gw6-margin-s82/Monza.json": "266f7a1bfdddc284dd9c6577123e2a66c9e5af8ba52aa12dd2314f43fcd68c8a",
+   "outputs/posthoc/margin-rtest/laps/gw6-margin-s82/Sakhir.json": "f2b72d91ba85e3fa8c406fef124a10784970a64b8d6274679853a54391344eab",
+   "outputs/posthoc/margin-rtest/laps/gw6-margin-s82/SaoPaulo.json": "41f8e4cb7dd3f70fab0dfcc4ef62ba9ebe65f15d99f334863faeea79b0b19cd8",
+   "outputs/posthoc/margin-rtest/laps/gw6-margin-s82/Shanghai.json": "07fc1e41d5cb32b81cbdf99903429820f78b1592b3252944a18a93b6ca0088ad",
+   "outputs/posthoc/margin-rtest/laps/gw6-margin-s82/Silverstone.json": "e868b1ff1c21ba7dadffee21cafde3fe43b602fb06d1487cb3d18fd4a92e3310",
+   "outputs/posthoc/margin-rtest/laps/gw6-margin-s82/Spa.json": "8e8810b5283df176620273c7d6c84ec001b425f5b9a528c0a7da09e5ed1eb38f",
+   "outputs/posthoc/margin-rtest/laps/gw6-margin-s82/Spielberg.json": "78e2159753e4e9ec5d5e47e65e556b6f889a0decd7ea935babc407edef369dc6",
+   "outputs/posthoc/margin-rtest/laps/gw6-margin-s82/Suzuka.json": "8a1ee3ea530f151b7c32009c13bedfd17bf758555cb704a0869760026c7598ff",
+   "outputs/posthoc/margin-rtest/laps/gw6-margin-s83/Austin.json": "1dbcd1f52515076253e523cb4f72f3dc41c9d146e1737eda433e299b15ce063a",
+   "outputs/posthoc/margin-rtest/laps/gw6-margin-s83/Budapest.json": "3a0662e04b0967b7b6c0a994529c734998e7aabc6503e3e7d8d1c35c95ef1ca0",
+   "outputs/posthoc/margin-rtest/laps/gw6-margin-s83/MexicoCity.json": "151335193dc5a84e620524be0cba6e4c0175afe17ebd37d0187269858d089f7e",
+   "outputs/posthoc/margin-rtest/laps/gw6-margin-s83/Montreal.json": "141f913feecb5251c8e56669ff0c647fb32df488c35d01d1a930261bbb2c3988",
+   "outputs/posthoc/margin-rtest/laps/gw6-margin-s83/Monza.json": "03eadd2950d9970be9e97b83e63973851113c55a45f7dabcdff555d28e40f53b",
+   "outputs/posthoc/margin-rtest/laps/gw6-margin-s83/Sakhir.json": "fbed8c376eeb8e3540c656f2efa27cc70b628347e4ae8fa5fadf5762d3823190",
+   "outputs/posthoc/margin-rtest/laps/gw6-margin-s83/SaoPaulo.json": "9948e7b39873a9c948d47eff37d8633407c9ccf34702054fe585a4e2244895b8",
+   "outputs/posthoc/margin-rtest/laps/gw6-margin-s83/Shanghai.json": "201be40cb9701fced4c4cb561209d5e37eff44b30ed4e39bd0b71856913dd31d",
+   "outputs/posthoc/margin-rtest/laps/gw6-margin-s83/Silverstone.json": "54f6825c3b00c9944f58d500a829b2f5d59dc3e3005b05706d4be066d4121bcb",
+   "outputs/posthoc/margin-rtest/laps/gw6-margin-s83/Spa.json": "9b956f68d6f6775c329aa7f08a066439e56c2c79a90b58ebfc80888a43b08a9e",
+   "outputs/posthoc/margin-rtest/laps/gw6-margin-s83/Spielberg.json": "45982c8e3b5eafb4bf17553312758d6fee4e4f5d9ba5ce2510225221623653d8",
+   "outputs/posthoc/margin-rtest/laps/gw6-margin-s83/Suzuka.json": "2b0acbedbc3b0c23071266646477fa5c9dced3b54cb61d0b1435b8aab6016f41",
+   "outputs/posthoc/margin-rtest/laps/gw6-margin-s84/Austin.json": "99625f22a9f82a63d24ca5e16834a010cc4809748cb8a752572ff1afa37be552",
+   "outputs/posthoc/margin-rtest/laps/gw6-margin-s84/Budapest.json": "c781c56b2f9fa380aecc0011d663275e80996c3773a2d4e40afc141dcd9a9ad5",
+   "outputs/posthoc/margin-rtest/laps/gw6-margin-s84/MexicoCity.json": "d80b63e4dd741b3a8c65d3522354e8f8e229d55106a32421b664d9c4e88a59fb",
+   "outputs/posthoc/margin-rtest/laps/gw6-margin-s84/Montreal.json": "a03c0ef93a6649b225bbfaaacb0a1fd44e8f1b71a66fd1c99797a0a55fbe9b64",
+   "outputs/posthoc/margin-rtest/laps/gw6-margin-s84/Monza.json": "3aed64b78c4d1762288c1e11c81aa0f519b3eecbfd7ba327900a69b3509cd412",
+   "outputs/posthoc/margin-rtest/laps/gw6-margin-s84/Sakhir.json": "5f086f7b3c06281f82e90dc463e3205157cba0ef059a82261a1115ab3501a5af",
+   "outputs/posthoc/margin-rtest/laps/gw6-margin-s84/SaoPaulo.json": "691ad69e19d9177d744a04a074e7599133111efd5eabb04d1593cc9076e01f9f",
+   "outputs/posthoc/margin-rtest/laps/gw6-margin-s84/Shanghai.json": "399d5261550a883d9cdfd57e576d04311f84633742461a96897ab29e0d9d09b6",
+   "outputs/posthoc/margin-rtest/laps/gw6-margin-s84/Silverstone.json": "6e81fcf77e87a8bbf65b6ef66922baa06fbc24fed0c903b88b96ded052cf67af",
+   "outputs/posthoc/margin-rtest/laps/gw6-margin-s84/Spa.json": "c31601d5bd4eecd3169fda0cc7b4b1e7872c93f671f1e1e8c24de308eebddb9c",
+   "outputs/posthoc/margin-rtest/laps/gw6-margin-s84/Spielberg.json": "7c73dd0f0d3021fe253479084e8604f455c8893c08908f8208239dd87e95bf6d",
+   "outputs/posthoc/margin-rtest/laps/gw6-margin-s84/Suzuka.json": "08461bb56407e5af518f67e5ed855b9c9054b2da1108e0c4b163d2096aca7426"
+  },
+  "argv": [
+   "scripts/lockbox.py",
+   "analyse"
+  ],
+  "start": "2026-11-26T00:59:00",
+  "end": "2026-11-26T00:59:01",
+  "seconds": 0.4,
+  "environment": {
+   "python": "3.12.4",
+   "jax": "0.11.2",
+   "numpy": "2.5.4",
+   "machine": "arm64",
+   "system": "Darwin",
+   "xla_flags": "--xla_cpu_multi_thread_eigen=false intra_op_parallelism_threads=2",
+   "nice": 0,
+   "cpu_count": 12
+  }
+ }
+}

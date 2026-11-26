@@ -14,16 +14,18 @@ Where the numbers come from
   (ties broken by the median gap closest to the headline), so the choice is a rule, not a
   pick.
 - Replays: POST HOC. The lockbox stored each completed lap's path at 2 m stations, but no
-  crash trace and no pedal or steering. Each replay is therefore a fresh single rollout of
-  the same checkpoint (sha256-checked against ``docs/prereg/protocol-v1-subjects.json``)
-  under run 0's protocol: n = 0, v = 0.9 x the reference speed, deterministic action. The
-  script stops unless every replay reproduces the stored run 0: the same outcome, and the
-  same lap time to 1 ms or the same crash station to 5 m.
+  crash trace and no pedal or steering. Each replay therefore reruns the lockbox's own lap
+  batch for the same checkpoint (sha256-checked against its subjects file) and keeps run 0's
+  full state: n = 0, v = 0.9 x the reference speed, deterministic action. The script stops
+  unless every replay reproduces the stored run 0: the same outcome, and the same lap time to
+  1 ms or the same crash station to 5 m. In practice they agree to a few microseconds.
+- The margin recipe, once ``scripts/margin_rtest.py`` has run: its median network's replays
+  the same way, and its scoreboard and result from ``outputs/posthoc/margin-rtest/``.
 - Charts: the committed result files of GW-3, GW-5, GW-6, GW-8, X-2/X-3 and E0's gate.
 
 Lockbox. ``protocol-v1`` was tagged and the lockbox ran once on 29 Oct 2026. Every later
-R_TEST run is POST HOC (protocol Section 2), and the page labels these replays so. No new
-subject, checkpoint or metric is evaluated here.
+R_TEST run is POST HOC (protocol Section 2), and the page labels these replays so. This
+script evaluates no new subject, checkpoint or metric: it replays runs that are on record.
 
 Output: ``docs/showcase/data.js``, which sets ``window.APEXZERO``. It holds TUMFTM-derived
 track geometry (LGPL-3.0), so it is git-ignored like the other demo exports.
@@ -39,6 +41,7 @@ import time
 from pathlib import Path
 
 import _bootstrap  # noqa: F401  (makes src/ importable)
+import lockbox as lb  # first, so JAX starts with the lockbox run's thread settings
 import numpy as np
 
 from apexzero.env import racing
@@ -227,6 +230,69 @@ def crash_facts(track, x_term, sectors, ref, margin: float) -> dict:
     return out
 
 
+def rollout_run0(policy_fn, track, v_start: float) -> export.PolicyRollout:
+    """The lockbox's lap batch again, keeping run 0's full state and applied action.
+
+    ``lockbox.rollout_laps`` step for step: the same ``PROTOCOL["laps"]`` runs with the same
+    jittered starts, the same vmapped step and the same hold of a finished car. A single-car
+    rollout compiles to a different float32 program and can drift from the stored lap (23 ms
+    on one circuit), so the batch is rerun whole and only what is recorded differs."""
+    import contextlib
+
+    import jax
+    import jax.numpy as jnp
+
+    from apexzero.vehicle.params import VehicleParams
+    from apexzero.vehicle.sim import track_arrays
+
+    lp = lb.PROTOCOL["laps"]
+    runs, laps = lp["runs"], lp["laps"]
+    float32 = getattr(jax, "enable_x64", None)
+    with float32(False) if float32 is not None else contextlib.nullcontext():
+        params = racing.EnvParams()
+        tr = track_arrays(track)
+        ctx = racing.default_context()
+        L = float(track.length)
+        max_steps = int(laps * 3.0 * L / max(v_start, 20.0) / params.dt) + 200
+        eval_params = params._replace(window_steps=10**9)
+        rng = np.random.default_rng(lp["seed"])
+        n0 = np.where(np.arange(runs) == 0, 0.0, rng.uniform(-1.0, 1.0, runs))
+        v0 = v_start * np.where(np.arange(runs) == 0, 1.0, rng.uniform(0.95, 1.05, runs))
+        x0 = np.zeros((runs, 8), np.float32)
+        x0[:, 1], x0[:, 3] = n0, v0
+
+        def init_state(x):
+            return racing.EnvState(x=x, prev_action=jnp.zeros(2), accel=jnp.zeros(2), ctx=ctx,
+                                   hidden_mu=jnp.array(1.0), t=jnp.zeros((), jnp.int32),
+                                   slow=jnp.zeros(()), s0=x[0])
+
+        states = jax.vmap(init_state)(jnp.asarray(x0))
+        p = racing.params_from_context(ctx)
+        obs = jax.vmap(lambda st: racing.observe(st, tr, p))(states)
+
+        @jax.jit
+        def run(states, obs):
+            def body(c, _):
+                st, ob, alive = c
+                a = policy_fn(ob)
+                ob2, st2, _, term, _, _ = jax.vmap(
+                    lambda s, aa: racing.step_no_reset(s, aa, tr, eval_params))(st, a)
+                alive2 = alive & ~term
+                st2 = jax.tree.map(lambda new, old: jnp.where(
+                    alive.reshape((-1,) + (1,) * (new.ndim - 1)), new, old), st2, st)
+                return (st2, ob2, alive2), (st2.x[0], jnp.clip(a[0], -1.0, 1.0), alive2[0])
+
+            return jax.lax.scan(body, (states, obs, jnp.ones(runs, bool)), None, max_steps)[1]
+
+        xs, acts, alive = (np.asarray(a) for a in run(states, obs))
+        p_np = VehicleParams(*[float(np.asarray(v)) for v in p])
+        return export.PolicyRollout(
+            t=np.arange(max_steps + 1) * params.dt,
+            x=np.vstack([x0[:1], xs]).astype(float), action=np.vstack([acts, acts[-1:]]).astype(float),
+            alive=np.r_[True, alive], laps=laps, v_start=float(v_start),
+            ctx=np.asarray(ctx, float), params=p_np)
+
+
 def replay(circuit: str, policy, start_fraction: float, stored: dict) -> dict:
     """One circuit: geometry, the optimum, the network's run, and how they compare."""
     track = refine_reference(load_tumftm(ROOT / "data" / "tracks" / "tumftm" / f"{circuit}.csv"))
@@ -241,7 +307,8 @@ def replay(circuit: str, policy, start_fraction: float, stored: dict) -> dict:
     if abs(v0 - stored["v_start"]) > 1e-9 * max(v0, 1.0):
         raise SystemExit(f"{circuit}: start speed {v0} differs from the lockbox's "
                          f"{stored['v_start']}")
-    ro = export.rollout_policy(policy, track, v0, laps=2, unsealed=True)
+    export.lockbox_guard(track.name, unsealed=True)     # R_TEST, after protocol-v1: POST HOC
+    ro = rollout_run0(policy, track, v0)
     completed = bool(ro.alive.all() and ro.x[:, 0].max() >= 2 * L)
     if completed != bool(stored["completed"][0]):
         raise SystemExit(f"{circuit}: the replay's outcome (completed={completed}) differs "

@@ -1,8 +1,9 @@
 # The showcase page
 
-`index.html` is one self-contained page: the final agent replayed on the 12 held-out circuits
-beside the optimal lap, the scoreboard of all five networks, and the project's main findings as
-charts. It has no build step and no dependency beyond two web fonts.
+`index.html` is one self-contained page: the final agent, and the margin recipe found after
+it, replayed on the 12 held-out circuits beside the optimal lap, the scoreboard of all five
+networks, and the project's main findings as charts. It has no build step and no dependency
+beyond two web fonts.
 
 Live: <https://adrian0729.github.io/apexzero/showcase/>
 
@@ -39,13 +40,17 @@ reference laps under `outputs/lockbox/ocp/`.
 
 - **Scoreboard and headline figures:** `outputs/lockbox/analysis.json`, the pre-registered
   `protocol-v1` analysis, read as it is.
-- **The network shown:** `e0-s52`, the median of the five by circuits completed (8 of 12). The
-  choice is a rule in `scripts/showcase.py`, not a pick.
-- **Replays: post hoc.** The lockbox stored each completed lap's path but no crash trace and no
-  pedal or steering, so each replay is a fresh single rollout of the same checkpoint under the
-  same protocol. The script stops unless every replay reproduces the stored run: the same
-  outcome, and the same lap time to 1 ms or the same crash station to 5 m. On the build of
-  25 Nov 2026 the largest differences were 0.83 ms and 0.06 m.
+- **The networks shown:** `e0-s52` for the final agent and `gw6-margin-s82` for the margin
+  recipe, each the median of its five by circuits completed (8 and 12 of 12). The choice is a
+  rule in `scripts/showcase.py`, not a pick.
+- **Replays: post hoc.** The stored runs keep each completed lap's path but no crash trace and
+  no pedal or steering. Each replay therefore reruns the lockbox's own ten-car lap batch for
+  the same checkpoint and keeps car 0's full state. The script stops unless every replay
+  reproduces the stored run: the same outcome, and the same lap time to 1 ms or the same crash
+  station to 5 m. On the build of 26 Nov 2026 all 24 replays agree with their stored laps to
+  within 3 microseconds.
+- **The margin recipe's numbers: post hoc.** `outputs/posthoc/margin-rtest/summary.json`, from
+  one run planned and predicted in advance ([findings](../findings/margin-rtest.md)).
 - **Charts:** the committed result files of GW-3, GW-5, GW-6, GW-8, X-2/X-3 and E0's gate.
 
 ## The geometry in `data.js`

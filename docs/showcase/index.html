@@ -225,7 +225,7 @@ footer { border-top: 1px solid var(--hair); padding-block: 1.6rem 2.6rem; }
     <div class="fact"><div class="num" id="factDone">8 of 12</div><div class="lab">unseen circuits completed by the median of five trained networks</div></div>
     <div class="fact"><div class="num" id="factGap">5.2%</div><div class="lab">slower than the optimal lap, on the laps it finishes</div></div>
   </div>
-  <p>Both targets were set before the test and both were missed. The rest of this page is what that miss taught: where the policy fails, why, and what fixed most of it.</p>
+  <p id="introNote">Both targets were set before the test and both were missed. The rest of this page is what that miss taught: where the policy fails, why, and what fixed most of it.</p>
 </section>
 
 <section id="replay" class="stack-lg">
@@ -995,7 +995,7 @@ function dialChart() {
   const R = D.margin.result, m = R.median, e = R.e0_median, t = R.circuits.test, mc = R.circuits.margin, ec = R.circuits.e0;
   $("#rtest").hidden = false;
   $("#fixNote").textContent = "These are the twelve development circuits, whose width profiles the track generator borrows, so they are not an independent test. The held-out circuits follow.";
-  const p = t.p_one_sided < 0.01 ? t.p_one_sided.toFixed(3) : t.p_one_sided.toFixed(2), a = mean(mc).toFixed(1), b = mean(ec).toFixed(1);
+  const p = t.p_one_sided < 0.1 ? t.p_one_sided.toFixed(3) : t.p_one_sided.toFixed(2), a = mean(mc).toFixed(1), b = mean(ec).toFixed(1);
   const verdict = {
     "the completion gain transfers": `The gain held: the margin networks complete ${a} circuits on average against the final agent's ${b} (exact permutation p = ${p}).`,
     "partly": `The margin networks complete more circuits, ${a} on average against ${b}, but five networks against five do not establish it (exact permutation p = ${p}).`,
@@ -1003,8 +1003,10 @@ function dialChart() {
   }[R.circuits.reading];
   const held = R.predictions.filter(x => x.held).length;
   $("#rtestText").textContent = "After the project closed, the margin recipe's five networks were run once on the twelve held-out circuits, with the plan and its predictions committed first. This is one look after the test was spent, not a second test. "
-    + verdict + ` ${held} of the ${R.predictions.length} predictions written down beforehand held.`;
+    + verdict + (held === R.predictions.length ? ` All ${held} predictions written down beforehand held.` : ` ${held} of the ${R.predictions.length} predictions written down beforehand held.`);
   const n = x => Number.isInteger(x) ? String(x) : x.toFixed(1);
+  if (R.circuits.reading === "the completion gain transfers")
+    $("#introNote").textContent = "Both targets were set before the test and both were missed. The rest of this page is what that miss taught: where the policy fails, why, and a change to training that, in one later look, took the median network from " + n(e.circuits_completed) + " of these circuits to " + n(m.circuits_completed) + ".";
   pair($("#rtestPair"), [[n(e.circuits_completed) + " to " + n(m.circuits_completed) + " of 12", "held-out circuits completed by the median network"],
                          [pct(e.median_gap) + " to " + pct(m.median_gap), "gap to the optimal lap, on the laps finished"]]);
   const eb = D.scoreboard, mb = D.margin.scoreboard, ring = mb.subjects.indexOf(D.margin.subject.name);

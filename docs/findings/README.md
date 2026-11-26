@@ -10,8 +10,8 @@ plan for existed. The label says how much weight a result carries:
 - **Pilot / descriptive:** decides nothing.
 
 Start with [lockbox.md](lockbox.md) for the headline result, then
-[psychophysics-step1.md](psychophysics-step1.md), [x2x3.md](x2x3.md) and [gw5.md](gw5.md) for
-why the agent fails and what helped. [../STATUS.md](../STATUS.md) has the whole story in order.
+[psychophysics-step1.md](psychophysics-step1.md), [x2x3.md](x2x3.md), [gw5.md](gw5.md) and
+[margin-rtest.md](margin-rtest.md) for why the agent fails and what helped. [../STATUS.md](../STATUS.md) has the whole story in order.
 
 ## The held-out test
 
@@ -46,7 +46,7 @@ why the agent fails and what helped. [../STATUS.md](../STATUS.md) has the whole 
 | [gw3.md](gw3.md), [gw4.md](gw4.md) | Confirmatory, `gw3-prereg-v1` | A width model fitted on one fold of circuits raises completion on the other fold (9.8 against 4.6), at 1.5 points of lap time. The pre-set rule then gives the final generator copied widths. |
 | [gw5.md](gw5.md) ([plan](gw5-plan.md)) | Exploratory | A 1.4 m training-only margin lifts completion from 8.0 to 10.6 at 200M steps and to 11.4 at 1B, for about one point of lap time. Local width bumps and a SimBa network do not help. |
 | [gw8.md](gw8.md) ([plan](gw8-plan.md)) | Exploratory | The margin is a dial: 1.2, 1.4 and 1.6 m complete 9.6, 10.8 and 11.4 circuits at rising lap-time cost. |
-| [margin-rtest-plan.md](margin-rtest-plan.md) | Post hoc, plan | The margin recipe's five networks on the 12 held-out circuits: the plan and its predictions, committed before the run. |
+| [margin-rtest.md](margin-rtest.md) ([plan](margin-rtest-plan.md)) | Post hoc | On the 12 held-out circuits the margin recipe's five networks complete 12, 12, 12, 10 and 11 against the final agent's 6, 10, 8, 10 and 7 (p = 0.012), at 6.3% off optimal against 5.2%. All five predictions held. |
 
 ## Critics and the costate
 

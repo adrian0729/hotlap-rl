@@ -58,11 +58,20 @@ a few metres and the line barely reacts
 
 **More training did not help. More room did.** Ending training runs 1.4 m from the edge
 instead of 1.0 m took the recipe from 7.2 to 11.4 of the 12 development circuits, for about
-one point of lap time ([margin rounds](docs/findings/gw5.md)). Those circuits lend the
-generator their width profiles, so they are not an independent test, and the recipe has not
-been run on the held-out circuits.
+one point of lap time ([margin rounds](docs/findings/gw5.md)).
 
 <img src="docs/showcase/img/ladder.png" alt="Development circuits completed, of 12: default generator 4.6, real width profiles 8.0, the same trained five times longer 7.2, plus a 1.4 m training margin 10.6, margin recipe trained five times longer 11.4; the pass mark is 10" width="620">
+
+**The gain held on the held-out circuits, in one later look.** Those development circuits
+lend the generator their width profiles, so they are not an independent test. After the
+project closed, the margin recipe's five networks were run once on the 12 held-out circuits,
+with the plan and its predictions committed first. They complete 12, 12, 12, 10 and 11
+circuits against the final agent's 6, 10, 8, 10 and 7 (exact permutation p = 0.012), and all
+five predictions held. Laps are 6.3% off optimal against the final agent's 5.2%: the recipe
+buys completion with lap time. This run is post hoc, not a second test
+([findings](docs/findings/margin-rtest.md)).
+
+<img src="docs/showcase/img/heldout-margin.png" alt="The 12 held-out circuits without and with the training margin: the median network goes from 8 to 12 circuits completed and from a 5.2% to a 6.3% gap to the optimal lap; a table shows which of five networks per recipe finish each circuit" width="720">
 
 Three smaller results:
 
@@ -78,9 +87,10 @@ Three smaller results:
 ## The showcase
 
 [docs/showcase](docs/showcase/README.md) is an interactive page: pick any of the 12 held-out
-circuits and watch the network's lap beside the optimal lap, with live speed, pedals, grip and
-time lost, the crashes included. Below the replay are the scoreboard of all five networks and
-the findings above as charts.
+circuits and watch a network's lap beside the optimal lap, with live speed, pedals, grip, time
+lost and the forty points of road the network sees, the crashes included. You can switch
+between the final agent and the margin recipe. Below the replay are the scoreboard of all
+five networks and the findings above as charts.
 
 ![A crash on a held-out circuit: the car reaches the inside edge of a hairpin](docs/showcase/img/replay-crash.png)
 
@@ -139,8 +149,10 @@ editable-install `.pth` file. Tests and scripts work around it; to fix the venv 
 
 ## Not done
 
-- The margin recipe has no held-out result. The lockbox is spent, so any run on those
-  circuits now would be post hoc.
+- The margin recipe's held-out result is one post hoc look. A clean confirmation would need
+  circuits that neither recipe has touched, and the circuit database has none left.
+- The lap-time target is still missed: 6.3% off optimal with the margin, 5.2% without,
+  against a target of 4%.
 - The policy still does not follow sharp edge changes. The margin works by keeping away from
   the edge, at a cost in lap time.
 - The planned paper's racing audit, the full drivers study and the wider demo were not run.

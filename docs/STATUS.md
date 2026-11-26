@@ -15,10 +15,12 @@ Section 11 records every decision round and the lead's notes on each round.
 - **The lockbox is spent** (`protocol-v1`, 29 Oct). On R_TEST, E0's median subject completes 66.7%
   of laps at a median gap of 5.16%, so H1 is refuted on both counts ([lockbox](findings/lockbox.md)).
   Any further use of R_TEST is POST HOC.
-- **The best recipe found since** (exploratory, R-dev only): a 1.4 m training-only margin. At 1B it
-  completes 11.4 of 12 R-dev circuits against E0's 7.2, for about 1 point of lap gap
-  ([gw5](findings/gw5.md) Section 5; the margin sweep in [gw8](findings/gw8.md)). E0 and the tags
-  are unchanged.
+- **The best recipe found since:** a 1.4 m training-only margin. At 1B it completes 11.4 of 12
+  R-dev circuits against E0's 7.2, for about 1 point of lap gap (exploratory;
+  [gw5](findings/gw5.md) Section 5; the margin sweep in [gw8](findings/gw8.md)).
+  **POST HOC on R_TEST (26 Nov):** its five networks complete 12, 12, 12, 10 and 11 of the 12
+  circuits against E0's 6, 10, 8, 10 and 7 (p 0.012), at a median gap of 6.33% against 5.16%
+  ([margin-rtest](findings/margin-rtest.md)). E0 and the tags are unchanged.
 - **Not pursued:** the paper, the drivers study and the wider demo.
 
 ## Wrap-up (25 Nov 2026)
@@ -29,10 +31,27 @@ Nothing was trained, and no study's result changed, after 30 Oct. The wrap-up ad
   scoreboard of all five networks and the main findings as charts.
   - Its scoreboard and headline figures are `outputs/lockbox/analysis.json` as it is.
   - Its replays are POST HOC. The lockbox stored no crash trace and no pedal or steering, so
-    each replay is a fresh single rollout of the registered checkpoint under run 0's protocol.
-    `scripts/showcase.py` stops unless each one reproduces the stored run 0. The largest
-    differences were 0.83 ms in lap time and 0.06 m in crash station.
-  - No new subject, checkpoint or metric was evaluated on R_TEST.
+    `scripts/showcase.py` reruns the lockbox's own lap batch for the registered checkpoint and
+    keeps run 0's full state. It stops unless each replay reproduces the stored run 0. They
+    agree to within 3 microseconds in lap time. (A first version rolled one car out alone,
+    which compiles to a different float32 program: it drifted by up to 0.83 ms on E0's laps
+    and by 23 ms on one of the margin network's, and the check caught it.)
+  - The showcase itself evaluates no new subject, checkpoint or metric on R_TEST.
+- **The margin recipe on R_TEST (POST HOC, 26 Nov 2026; the user asked for it;
+  [findings](findings/margin-rtest.md), [plan](findings/margin-rtest-plan.md)).** The plan, its
+  subjects, its predictions and its script were committed and pushed in `f0567ad` before the
+  run, and the script refuses to run otherwise.
+  - GW-6's five networks went through `scripts/lockbox.py`'s own lap protocol, behind its tag
+    gate, on the 12 originals, against the lockbox's stored references.
+  - **The completion gain transfers** by the plan's rule: 12, 12, 12, 10 and 11 circuits
+    against E0's 6, 10, 8, 10 and 7 (exact one-sided permutation p = 0.012). The median
+    network completes 12 of 12 and 100% of its laps.
+  - **The cost is lap time:** a median gap of 6.33% against E0's 5.16%. H1's completion part
+    is met and its gap part is not.
+  - All five predictions held. Of the 30 crashes in 600 runs, 20 are slips and 10 corridor
+    exits; E0's were all corridor exits.
+  - It is one look after the lockbox was spent. It is not a second lockbox, and H1 stays
+    refuted for E0.
 - **Indexes and a licence file:** [docs/README.md](README.md),
   [findings/README.md](findings/README.md), `scripts/README.md`, `paper/README.md` and `LICENSE`
   (Apache-2.0, as the README and `pyproject.toml` already said).
@@ -45,8 +64,8 @@ Nothing was trained, and no study's result changed, after 30 Oct. The wrap-up ad
 - **Tests.** The full suite ran on 25 Nov 2026: 2,065 passed, 7 skipped and 1 failed. The failure
   was `test_p4_b2.py::test_manifest_stage_rehearsal`, which rehearses a pre-tag stage that has
   refused to run since `p4-b2-prereg-v1` was placed on 27 Oct. It is now skipped once that tag
-  exists, as the costate tests already were. With the wrap-up's 14 new tests the suite has
-  2,087 tests in 92 files.
+  exists, as the costate tests already were. With the wrap-up's 15 new tests the suite has
+  2,088 tests in 92 files.
 - **The showcase is public** at <https://adrian0729.github.io/apexzero/showcase/>, by the user's
   decision of 26 Nov 2026 (see "Decisions taken" for what that changed about track geometry).
 
@@ -326,8 +345,10 @@ open:
   - the drivers case studies (DV-B is a no-go).
 - **Dropped:** BC-1, and CS-13 on T.
 - **Open and optional:**
-  - The margin recipe has been shown on R-dev only, where it is in-sample for widths. The lockbox
-    is spent, so any R_TEST check of the recipe would be POST HOC.
+  - The margin recipe's R_TEST result is one POST HOC look ([margin-rtest](findings/margin-rtest.md)).
+    A clean confirmation would need circuits neither recipe has touched; all 24 usable TUMFTM
+    circuits are in R-dev or R_TEST.
+  - The lap-time half of H1 is unmet by either recipe (5.16% and 6.33% against 4%).
   - The 1.6 m margin was not run at 1B.
   - E0 and the tags stay the frozen baseline.
 
