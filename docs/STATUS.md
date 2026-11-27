@@ -75,8 +75,12 @@ Nothing was trained, and no study's result changed, after 30 Oct. The wrap-up ad
     MIT and gave the project the public title "Hotlap RL". `LICENSE` is now the MIT text. The
     Apache-2.0 text moved beside the vendored JaxUED file, which stays under that licence, as
     the vendored SFL code does. `pyproject.toml` still declares Apache-2.0 and the package is
-    still `apexzero`, because `protocol-v1` pins both. The repository's address and the
-    documents written during the work keep the working name, ApexZero.
+    still `apexzero`, because `protocol-v1` pins both. The documents written during the work
+    keep the working name, ApexZero.
+  - The same day the repository was renamed from `apexzero` to `hotlap-rl`, at the user's
+    request, and the links in the README, the showcase and these notes were changed to
+    match. GitHub redirects the old repository address. The showcase's old address,
+    `adrian0729.github.io/apexzero/showcase/`, no longer answers.
 - **One defect, found and worked around.** `viz.sectors.carry_over_split` stops on Austin and Spa,
   where a sector boundary lands within 1e-12 m of a grid station. `scripts/showcase.py` snaps
   such boundaries first, with a test. The fix is not in `src/`, for the next reason.
@@ -98,7 +102,7 @@ Nothing was trained, and no study's result changed, after 30 Oct. The wrap-up ad
   - The full suite ran a third time on 26 Nov 2026, at `284ab3b` (the redesigned page and that
     fix), on a lightly loaded machine: 2,080 passed, 8 skipped and none failed, in 54 minutes.
     The costate end-to-end test took 361 s of its 600 s.
-- **The showcase is public** at <https://adrian0729.github.io/apexzero/showcase/>, by the user's
+- **The showcase is public** at <https://adrian0729.github.io/hotlap-rl/showcase/>, by the user's
   decision of 26 Nov 2026 (see "Decisions taken" for what that changed about track geometry).
 
 ## Built first (18–24 Oct)

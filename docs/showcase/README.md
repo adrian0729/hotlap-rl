@@ -5,7 +5,7 @@ it, replayed on the 12 held-out circuits beside the optimal lap, the scoreboard 
 networks, and the project's main findings as charts. It has no build step and no dependency
 beyond one family of web fonts (IBM Plex).
 
-Live: <https://adrian0729.github.io/apexzero/showcase/>
+Live: <https://adrian0729.github.io/hotlap-rl/showcase/>
 
 | File | What |
 |---|---|

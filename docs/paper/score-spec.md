@@ -20,7 +20,7 @@ This spec covers the six headline estimators, the two samplers, a table of devia
 | minimax | `facebookresearch/minimax` @ `2ae9e04d37f97d7c14308f5a26237dcfca63470f` | `src/minimax/util/rl/ued_scores.py`, `util/rl/rollout_storage.py`, `agents/ppo.py`, `models/common.py` |
 | MNA | `HarryMJMead/Dynamic-Environment-Generation-for-UED` @ `12340c7fe443278f4033bab977054af1e40b8188` | `minigrid/maze_plr.py`, `src/jaxued/utils.py`, `minigrid/config/main_plr.yaml` |
 | SFL | `amacrutherford/sampling-for-learnability` @ `8b14e2ec07b38dc33a9df476b84faa2f3ca5fd3b` | `sfl/train/minigrid_sfl.py`, `sfl/train/config/{minigrid-sfl,jaxnav-sfl}.yaml`, `config/learning/{ippo-minigrid,ippo-jaxnav}.yaml` |
-| Ours | `adrian0729/apexzero` @ `99ee5a0` | `src/apexzero/agents/ppo.py`, `src/apexzero/env/racing.py`, `src/apexzero/audit/rollouts.py` |
+| Ours | `adrian0729/hotlap-rl` @ `99ee5a0` | `src/apexzero/agents/ppo.py`, `src/apexzero/env/racing.py`, `src/apexzero/audit/rollouts.py` |
 
 Papers:
 - Robust PLR, arXiv 2110.02439, §4.2.

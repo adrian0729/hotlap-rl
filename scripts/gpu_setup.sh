@@ -10,7 +10,7 @@
 set -euo pipefail
 command -v uv >/dev/null || curl -LsSf https://astral.sh/uv/install.sh | sh
 export PATH="$HOME/.local/bin:$PATH"
-[ -d ~/apexzero ] || git clone https://github.com/adrian0729/apexzero.git ~/apexzero
+[ -d ~/apexzero ] || git clone https://github.com/adrian0729/hotlap-rl.git ~/apexzero
 cd ~/apexzero
 git pull --ff-only
 uv sync

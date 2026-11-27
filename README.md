@@ -10,12 +10,13 @@ the fastest lap the same car can physically drive.
 25 November 2026. Every study that was started has been run and written up.
 [docs/STATUS.md](docs/STATUS.md) tells the whole story in order.
 
-The project's working name was ApexZero. The repository, the Python package (`apexzero`) and
-the documents written during the work still use it.
+The project's working name was ApexZero. The Python package (`apexzero`) and the documents
+written during the work still use it. The repository was called `apexzero` until
+26 November 2026, and old links to it redirect here.
 
 ## Start here
 
-1. **Watch it drive.** The [live showcase](https://adrian0729.github.io/apexzero/showcase/)
+1. **Watch it drive.** The [live showcase](https://adrian0729.github.io/hotlap-rl/showcase/)
    replays the laps and walks through the findings.
 2. **Read the result.** The next three sections of this page.
 3. **Read the whole story.** [docs/STATUS.md](docs/STATUS.md), then any study in the
@@ -111,7 +112,7 @@ beside their charts, with a drawing of the network itself and of the loop that t
 
 ![The network and its training loop: 222 numbers in, three layers of 256 units, two commands out, and under it the reward, the critic and the update that ran only in training](docs/showcase/img/network.png)
 
-**Live: <https://adrian0729.github.io/apexzero/showcase/>**
+**Live: <https://adrian0729.github.io/hotlap-rl/showcase/>**
 
 ## How the work was done
 
